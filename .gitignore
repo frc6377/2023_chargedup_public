@@ -163,3 +163,4 @@ bin/
 
 # Howdybot added
 src/main/deploy/*.txt
+simgui*
