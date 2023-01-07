@@ -162,4 +162,4 @@ bin/
 *-window.json
 
 # Howdybot added
-deploy/*.txt
+src/main/deploy/*.txt
