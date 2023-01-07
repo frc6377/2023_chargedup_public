@@ -1,4 +1,4 @@
-package frc.robot.subsystem;
+package frc.robot.subsystems;
 
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
