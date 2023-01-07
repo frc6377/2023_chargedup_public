@@ -6,7 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.subsystem.DeploySubsystem;
+import frc.robot.subsystems.DeploySubsystem;
 
 public class RobotContainer {
   private final DeploySubsystem deploySubsystem = new DeploySubsystem();
