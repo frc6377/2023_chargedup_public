@@ -6,7 +6,7 @@
 
 To get started with Command-base, start with [What Is “Command-Based” Programming?](https://docs.wpilib.org/en/stable/docs/software/commandbased/what-is-command-based.html)
 
-Our repository attempts to follow the best practices listed in the document 
+Our repository attempts to follow the best practices listed in the document
 [Structuring a Command-Based Robot Project](https://docs.wpilib.org/en/stable/docs/software/commandbased/structuring-command-based-project.html).
 
 For organization guidelines read: [Organizing Command-Based Robot Projects](https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html).
@@ -58,4 +58,3 @@ Spotless can also be used as a CI check. The check is ran with `./gradlew spotle
 `./gradlew simulateNative` - Launches simulation for C++ projects
 
 `./gradlew vendordep` - Install vendordep JSON file from URL or local installation. See 3rd Party Libraries
-
