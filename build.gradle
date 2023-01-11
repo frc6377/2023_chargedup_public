@@ -197,18 +197,18 @@ tasks.register("writeComputerName") {
             ).text = outstream
 }
 
-tasks.register("writeBuildDate") {
-    def stdout = new ByteArrayOutputStream()
+// tasks.register("writeBuildDate") {
+//     def stdout = new ByteArrayOutputStream()
 
-    exec {
-        commandLine "date"
-        standardOutput = stdout
-    }
+//     exec {
+//         commandLine "date"
+//         standardOutput = stdout
+//     }
 
-    def outstream = stdout.toString().trim()
+//     def outstream = stdout.toString().trim()
 
-    new File(
-            projectDir.toString() + "/src/main/deploy",
-            "date.txt"
-            ).text = outstream
-}
+//     new File(
+//             projectDir.toString() + "/src/main/deploy",
+//             "date.txt"
+//             ).text = outstream
+// }
