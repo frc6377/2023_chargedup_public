@@ -28,4 +28,10 @@ public class EndAffectorSubsystem extends SubsystemBase {
     rightMotor.set(Constants.endAffectorIntakespeed);
     leftMotor.set(-Constants.endAffectorIntakespeed);
   }
+
+  public void halt() {
+
+    rightMotor.set(0);
+    leftMotor.set(0);
+  }
 }

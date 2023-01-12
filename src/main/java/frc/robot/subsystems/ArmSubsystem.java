@@ -14,9 +14,10 @@ public class ArmSubsystem extends SubsystemBase {
 
   public ArmSubsystem(int ID) {
 
+    motor = new CANSparkMax(ID, MotorType.kBrushless);
+
     encoder = motor.getEncoder();
     controller = motor.getPIDController();
-    motor = new CANSparkMax(ID, MotorType.kBrushless);
     motor.getPIDController().setFF(Constants.armKf);
     motor.getPIDController().setP(Constants.armKp);
 
