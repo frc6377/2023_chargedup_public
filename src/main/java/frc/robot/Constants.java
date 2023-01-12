@@ -72,4 +72,16 @@ public final class Constants {
   public static final int PIDSlotMotionProfile = 3;
 
   public static final double doubleEpsilon = 0.001;
+
+  public static final double armKp = 8.768571;
+  public static final double armKf = 3.133968;
+  public static final int armMaxvelo = 70;
+  public static final int armMaxAccel = 82;
+
+  public static final int armPositionLow = 1;
+  public static final int armPositionMid = 4;
+  public static final int armPositionHigh = 7;
+
+  public static final double endAffectorIntakespeed = 0.4;
+  public static final double endAffectorOutakespeed = 0.4;
 }

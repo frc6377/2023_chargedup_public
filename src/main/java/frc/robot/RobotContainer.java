@@ -16,7 +16,10 @@ public class RobotContainer {
     configureBindings();
   }
 
-  private void configureBindings() {}
+  private void configureBindings() {
+
+    
+  }
 
   public Command getAutonomousCommand() {
     // AutoRoutines should be used to add more auto routines that we'll execute.
