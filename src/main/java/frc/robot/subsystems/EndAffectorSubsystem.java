@@ -34,4 +34,10 @@ public class EndAffectorSubsystem extends SubsystemBase {
     rightMotor.set(0);
     leftMotor.set(0);
   }
+
+  public void idle() {
+
+    rightMotor.set(-Constants.endAffectorIdleSpeed);
+    leftMotor.set(Constants.endAffectorIdleSpeed);   
+  }
 }

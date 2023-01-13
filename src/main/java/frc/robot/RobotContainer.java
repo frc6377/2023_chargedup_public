@@ -16,7 +16,7 @@ public class RobotContainer {
   private final DeploySubsystem deploySubsystem = new DeploySubsystem();
   CommandXboxController controller = new CommandXboxController(0);
   ArmSubsystem arm = new ArmSubsystem(3);
-  EndAffectorSubsystem endAffector = new EndAffectorSubsystem(6, 8);
+  EndAffectorSubsystem endAffector = new EndAffectorSubsystem(9, 10);
 
   public RobotContainer() {
     deploySubsystem.Log();
@@ -30,7 +30,7 @@ public class RobotContainer {
     Trigger bButton = controller.b();
 
     aButton.whileTrue(
-        Commands.startEnd(() -> endAffector.intake(), () -> endAffector.halt(), endAffector));
+        Commands.startEnd(() -> endAffector.intake(), () -> endAffector.idle(), endAffector));
     bButton.whileTrue(
         Commands.startEnd(() -> endAffector.outake(), () -> endAffector.halt(), endAffector));
   }

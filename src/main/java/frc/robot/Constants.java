@@ -84,4 +84,5 @@ public final class Constants {
 
   public static final double endAffectorIntakespeed = 0.4;
   public static final double endAffectorOutakespeed = 0.4;
+  public static final double endAffectorIdleSpeed = 0.2;
 }
