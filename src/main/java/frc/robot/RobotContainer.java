@@ -56,7 +56,6 @@ public class RobotContainer {
     elevationButton.whileTrue(Commands.startEnd(() -> arm.sethHigh(), () -> arm.setLow(), arm));
     midButton.whileTrue(Commands.startEnd(() -> arm.setMid(), () -> arm.setLow(), arm));
   }
-  
 
   public Command getAutonomousCommand() {
     // AutoRoutines should be used to add more auto routines that we'll execute.
