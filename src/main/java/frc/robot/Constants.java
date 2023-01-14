@@ -73,16 +73,16 @@ public final class Constants {
 
   public static final double doubleEpsilon = 0.001;
 
-  public static final double armKp = 8.768571;
-  public static final double armKf = 3.133968;
-  public static final int armMaxvelo = 70;
-  public static final int armMaxAccel = 82;
+  public static final double armKp = 5e-5*10;
+  public static final double armKf = 0.000156*10;
+  public static final int armMaxvelo = 2;
+  public static final int armMaxAccel = 1;
 
-  public static final int armPositionLow = 1;
-  public static final int armPositionMid = 4;
-  public static final int armPositionHigh = 7;
+  public static final double armPositionLow = -1  ;
+  public static final double armPositionMid = -10.428622245788574 - 3;
+  public static final double armPositionHigh = -1;
 
   public static final double endAffectorIntakespeed = 0.4;
-  public static final double endAffectorOutakespeed = 0.4;
+  public static final double endAffectorOutakespeed = 0.2;
   public static final double endAffectorIdleSpeed = 0.2;
 }

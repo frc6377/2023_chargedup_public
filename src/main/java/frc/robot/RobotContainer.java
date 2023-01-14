@@ -15,7 +15,7 @@ import frc.robot.subsystems.EndAffectorSubsystem;
 public class RobotContainer {
   private final DeploySubsystem deploySubsystem = new DeploySubsystem();
   CommandXboxController controller = new CommandXboxController(0);
-  ArmSubsystem arm = new ArmSubsystem(3);
+  ArmSubsystem arm = new ArmSubsystem(11);
   EndAffectorSubsystem endAffector = new EndAffectorSubsystem(9, 10);
 
   public RobotContainer() {
@@ -26,13 +26,18 @@ public class RobotContainer {
 
   private void configureBindings() {
 
-    Trigger aButton = controller.a();
-    Trigger bButton = controller.b();
+    Trigger intakeButton = controller.leftTrigger(0.3);
+    Trigger shootButton = controller.rightTrigger(0.3);
+    Trigger elevationButton = controller.a();
 
-    aButton.whileTrue(
+    intakeButton.whileTrue(
         Commands.startEnd(() -> endAffector.intake(), () -> endAffector.idle(), endAffector));
-    bButton.whileTrue(
+    shootButton.whileTrue(
         Commands.startEnd(() -> endAffector.outake(), () -> endAffector.halt(), endAffector));
+    elevationButton.whileTrue(
+      Commands.startEnd(() -> arm.setMid(), () -> arm.setLow(), arm));
+    
+
   }
 
   public Command getAutonomousCommand() {

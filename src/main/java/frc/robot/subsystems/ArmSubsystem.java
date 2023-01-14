@@ -4,6 +4,9 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.SparkMaxRelativeEncoder;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -15,30 +18,44 @@ public class ArmSubsystem extends SubsystemBase {
   public ArmSubsystem(int ID) {
 
     motor = new CANSparkMax(ID, MotorType.kBrushless);
-
-    encoder = motor.getEncoder();
+    motor.restoreFactoryDefaults();
+    encoder = motor.getEncoder(SparkMaxRelativeEncoder.Type.kHallSensor, 42);
     controller = motor.getPIDController();
-    motor.getPIDController().setFF(Constants.armKf);
-    motor.getPIDController().setP(Constants.armKp);
+    
+    controller.setFF(0);
+    controller.setP(0.045);
+    controller.setI(0);
+    controller.setD(1);
+    controller.setIZone(0);
+
+    // controller.setOutputRange(-1, 1);
+
+
+    controller.setFeedbackDevice(encoder);
 
     motor.setSmartCurrentLimit(40);
     controller.setSmartMotionMaxVelocity(Constants.armMaxvelo, 0);
     controller.setSmartMotionMaxAccel(Constants.armMaxAccel, 0);
   }
 
-  private void setLow() {
+  @Override
+  public void periodic(){
+    System.out.println(encoder.getPosition());
+  }
+  
+  public void setLow() {
     setPosition(Constants.armPositionLow);
   }
 
-  private void setMid() {
+  public void setMid() {
     setPosition(Constants.armPositionMid);
   }
 
-  private void sethHigh() {
+  public void sethHigh() {
     setPosition(Constants.armPositionHigh);
   }
 
-  private void setPosition(int position) {
-    controller.setReference(position, CANSparkMax.ControlType.kSmartMotion);
+  private void setPosition(double position) {
+    controller.setReference(position, CANSparkMax.ControlType.kPosition);
   }
 }
