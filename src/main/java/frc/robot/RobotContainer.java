@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -12,15 +14,33 @@ import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DeploySubsystem;
 import frc.robot.subsystems.EndAffectorSubsystem;
 
+import frc.robot.commands.DefaultDriveCommand;
+import frc.robot.subsystems.DeploySubsystem;
+import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
+import frc.robot.subsystems.fieldPositioningSystem.FieldPositioningSystem;
+
 public class RobotContainer {
+  // Input controllers
+  private final XboxController driveController = new XboxController(0);
+
+  // Subsystems
   private final DeploySubsystem deploySubsystem = new DeploySubsystem();
   CommandXboxController controller = new CommandXboxController(0);
   ArmSubsystem arm = new ArmSubsystem(11);
   EndAffectorSubsystem endAffector = new EndAffectorSubsystem(9, 10);
 
+  private final FieldPositioningSystem fieldPositioningSystem = new FieldPositioningSystem();
+  private final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem(null);
+
   public RobotContainer() {
     deploySubsystem.Log();
-
+    drivetrainSubsystem.setDefaultCommand(
+        new DefaultDriveCommand(
+            drivetrainSubsystem,
+            () -> MathUtil.applyDeadband(-driveController.getLeftY(), 0.05),
+            () -> MathUtil.applyDeadband(-driveController.getLeftX(), 0.05),
+            () -> MathUtil.applyDeadband(driveController.getRightX(), 0.05),
+            () -> fieldPositioningSystem.getCurrentRobotRotationXY()));
     configureBindings();
   }
 

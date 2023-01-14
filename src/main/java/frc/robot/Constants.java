@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import frc.robot.subsystems.drivetrain.config.PodName;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -85,4 +87,27 @@ public final class Constants {
   public static final double endAffectorIntakespeed = 0.4;
   public static final double endAffectorOutakespeed = 0.2;
   public static final double endAffectorIdleSpeed = 0.2;
+
+  /**
+   * The left-to-right distance between the drivetrain wheels
+   *
+   * <p>Should be measured from center to center.
+   */
+  public static final double DRIVETRAIN_TRACKWIDTH_METERS = 0.62865;
+  /**
+   * The front-to-back distance between the drivetrain wheels.
+   *
+   * <p>Should be measured from center to center.
+   */
+  public static final double DRIVETRAIN_WHEELBASE_METERS = 0.62865;
+
+  public static final int DRIVETRAIN_PIGEON_ID = 1;
+
+  public static final PodName FRONT_LEFT_POD_NAME = PodName.B;
+
+  public static final PodName FRONT_RIGHT_POD_NAME = PodName.C;
+
+  public static final PodName BACK_LEFT_POD_NAME = PodName.A;
+
+  public static final PodName BACK_RIGHT_POD_NAME = PodName.D;
 }
