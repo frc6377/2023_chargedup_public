@@ -5,8 +5,6 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.SparkMaxRelativeEncoder;
-
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -21,7 +19,7 @@ public class ArmSubsystem extends SubsystemBase {
     motor.restoreFactoryDefaults();
     encoder = motor.getEncoder(SparkMaxRelativeEncoder.Type.kHallSensor, 42);
     controller = motor.getPIDController();
-    
+
     controller.setFF(0);
     controller.setP(0.045);
     controller.setI(0);
@@ -29,7 +27,6 @@ public class ArmSubsystem extends SubsystemBase {
     controller.setIZone(0);
 
     // controller.setOutputRange(-1, 1);
-
 
     controller.setFeedbackDevice(encoder);
 
@@ -39,10 +36,10 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   @Override
-  public void periodic(){
+  public void periodic() {
     System.out.println(encoder.getPosition());
   }
-  
+
   public void setLow() {
     setPosition(Constants.armPositionLow);
   }

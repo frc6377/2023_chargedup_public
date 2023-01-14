@@ -10,12 +10,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.DefaultDriveCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DeploySubsystem;
 import frc.robot.subsystems.EndAffectorSubsystem;
-
-import frc.robot.commands.DefaultDriveCommand;
-import frc.robot.subsystems.DeploySubsystem;
 import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
 import frc.robot.subsystems.fieldPositioningSystem.FieldPositioningSystem;
 
@@ -39,7 +37,7 @@ public class RobotContainer {
             drivetrainSubsystem,
             () -> MathUtil.applyDeadband(-driveController.getLeftY(), 0.05),
             () -> MathUtil.applyDeadband(-driveController.getLeftX(), 0.05),
-            () -> MathUtil.applyDeadband(driveController.getRightX(), 0.05),
+            () -> MathUtil.applyDeadband(-driveController.getRightX(), 0.05),
             () -> fieldPositioningSystem.getCurrentRobotRotationXY()));
     configureBindings();
   }
@@ -49,16 +47,16 @@ public class RobotContainer {
     Trigger intakeButton = controller.leftTrigger(0.3);
     Trigger shootButton = controller.rightTrigger(0.3);
     Trigger elevationButton = controller.a();
+    Trigger midButton = controller.x();
 
     intakeButton.whileTrue(
         Commands.startEnd(() -> endAffector.intake(), () -> endAffector.idle(), endAffector));
     shootButton.whileTrue(
         Commands.startEnd(() -> endAffector.outake(), () -> endAffector.halt(), endAffector));
-    elevationButton.whileTrue(
-      Commands.startEnd(() -> arm.setMid(), () -> arm.setLow(), arm));
-    
-
+    elevationButton.whileTrue(Commands.startEnd(() -> arm.sethHigh(), () -> arm.setLow(), arm));
+    midButton.whileTrue(Commands.startEnd(() -> arm.setMid(), () -> arm.setLow(), arm));
   }
+  
 
   public Command getAutonomousCommand() {
     // AutoRoutines should be used to add more auto routines that we'll execute.

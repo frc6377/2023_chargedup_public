@@ -15,6 +15,9 @@ public class EndAffectorSubsystem extends SubsystemBase {
 
     leftMotor = new CANSparkMax(leftID, MotorType.kBrushless);
     rightMotor = new CANSparkMax(rightID, MotorType.kBrushless);
+
+    leftMotor.setSmartCurrentLimit(40);
+    rightMotor.setSmartCurrentLimit(20);
   }
 
   public void intake() {
@@ -25,8 +28,8 @@ public class EndAffectorSubsystem extends SubsystemBase {
 
   public void outake() {
 
-    rightMotor.set(Constants.endAffectorIntakespeed);
-    leftMotor.set(-Constants.endAffectorIntakespeed);
+    rightMotor.set(Constants.endAffectorOutakespeed);
+    leftMotor.set(-Constants.endAffectorOutakespeed);
   }
 
   public void halt() {
@@ -38,6 +41,6 @@ public class EndAffectorSubsystem extends SubsystemBase {
   public void idle() {
 
     rightMotor.set(-Constants.endAffectorIdleSpeed);
-    leftMotor.set(Constants.endAffectorIdleSpeed);   
+    leftMotor.set(Constants.endAffectorIdleSpeed);
   }
 }
