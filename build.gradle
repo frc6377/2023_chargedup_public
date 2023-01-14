@@ -142,6 +142,11 @@ tasks.withType(JavaCompile) {
     options.compilerArgs.add '-XDstringConcat=inline'
 }
 
+test {
+    useJUnitPlatform()
+    systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
+}
+
 tasks.register("writeBranchName") {
     // Define an output stream to write to instead of terminal
     def stdout = new ByteArrayOutputStream()
