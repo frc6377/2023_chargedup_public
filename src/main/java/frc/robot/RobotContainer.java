@@ -20,10 +20,10 @@ import frc.robot.subsystems.fieldPositioningSystem.FieldPositioningSystem;
 public class RobotContainer {
   // Input controllers
   private final XboxController driveController = new XboxController(0);
-
   // Subsystems
   private final DeploySubsystem deploySubsystem = new DeploySubsystem();
-  CommandXboxController controller = new CommandXboxController(0);
+  CommandXboxController driver = new CommandXboxController(0);
+  CommandXboxController gunner = new CommandXboxController(1);
   ArmSubsystem arm = new ArmSubsystem(11);
   EndAffectorSubsystem endAffector = new EndAffectorSubsystem(9, 10);
 
@@ -44,17 +44,24 @@ public class RobotContainer {
 
   private void configureBindings() {
 
-    Trigger intakeButton = controller.leftTrigger(0.3);
-    Trigger shootButton = controller.rightTrigger(0.3);
-    Trigger elevationButton = controller.a();
-    Trigger midButton = controller.x();
+    Trigger intakeButton = driver.leftTrigger(0.3);
+    Trigger shootButton = driver.rightTrigger(0.3);
+
+    Trigger gunnerHighButton = gunner.a();
+    Trigger gunnerMidButton = gunner.x();
+    Trigger driverHighButton = driver.a();
+    Trigger driverMidButton = driver.x();
 
     intakeButton.whileTrue(
         Commands.startEnd(() -> endAffector.intake(), () -> endAffector.idle(), endAffector));
     shootButton.whileTrue(
         Commands.startEnd(() -> endAffector.outake(), () -> endAffector.halt(), endAffector));
-    elevationButton.whileTrue(Commands.startEnd(() -> arm.sethHigh(), () -> arm.setLow(), arm));
-    midButton.whileTrue(Commands.startEnd(() -> arm.setMid(), () -> arm.setLow(), arm));
+    gunnerHighButton
+        .or(driverHighButton)
+        .whileTrue(Commands.startEnd(() -> arm.sethHigh(), () -> arm.setLow(), arm));
+    gunnerMidButton
+        .or(driverMidButton)
+        .whileTrue(Commands.startEnd(() -> arm.setMid(), () -> arm.setLow(), arm));
   }
 
   public Command getAutonomousCommand() {
