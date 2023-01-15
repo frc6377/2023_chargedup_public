@@ -117,6 +117,8 @@ spotless {
         indentWithSpaces(2)
         endWithNewline()
     }
+
+    lineEndings 'UNIX'
 }
 
 // Simulation configuration (e.g. environment variables).
