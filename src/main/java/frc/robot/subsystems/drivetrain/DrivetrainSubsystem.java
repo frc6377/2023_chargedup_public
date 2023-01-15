@@ -225,6 +225,24 @@ public class DrivetrainSubsystem extends SubsystemBase {
     return states;
   }
 
+  public ChassisSpeeds getChassisSpeeds() {
+    return m_kinematics.toChassisSpeeds(
+        new SwerveModuleState[] {
+          new SwerveModuleState(
+              m_frontLeftModule.getDriveVelocity(),
+              new Rotation2d(m_frontLeftModule.getSteerAngle())),
+          new SwerveModuleState(
+              m_frontRightModule.getDriveVelocity(),
+              new Rotation2d(m_frontRightModule.getSteerAngle())),
+          new SwerveModuleState(
+              m_backLeftModule.getDriveVelocity(),
+              new Rotation2d(m_backLeftModule.getSteerAngle())),
+          new SwerveModuleState(
+              m_backRightModule.getDriveVelocity(),
+              new Rotation2d(m_backRightModule.getSteerAngle()))
+        });
+  }
+
   @Override
   public void periodic() {
     SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
