@@ -58,7 +58,7 @@ public class RobotContainer {
         Commands.startEnd(() -> endAffector.outake(), () -> endAffector.halt(), endAffector));
     gunnerHighButton
         .or(driverHighButton)
-        .whileTrue(Commands.startEnd(() -> arm.sethHigh(), () -> arm.setLow(), arm));
+        .whileTrue(Commands.startEnd(() -> arm.setHigh(), () -> arm.setLow(), arm));
     gunnerMidButton
         .or(driverMidButton)
         .whileTrue(Commands.startEnd(() -> arm.setMid(), () -> arm.setLow(), arm));

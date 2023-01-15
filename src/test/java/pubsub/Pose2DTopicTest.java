@@ -7,7 +7,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.networktables.Topics;
 import org.junit.jupiter.api.Test;
 
-public class JsonPublisherTest {
+public class Pose2DTopicTest {
   @Test // marks this method as a test
   void publish_subscribe() {
     var expected = new Pose2d(6.0, 7.0, new Rotation2d(8.0));
