@@ -32,6 +32,10 @@ public class RobotContainer {
 
   public RobotContainer() {
     deploySubsystem.Log();
+
+    fieldPositioningSystem.setDriveTrainSupplier(
+        () -> drivetrainSubsystem.getOdometry(), drivetrainSubsystem.getKinematics());
+
     drivetrainSubsystem.setDefaultCommand(
         new DefaultDriveCommand(
             drivetrainSubsystem,

@@ -14,7 +14,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
@@ -206,19 +205,19 @@ public class DrivetrainSubsystem extends SubsystemBase {
     m_field2d.getObject("traj").setTrajectory(traj);
   }
 
-  private SwerveModulePosition[] getOdometry() {
-    SwerveModulePosition[] states =
-        new SwerveModulePosition[] {
-          new SwerveModulePosition(
+  public SwerveModuleState[] getOdometry() {
+    SwerveModuleState[] states =
+        new SwerveModuleState[] {
+          new SwerveModuleState(
               m_frontLeftModule.getDriveVelocity(),
               new Rotation2d(m_frontLeftModule.getSteerAngle())),
-          new SwerveModulePosition(
+          new SwerveModuleState(
               m_frontRightModule.getDriveVelocity(),
               new Rotation2d(m_frontRightModule.getSteerAngle())),
-          new SwerveModulePosition(
+          new SwerveModuleState(
               m_backLeftModule.getDriveVelocity(),
               new Rotation2d(m_backLeftModule.getSteerAngle())),
-          new SwerveModulePosition(
+          new SwerveModuleState(
               m_backRightModule.getDriveVelocity(),
               new Rotation2d(m_backRightModule.getSteerAngle())),
         };

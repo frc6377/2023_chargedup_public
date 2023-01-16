@@ -1,0 +1,38 @@
+package frc.robot.subsystems.fieldPositioningSystem;
+
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
+
+class CameraInformation {
+  private String name;
+  private Pose3d cameraLocation;
+  /**
+   * Coordinates are in meters relative to robot center.
+   *
+   * @param name Name of the camera in the PhotonUI
+   * @param x x of the camera relative to robot center in meters
+   * @param y y of the camera relative to robot center in meters
+   * @param z z of the camera relative to robot center in meters
+   * @param yaw yaw of the camera relative to robot center in radians
+   * @param pitch pitch of the camera relative to robot center in radians
+   */
+  public CameraInformation(
+      final String name,
+      final double x,
+      final double y,
+      final double z,
+      final double yaw,
+      final double pitch) {
+    this.name = name;
+    cameraLocation = new Pose3d(new Translation3d(x, y, z), new Rotation3d(0, pitch, yaw));
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public Pose3d getCameraLocation() {
+    return cameraLocation;
+  }
+}
