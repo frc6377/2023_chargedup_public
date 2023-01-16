@@ -6,9 +6,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -22,12 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.function.Supplier;
-import org.photonvision.PhotonCamera;
-import org.photonvision.targeting.PhotonPipelineResult;
-import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class FieldPositioningSystem extends SubsystemBase {
 
@@ -231,111 +224,6 @@ public class FieldPositioningSystem extends SubsystemBase {
                 camInfo.getCameraLocation(), aprilTagFieldLayout, camInfo.getName());
       }
       FPS.setCameras(interperters);
-    }
-  }
-
-  private class CameraInterperter {
-    private Pose3d[] lastMeasuredPoseAtTagID = new Pose3d[9];
-    private final Pose3d cameraPosition;
-    private final AprilTagFieldLayout aprilTagLayout;
-    private final PhotonCamera photonCamera;
-
-    public CameraInterperter(
-        Pose3d cameraPosition, AprilTagFieldLayout aprilTagLayout, String cameraName) {
-      this.cameraPosition = cameraPosition;
-      this.aprilTagLayout = aprilTagLayout;
-      photonCamera = new PhotonCamera(cameraName);
-    }
-
-    public VisionMeasurement[] measure() {
-      AprilTagRead[] aprilTagRelativeLocations = readAprilTags();
-      if (aprilTagRelativeLocations == null) return new VisionMeasurement[0];
-
-      LinkedList<VisionMeasurement> visionMeasurements = new LinkedList<>();
-
-      for (AprilTagRead apriltagRead : aprilTagRelativeLocations) {
-        int tagID = apriltagRead.id;
-        Pose3d aprilTagAbsoluteLocation = aprilTagLayout.getTagPose(tagID).get();
-
-        Pose3d cameraPos = calculateCameraPoseOnField(aprilTagAbsoluteLocation, apriltagRead.tag);
-
-        Pose3d robotPose = calculateRobotPositionFromCameraPosition(cameraPos);
-
-        double stDev = calculateSTDevOfMeasure(robotPose, lastMeasuredPoseAtTagID[tagID - 1]);
-
-        VisionMeasurement measurement =
-            new VisionMeasurement(robotPose, stDev, apriltagRead.timeRecorded);
-        visionMeasurements.add(measurement);
-
-        lastMeasuredPoseAtTagID[tagID - 1] = robotPose;
-      }
-
-      return visionMeasurements.toArray(new VisionMeasurement[0]);
-    }
-
-    private double lastestTimeStamp = 0;
-
-    private AprilTagRead[] readAprilTags() {
-      PhotonPipelineResult pipelineResult = photonCamera.getLatestResult();
-      if (!pipelineResult.hasTargets() || lastestTimeStamp == pipelineResult.getTimestampSeconds())
-        return null;
-      lastestTimeStamp = pipelineResult.getTimestampSeconds();
-
-      List<PhotonTrackedTarget> targets = pipelineResult.getTargets();
-      LinkedList<AprilTagRead> output = new LinkedList<>();
-
-      for (PhotonTrackedTarget target : targets) {
-        output.add(
-            new AprilTagRead(
-                target.getBestCameraToTarget(),
-                target.getFiducialId(),
-                pipelineResult.getTimestampSeconds()));
-      }
-
-      return output.toArray(new AprilTagRead[0]);
-    }
-
-    private Pose3d calculateCameraPoseOnField(
-        Pose3d tagAbsolutePositionOnField, Transform3d tagRelativeLocationToCamera) {
-
-      Pose3d cameraPose3d = tagAbsolutePositionOnField.plus(tagRelativeLocationToCamera);
-
-      return cameraPose3d;
-    }
-
-    private Pose3d calculateRobotPositionFromCameraPosition(Pose3d cameraComputedLocation) {
-      Transform3d subtraction = new Pose3d().minus(cameraPosition);
-      Pose3d cameraPose3d = cameraComputedLocation.transformBy(subtraction);
-
-      return cameraPose3d;
-    }
-
-    private double calculateSTDevOfMeasure(Pose3d robotPose, Pose3d previousMeasure) {
-      return 0.1;
-    }
-
-    private class AprilTagRead {
-      public final Transform3d tag;
-      public final double timeRecorded;
-      public final int id;
-
-      public AprilTagRead(Transform3d tag, int id, double timeRecorded) {
-        this.tag = tag;
-        this.id = id;
-        this.timeRecorded = timeRecorded;
-      }
-    }
-  }
-
-  private class VisionMeasurement {
-    private Pose3d measurement;
-    private double stdev;
-    private double timeRecorded;
-
-    public VisionMeasurement(Pose3d measurement, double stdev, double timeRecorded) {
-      this.measurement = measurement;
-      this.timeRecorded = timeRecorded;
-      this.stdev = stdev;
     }
   }
 }
