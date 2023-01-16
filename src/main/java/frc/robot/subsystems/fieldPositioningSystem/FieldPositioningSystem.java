@@ -25,7 +25,7 @@ import java.util.function.Supplier;
 public class FieldPositioningSystem extends SubsystemBase {
 
   private final Field2d field = new Field2d();
-  private final AprilTagFieldLayout aprilTagFieldLayout;
+  final AprilTagFieldLayout aprilTagFieldLayout;
 
   private Pose2d currentRobotPose;
   private Pigeon2 inertialMeasurementUnit;
@@ -59,7 +59,7 @@ public class FieldPositioningSystem extends SubsystemBase {
 
     SmartDashboard.putData("Field", field);
 
-    new FPSHardware().configure(this, new FPSConfiguration());
+    new FPSHardware(this).configure(this, new FPSConfiguration());
     currentRobotPose = new Pose2d();
   }
 
@@ -205,25 +205,5 @@ public class FieldPositioningSystem extends SubsystemBase {
 
     swerveDriveOdometry.update(
         Rotation2d.fromDegrees(inertialMeasurementUnit.getYaw()), currentSwervePodPosition);
-  }
-
-  private class FPSHardware {
-    public void configure(FieldPositioningSystem FPS, FPSConfiguration config) {
-      configCameras(FPS, config);
-
-      Pigeon2 pig = new Pigeon2(0);
-      FPS.setPigeon2(pig);
-    }
-
-    private void configCameras(FieldPositioningSystem FPS, FPSConfiguration config) {
-      CameraInterperter[] interperters = new CameraInterperter[config.cameraInformations.length];
-      for (int i = 0; i < config.cameraInformations.length; i++) {
-        CameraInformation camInfo = config.cameraInformations[i];
-        interperters[i] =
-            new CameraInterperter(
-                camInfo.getCameraLocation(), aprilTagFieldLayout, camInfo.getName());
-      }
-      FPS.setCameras(interperters);
-    }
   }
 }

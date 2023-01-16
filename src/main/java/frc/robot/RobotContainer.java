@@ -50,7 +50,6 @@ public class RobotContainer {
 
     Trigger intakeButton = driver.leftTrigger(0.3);
     Trigger shootButton = driver.rightTrigger(0.3);
-
     Trigger gunnerHighButton = gunner.a();
     Trigger gunnerMidButton = gunner.x();
     Trigger driverHighButton = driver.a();
@@ -58,10 +57,22 @@ public class RobotContainer {
 
     intakeButton.whileTrue(
         Commands.startEnd(() -> endAffector.intake(), () -> endAffector.idle(), endAffector));
-    shootButton.whileTrue(
-        Commands.startEnd(() -> endAffector.outake(), () -> endAffector.halt(), endAffector));
-    gunnerHighButton
-        .or(driverHighButton)
+
+    // This watches for the buttons to be pressed then released,
+    // thereby making the arm extend quickly.
+    shootButton
+        .and(gunnerMidButton.or(driverMidButton).negate())
+        .whileTrue(
+            Commands.startEnd(
+                () -> endAffector.fastOutake(), () -> endAffector.halt(), endAffector));
+    // This watches for the buttons to be pressed and held, thereby making the arm extend slowly.
+    shootButton
+        .and(gunnerMidButton.or(driverMidButton))
+        .whileTrue(
+            Commands.startEnd(
+                () -> endAffector.slowOutake(), () -> endAffector.halt(), endAffector));
+    gunnerMidButton
+        .or(driverMidButton)
         .whileTrue(Commands.startEnd(() -> arm.setHigh(), () -> arm.setLow(), arm));
     gunnerMidButton
         .or(driverMidButton)

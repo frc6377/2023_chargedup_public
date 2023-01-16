@@ -26,10 +26,16 @@ public class EndAffectorSubsystem extends SubsystemBase {
     leftMotor.set(Constants.endAffectorIntakespeed);
   }
 
-  public void outake() {
+  public void fastOutake() {
 
     rightMotor.set(Constants.endAffectorOutakespeed);
     leftMotor.set(-Constants.endAffectorOutakespeed);
+  }
+
+  public void slowOutake() {
+
+    rightMotor.set(Constants.endAffectorSlowOutakespeed);
+    leftMotor.set(-Constants.endAffectorSlowOutakespeed);
   }
 
   public void halt() {

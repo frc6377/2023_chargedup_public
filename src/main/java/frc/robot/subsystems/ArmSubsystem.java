@@ -5,12 +5,15 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.SparkMaxRelativeEncoder;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.DoubleTopic;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -21,6 +24,7 @@ public class ArmSubsystem extends SubsystemBase {
   private final CANSparkMax motor;
   private final SparkMaxPIDController controller;
   private final RelativeEncoder encoder;
+  private final ProfiledPIDController ppc;
 
   // Dashboard elements
   private GenericEntry armHighEntry;
@@ -29,6 +33,8 @@ public class ArmSubsystem extends SubsystemBase {
 
   public ArmSubsystem(int ID) {
     System.out.println("Starting Construct ArmSubsystem");
+
+    ppc = new ProfiledPIDController(0.4, 0, 0, new TrapezoidProfile.Constraints(30, 30));
     motor = new CANSparkMax(ID, MotorType.kBrushless);
     motor.restoreFactoryDefaults();
     encoder = motor.getEncoder(SparkMaxRelativeEncoder.Type.kHallSensor, 42);
@@ -44,8 +50,8 @@ public class ArmSubsystem extends SubsystemBase {
     controller.setFeedbackDevice(encoder);
 
     motor.setSmartCurrentLimit(40);
-    controller.setSmartMotionMaxVelocity(Constants.armMaxvelo, 0);
-    controller.setSmartMotionMaxAccel(Constants.armMaxAccel, 0);
+    // controller.setSmartMotionMaxVelocity(Constants.armMaxvelo, 0);
+    // controller.setSmartMotionMaxAccel(Constants.armMaxAccel, 0);
 
     var layout = tab.getLayout("Height", BuiltInLayouts.kGrid);
     layout.addDouble("Current", this::getPosition).withWidget(BuiltInWidgets.kDial);
@@ -65,7 +71,14 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   @Override
-  public void periodic() {}
+  public void periodic() {
+    motor.set(ppc.calculate(encoder.getPosition()) - computeArbitraryFeetForward());
+    SmartDashboard.putNumber("encoder pos", encoder.getPosition());
+    SmartDashboard.putNumber("ppc error", ppc.getPositionError());
+    SmartDashboard.putNumber("setpoint", ppc.getSetpoint().position);
+    SmartDashboard.putNumber("goal", ppc.getGoal().position);
+    SmartDashboard.putNumber("arbitrary ffw", computeArbitraryFeetForward());
+  }
 
   public void setLow() {
     setPosition(armLowEntry.getDouble(Constants.armPositionLow));
@@ -79,8 +92,14 @@ public class ArmSubsystem extends SubsystemBase {
     setPosition(armHighEntry.getDouble(Constants.armPositionHigh));
   }
 
+  private double computeArbitraryFeetForward() {
+    double theta = encoder.getPosition() * Math.PI / 50;
+    return (3 * Math.cos(theta - Math.toRadians(9.3)) / 328);
+  }
+
   private void setPosition(double position) {
-    controller.setReference(position, CANSparkMax.ControlType.kPosition);
+    // controller.setReference(position, CANSparkMax.ControlType.kPosition);
+    ppc.setGoal(position);
   }
 
   private double getPosition() {
