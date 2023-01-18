@@ -5,12 +5,14 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DefaultDriveCommand;
+import frc.robot.commands.SwerveAutoCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DeploySubsystem;
 import frc.robot.subsystems.EndAffectorSubsystem;
@@ -36,17 +38,20 @@ public class RobotContainer {
     fieldPositioningSystem.setDriveTrainSupplier(
         () -> drivetrainSubsystem.getOdometry(), drivetrainSubsystem.getKinematics());
 
-    drivetrainSubsystem.setDefaultCommand(
+     drivetrainSubsystem.setDefaultCommand(
         new DefaultDriveCommand(
             drivetrainSubsystem,
             () -> MathUtil.applyDeadband(-driveController.getLeftY(), 0.05),
             () -> MathUtil.applyDeadband(-driveController.getLeftX(), 0.05),
             () -> MathUtil.applyDeadband(-driveController.getRightX(), 0.05),
             () -> fieldPositioningSystem.getCurrentRobotRotationXY()));
+            
     configureBindings();
   }
 
   private void configureBindings() {
+
+    FieldPoses poses = new FieldPoses();
 
     Trigger intakeButton = driver.leftTrigger(0.3);
     Trigger shootButton = driver.rightTrigger(0.3);
@@ -54,6 +59,7 @@ public class RobotContainer {
     Trigger gunnerMidButton = gunner.x();
     Trigger driverHighButton = driver.a();
     Trigger driverMidButton = driver.x();
+    Trigger driverGoButton = driver.b();
 
     intakeButton.whileTrue(
         Commands.startEnd(() -> endAffector.intake(), () -> endAffector.idle(), endAffector));
@@ -77,6 +83,8 @@ public class RobotContainer {
     gunnerMidButton
         .or(driverMidButton)
         .whileTrue(Commands.startEnd(() -> arm.setMid(), () -> arm.setLow(), arm));
+        Command runHumans = new SwerveAutoCommand(poses.getBay(7), drivetrainSubsystem);
+    driverGoButton.whileTrue(runHumans);
   }
 
   public Command getAutonomousCommand() {

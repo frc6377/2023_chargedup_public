@@ -39,7 +39,7 @@ public class FieldPoses {
   public FieldPoses() {
     boolean isRed = isRed();
 
-    var xPosition = isRed ? 1.9 : 14.6;
+    var xPosition = isRed ? 2.9 : 14.6;
 
     // The following values are coordinate points describing the y-locations of the individual
     // grids. They are ordered assuming we are on the Blue team.

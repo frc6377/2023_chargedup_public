@@ -121,6 +121,7 @@ public class FieldPositioningSystem extends SubsystemBase {
     currentRobotPose = swerveDriveOdometry.getEstimatedPosition();
     field.setRobotPose(currentRobotPose);
     pub.accept(currentRobotPose);
+    SmartDashboard.putString("pose", currentRobotPose.getX() + " " + currentRobotPose.getY());
   }
 
   /**
