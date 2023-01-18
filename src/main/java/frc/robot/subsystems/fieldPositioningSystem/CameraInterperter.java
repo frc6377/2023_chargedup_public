@@ -2,9 +2,15 @@ package frc.robot.subsystems.fieldPositioningSystem;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Supplier;
+
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
@@ -14,11 +20,13 @@ class CameraInterperter {
   private final Pose3d cameraPosition;
   private final AprilTagFieldLayout aprilTagLayout;
   private final PhotonCamera photonCamera;
+  private final Supplier<Rotation2d> yawSupplier;
 
   public CameraInterperter(
-      Pose3d cameraPosition, AprilTagFieldLayout aprilTagLayout, String cameraName) {
+      Pose3d cameraPosition, AprilTagFieldLayout aprilTagLayout, String cameraName, Supplier<Rotation2d> yaw) {
     this.cameraPosition = cameraPosition;
     this.aprilTagLayout = aprilTagLayout;
+    yawSupplier = yaw;
     photonCamera = new PhotonCamera(cameraName);
   }
 
@@ -71,9 +79,11 @@ class CameraInterperter {
   }
 
   private Pose3d calculateCameraPoseOnField(
-      Pose3d tagAbsolutePositionOnField, Transform3d tagRelativeLocationToCamera) {
-
-    Pose3d cameraPose3d = tagAbsolutePositionOnField.plus(tagRelativeLocationToCamera);
+      Pose3d tagAbsolutePositionOnField, final Transform3d tagRelativeLocationToCamera) {
+    final Translation3d tagTranslation3d = tagRelativeLocationToCamera.getTranslation();
+    final Translation3d rotatedTagLocation = tagTranslation3d.rotateBy(new Rotation3d(0, 0, yawSupplier.get().getRadians()));
+    final Transform3d tagOffset = new Transform3d(rotatedTagLocation, tagRelativeLocationToCamera.getRotation());
+    Pose3d cameraPose3d = tagAbsolutePositionOnField.plus(tagOffset);
 
     return cameraPose3d;
   }
@@ -86,7 +96,7 @@ class CameraInterperter {
   }
 
   private double calculateSTDevOfMeasure(Pose3d robotPose, Pose3d previousMeasure) {
-    return 0.1;
+    return 0.05;
   }
 
   private class AprilTagRead {
