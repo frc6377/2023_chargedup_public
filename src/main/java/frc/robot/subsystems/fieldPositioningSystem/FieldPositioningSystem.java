@@ -19,6 +19,9 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.networktables.Pose2DPublisher;
+import frc.robot.networktables.Topics;
+
 import java.io.IOException;
 import java.util.function.Supplier;
 
@@ -32,6 +35,7 @@ public class FieldPositioningSystem extends SubsystemBase {
   private Supplier<SwerveModuleState[]> swerveOdomSupplier;
   private SwerveDrivePoseEstimator swerveDriveOdometry;
   private CameraInterperter[] cameras;
+  private final Pose2DPublisher pub = Topics.PoseTopic().publish();
 
   class FieldPositioningSystemError extends RuntimeException {
     public FieldPositioningSystemError(final String message, final Throwable throwable) {
@@ -62,6 +66,8 @@ public class FieldPositioningSystem extends SubsystemBase {
     new FPSHardware(this).configure(this, new FPSConfiguration());
     currentRobotPose = new Pose2d();
   }
+
+  
 
   /**
    * returns the current robot rotation on the X-Y plane computed from the gyro and vision data
@@ -114,6 +120,7 @@ public class FieldPositioningSystem extends SubsystemBase {
     doVisionEstimation();
     currentRobotPose = swerveDriveOdometry.getEstimatedPosition();
     field.setRobotPose(currentRobotPose);
+    pub.accept(currentRobotPose);
   }
 
   /**
