@@ -38,7 +38,13 @@ class CameraInterperter {
 
     for (AprilTagRead apriltagRead : aprilTagRelativeLocations) {
       int tagID = apriltagRead.id;
-      Pose3d aprilTagAbsoluteLocation = aprilTagLayout.getTagPose(tagID).get();
+
+      Pose3d aprilTagAbsoluteLocation;
+      try{
+        aprilTagAbsoluteLocation = aprilTagLayout.getTagPose(tagID).get();
+      }catch(NullPointerException e){
+        continue;
+      }
 
       Pose3d cameraPos = calculateCameraPoseOnField(aprilTagAbsoluteLocation, apriltagRead.tag);
 
@@ -80,10 +86,7 @@ class CameraInterperter {
 
   private Pose3d calculateCameraPoseOnField(
       Pose3d tagAbsolutePositionOnField, final Transform3d tagRelativeLocationToCamera) {
-    final Translation3d tagTranslation3d = tagRelativeLocationToCamera.getTranslation();
-    final Translation3d rotatedTagLocation = tagTranslation3d.rotateBy(new Rotation3d(0, 0, yawSupplier.get().getRadians()));
-    final Transform3d tagOffset = new Transform3d(rotatedTagLocation, tagRelativeLocationToCamera.getRotation());
-    Pose3d cameraPose3d = tagAbsolutePositionOnField.plus(tagOffset);
+    Pose3d cameraPose3d = tagAbsolutePositionOnField.plus(tagRelativeLocationToCamera.inverse());
 
     return cameraPose3d;
   }
