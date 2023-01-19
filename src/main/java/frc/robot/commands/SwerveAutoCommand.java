@@ -62,11 +62,13 @@ public class SwerveAutoCommand extends SequentialCommandGroup {
         points.add(
             new PathPoint(
                 fieldPoses.getUpperSafePoint().getTranslation(),
+                fieldPoses.getUpperSafePoint().getRotation(),
                 fieldPoses.getUpperSafePoint().getRotation()));
       } else {
         points.add(
             new PathPoint(
                 fieldPoses.getLowerSafePoint().getTranslation(),
+                fieldPoses.getLowerSafePoint().getRotation(),
                 fieldPoses.getLowerSafePoint().getRotation()));
       }
     }
