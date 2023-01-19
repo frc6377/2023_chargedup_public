@@ -72,7 +72,9 @@ public class SwerveAutoCommand extends SequentialCommandGroup {
                 fieldPoses.getLowerSafePoint().getRotation()));
       }
     }
-    SmartDashboard.putString("target pose ", targetPose.getX() + " " + targetPose.getY() + " " + targetPose.getRotation().getDegrees());
+    SmartDashboard.putString(
+        "target pose ",
+        targetPose.getX() + " " + targetPose.getY() + " " + targetPose.getRotation().getDegrees());
     points.add(
         new PathPoint(
             targetPose.getTranslation(), new Rotation2d(Math.PI), new Rotation2d(Math.PI)));
@@ -84,7 +86,7 @@ public class SwerveAutoCommand extends SequentialCommandGroup {
     fredrick(trajectory, drivetrainSubsystem, false);
   }
 
-  private  void fredrick(
+  private void fredrick(
       PathPlannerTrajectory trajectory,
       DrivetrainSubsystem drivetrainSubsystem,
       Boolean isFirstPath) {

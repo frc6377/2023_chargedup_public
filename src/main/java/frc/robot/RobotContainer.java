@@ -5,7 +5,6 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -38,14 +37,14 @@ public class RobotContainer {
     fieldPositioningSystem.setDriveTrainSupplier(
         () -> drivetrainSubsystem.getOdometry(), drivetrainSubsystem.getKinematics());
 
-     drivetrainSubsystem.setDefaultCommand(
+    drivetrainSubsystem.setDefaultCommand(
         new DefaultDriveCommand(
             drivetrainSubsystem,
             () -> MathUtil.applyDeadband(-driveController.getLeftY(), 0.05),
             () -> MathUtil.applyDeadband(-driveController.getLeftX(), 0.05),
             () -> MathUtil.applyDeadband(-driveController.getRightX(), 0.05),
             () -> fieldPositioningSystem.getCurrentRobotRotationXY()));
-            
+
     configureBindings();
   }
 
@@ -83,7 +82,7 @@ public class RobotContainer {
     gunnerMidButton
         .or(driverMidButton)
         .whileTrue(Commands.startEnd(() -> arm.setMid(), () -> arm.setLow(), arm));
-        Command runHumans = new SwerveAutoCommand(poses.getBay(7), drivetrainSubsystem);
+    Command runHumans = new SwerveAutoCommand(poses.getBay(7), drivetrainSubsystem);
     driverGoButton.whileTrue(runHumans);
   }
 

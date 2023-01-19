@@ -7,21 +7,23 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.networktables.Pose2DPublisher;
 import frc.robot.networktables.Topics;
-
 import java.io.IOException;
 import java.util.function.Supplier;
 
@@ -65,9 +67,19 @@ public class FieldPositioningSystem extends SubsystemBase {
 
     new FPSHardware(this).configure(this, new FPSConfiguration());
     currentRobotPose = new Pose2d();
+    enableCameraDebug(0);
   }
 
-  
+  private void enableCameraDebug(int targetCameraIndex) {
+    final FieldObject2d rawRobotPose =
+        field.getObject("Robot Pose From Camera Raw ID:" + targetCameraIndex);
+    final FieldObject2d rawCameraPose = field.getObject("Camera Pose ID:" + targetCameraIndex);
+
+    cameras[targetCameraIndex].setCameraFieldObject(rawCameraPose);
+    cameras[targetCameraIndex].setRobotFieldObject(rawRobotPose);
+
+    System.out.println("Starting Camera Debug for camera ID:" + targetCameraIndex);
+  }
 
   /**
    * returns the current robot rotation on the X-Y plane computed from the gyro and vision data
@@ -113,9 +125,7 @@ public class FieldPositioningSystem extends SubsystemBase {
             new Pose2d());
   }
 
-  /** 
-   * Called every 20ms to provide update the robots position
-   */
+  /** Called every 20ms to provide update the robots position */
   @Override
   public void periodic() {
     updateSwerveDriveOdometry();
@@ -173,11 +183,33 @@ public class FieldPositioningSystem extends SubsystemBase {
       for (VisionMeasurement measurement : measurements) {
         Matrix<N3, N1> stdevMatrix =
             VecBuilder.fill(measurement.stdev, measurement.stdev, measurement.stdev);
-        Translation2d measuredLocation = measurement.measurement.toPose2d().getTranslation();
+        Translation2d measuredLocation = measurement.measurement.getTranslation();
+
+        final double correctionDistance =
+            measuredLocation.getDistance(
+                swerveDriveOdometry.getEstimatedPosition().getTranslation());
+
+        if (correctionDistance > FPSConfiguration.CAMER_OUTLIER_DISTANCE) {
+          continue;
+        }
+        /*
         swerveDriveOdometry.addVisionMeasurement(
             new Pose2d(measuredLocation, getRotionFromIMU()),
             measurement.timeRecorded,
             stdevMatrix);
+          */
+        double[] poseRaw =
+            NetworkTableInstance.getDefault()
+                .getTable("photonvision")
+                .getSubTable("Test1")
+                .getEntry("targetPose")
+                .getDoubleArray(new double[3]);
+
+        System.out.println(poseRaw[0] + " " + poseRaw[1]);
+        Pose2d pose = new Pose2d(poseRaw[0], poseRaw[1], new Rotation2d(poseRaw[2]));
+        swerveDriveOdometry.addVisionMeasurement(
+            pose.plus(new Transform2d(new Translation2d(1, 1), new Rotation2d(Math.PI))),
+            Timer.getFPGATimestamp());
         // field.setRobotPose(measurement.measurement.toPose2d());
       }
     }
