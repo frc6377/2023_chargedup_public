@@ -1,9 +1,8 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.arm;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.SparkMaxRelativeEncoder;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -22,51 +21,43 @@ public class ArmSubsystem extends SubsystemBase {
 
   // Hardware
   private final CANSparkMax motor;
-  private final SparkMaxPIDController controller;
   private final RelativeEncoder encoder;
   private final ProfiledPIDController ppc;
+  private final ArmExtender extender;
 
   // Dashboard elements
   private GenericEntry armHighEntry;
   private GenericEntry armMidEntry;
   private GenericEntry armLowEntry;
 
-  public ArmSubsystem(int ID) {
+  public ArmSubsystem(int rotateID, int extendID) {
     System.out.println("Starting Construct ArmSubsystem");
 
     ppc = new ProfiledPIDController(0.4, 0, 0, new TrapezoidProfile.Constraints(30, 30));
-    motor = new CANSparkMax(ID, MotorType.kBrushless);
+    motor = new CANSparkMax(rotateID, MotorType.kBrushless);
     motor.restoreFactoryDefaults();
     encoder = motor.getEncoder(SparkMaxRelativeEncoder.Type.kHallSensor, 42);
-    controller = motor.getPIDController();
-
-    controller.setFF(0);
-    controller.setP(0.045);
-    controller.setI(0);
-    controller.setD(1);
-    controller.setIZone(0);
-    // controller.setOutputRange(-1, 1);
-
-    controller.setFeedbackDevice(encoder);
 
     motor.setSmartCurrentLimit(40);
-    // controller.setSmartMotionMaxVelocity(Constants.armMaxvelo, 0);
-    // controller.setSmartMotionMaxAccel(Constants.armMaxAccel, 0);
 
     var layout = tab.getLayout("Height", BuiltInLayouts.kGrid);
     layout.addDouble("Current", this::getPosition).withWidget(BuiltInWidgets.kDial);
     armHighEntry =
         layout
-            .addPersistent("High Value", -Constants.armPositionHigh)
+            .addPersistent("High Value", -Constants.armRotationHigh)
             .getEntry(DoubleTopic.kTypeString);
     armMidEntry =
         layout
-            .addPersistent("Mid Value", -Constants.armPositionMid)
+            .addPersistent("Mid Value", -Constants.armRotationMid)
             .getEntry(DoubleTopic.kTypeString);
     armLowEntry =
         layout
-            .addPersistent("Low Value", -Constants.armPositionLow)
+            .addPersistent("Low Value", -Constants.armRotationLow)
             .getEntry(DoubleTopic.kTypeString);
+
+    // TODO: when we have a real extension arm, change this to `ActiveArmExtender`
+    extender = new DisabledArmExtender(extendID);
+
     System.out.println("Complete Construct ArmSubsystem");
   }
 
@@ -80,25 +71,42 @@ public class ArmSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("arbitrary ffw", computeArbitraryFeetForward());
   }
 
+  public void setStowed() {
+    setPosition(armLowEntry.getDouble(Constants.armRotationStowed));
+    extender.setLength(Constants.armLengthStowed);
+  }
+
   public void setLow() {
-    setPosition(armLowEntry.getDouble(Constants.armPositionLow));
+    setPosition(Constants.armRotationLow);
+    extender.setLength(Constants.armLengthLow);
   }
 
   public void setMid() {
-    setPosition(armMidEntry.getDouble(Constants.armPositionMid));
+    setPosition(Constants.armRotationMid);
+    extender.setLength(Constants.armLengthMid);
   }
 
   public void setHigh() {
-    setPosition(armHighEntry.getDouble(Constants.armPositionHigh));
+    setPosition(Constants.armRotationHigh);
+    extender.setLength(Constants.armLengthHigh);
   }
 
+  /**
+   * Calculates the amount of power needed to counteract the force of gravity to keep the arm at a
+   * constant angle.
+   *
+   * @return The power needed to keep the arme stable, in ?electrical output units?.
+   */
   private double computeArbitraryFeetForward() {
-    double theta = encoder.getPosition() * Math.PI / 50;
-    return (3 * Math.cos(theta - Math.toRadians(9.3)) / 328);
+    double theta = encoder.getPosition() * Constants.armRotationalTicksToRadians;
+    double armLength = extender.getLength();
+    return (Math.cos(theta - Math.toRadians(Constants.armAngleAtRest))
+            * armLength
+            * Constants.armWeight)
+        / (Constants.stalledTorque * Constants.rotationArmGearRatio);
   }
 
   private void setPosition(double position) {
-    // controller.setReference(position, CANSparkMax.ControlType.kPosition);
     ppc.setGoal(position);
   }
 

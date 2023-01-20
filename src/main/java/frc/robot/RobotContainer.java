@@ -11,9 +11,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DefaultDriveCommand;
-import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DeploySubsystem;
 import frc.robot.subsystems.EndAffectorSubsystem;
+import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
 import frc.robot.subsystems.fieldPositioningSystem.FieldPositioningSystem;
 
@@ -24,7 +24,7 @@ public class RobotContainer {
   private final DeploySubsystem deploySubsystem = new DeploySubsystem();
   CommandXboxController driver = new CommandXboxController(0);
   CommandXboxController gunner = new CommandXboxController(1);
-  ArmSubsystem arm = new ArmSubsystem(11);
+  ArmSubsystem arm = new ArmSubsystem(11, 12);
   EndAffectorSubsystem endAffector = new EndAffectorSubsystem(9, 10);
 
   private final FieldPositioningSystem fieldPositioningSystem = new FieldPositioningSystem();
@@ -71,8 +71,8 @@ public class RobotContainer {
         .whileTrue(
             Commands.startEnd(
                 () -> endAffector.slowOutake(), () -> endAffector.halt(), endAffector));
-    gunnerMidButton
-        .or(driverMidButton)
+    gunnerHighButton
+        .or(driverHighButton)
         .whileTrue(Commands.startEnd(() -> arm.setHigh(), () -> arm.setLow(), arm));
     gunnerMidButton
         .or(driverMidButton)

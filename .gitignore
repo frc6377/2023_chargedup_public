@@ -166,3 +166,4 @@ src/main/deploy/*.txt
 simgui*
 networktables.json
 networktables.json.bck
+*.code-workspace
