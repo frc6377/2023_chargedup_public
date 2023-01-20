@@ -7,7 +7,6 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -37,6 +36,7 @@ public class FieldPositioningSystem extends SubsystemBase {
   private Supplier<SwerveModuleState[]> swerveOdomSupplier;
   private SwerveDrivePoseEstimator swerveDriveOdometry;
   private CameraInterperter[] cameras;
+  private boolean discardOutlierRejectionForNextIteration = false;
   private final Pose2DPublisher pub = Topics.PoseTopic().publish();
 
   class FieldPositioningSystemError extends RuntimeException {
@@ -175,43 +175,45 @@ public class FieldPositioningSystem extends SubsystemBase {
     swerveDriveOdometry.resetPosition(getRotionFromIMU(), currentSwervePodPosition, robotPosition);
   }
 
+  public void discardOutlierRejectionForNextIteration() {}
+
   /** Run vision estimation on cameras. */
   private void doVisionEstimation() {
     for (CameraInterperter interperter : cameras) {
-      VisionMeasurement[] measurements = interperter.measure();
+      VisionMeasurement measurement = interperter.measure();
+      if(measurement == null) continue;
 
-      for (VisionMeasurement measurement : measurements) {
-        Matrix<N3, N1> stdevMatrix =
-            VecBuilder.fill(measurement.stdev, measurement.stdev, measurement.stdev);
-        Translation2d measuredLocation = measurement.measurement.getTranslation();
+      Matrix<N3, N1> stdevMatrix =
+          VecBuilder.fill(measurement.stdev, measurement.stdev, measurement.stdev);
+      Translation2d measuredLocation = measurement.measurement.getTranslation();
+      
+      final double correctionDistance =
+          measuredLocation.getDistance(
+              swerveDriveOdometry.getEstimatedPosition().getTranslation());
 
-        final double correctionDistance =
-            measuredLocation.getDistance(
-                swerveDriveOdometry.getEstimatedPosition().getTranslation());
+      // if (correctionDistance > FPSConfiguration.CAMER_OUTLIER_DISTANCE) {
+      //   continue;
+      // }
+      
+      swerveDriveOdometry.addVisionMeasurement(
+          new Pose2d(measuredLocation, getRotionFromIMU()),
+          measurement.timeRecorded,
+          stdevMatrix);
+        
+      double[] poseRaw =
+          NetworkTableInstance.getDefault()
+              .getTable("photonvision")
+              .getSubTable("Test1")
+              .getEntry("targetPose")
+              .getDoubleArray(new double[3]);
 
-        if (correctionDistance > FPSConfiguration.CAMER_OUTLIER_DISTANCE) {
-          continue;
-        }
-        /*
-        swerveDriveOdometry.addVisionMeasurement(
-            new Pose2d(measuredLocation, getRotionFromIMU()),
-            measurement.timeRecorded,
-            stdevMatrix);
-          */
-        double[] poseRaw =
-            NetworkTableInstance.getDefault()
-                .getTable("photonvision")
-                .getSubTable("Test1")
-                .getEntry("targetPose")
-                .getDoubleArray(new double[3]);
-
-        System.out.println(poseRaw[0] + " " + poseRaw[1]);
-        Pose2d pose = new Pose2d(poseRaw[0], poseRaw[1], new Rotation2d(poseRaw[2]));
-        swerveDriveOdometry.addVisionMeasurement(
-            pose.plus(new Transform2d(new Translation2d(1, 1), new Rotation2d(Math.PI))),
-            Timer.getFPGATimestamp());
-        // field.setRobotPose(measurement.measurement.toPose2d());
-      }
+      // System.out.println(poseRaw[0] + " " + poseRaw[1]);
+      // Pose2d pose = new Pose2d(poseRaw[0], poseRaw[1], new Rotation2d(poseRaw[2]));
+      // swerveDriveOdometry.addVisionMeasurement(
+      //     pose.plus(new Transform2d(new Translation2d(1, 1), new Rotation2d(Math.PI))),
+      //     Timer.getFPGATimestamp());
+      field.setRobotPose(measurement.measurement);
+    
     }
   }
 

@@ -12,7 +12,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Supplier;
 import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonUtils;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
@@ -21,6 +23,7 @@ class CameraInterperter {
   private final Transform3d cameraPosition;
   private final AprilTagFieldLayout aprilTagLayout;
   private final PhotonCamera photonCamera;
+  private final PhotonPoseEstimator estimator;
   private final Supplier<Rotation2d> yawSupplier;
   ;
 
@@ -36,6 +39,8 @@ class CameraInterperter {
     this.aprilTagLayout = aprilTagLayout;
     yawSupplier = yaw;
     photonCamera = new PhotonCamera(cameraName);
+    estimator = new PhotonPoseEstimator(aprilTagLayout, PoseStrategy.CLOSEST_TO_LAST_POSE, photonCamera, cameraPosition);
+
   }
 
   public void setCameraFieldObject(FieldObject2d cameraFieldObject2d) {
@@ -46,32 +51,14 @@ class CameraInterperter {
     robotPositionFieldObject = robotFieldObject2d;
   }
 
-  public VisionMeasurement[] measure() {
-    PhotonPipelineResult piplineResult = photonCamera.getLatestResult();
-    List<PhotonTrackedTarget> targets = piplineResult.getTargets();
-    LinkedList<VisionMeasurement> measurements = new LinkedList<>();
-
-    for (PhotonTrackedTarget target : targets) {
-      int tagID = target.getFiducialId();
-
-      Pose3d targetFieldPosition;
-      try {
-        targetFieldPosition = aprilTagLayout.getTagPose(tagID).get();
-      } catch (NullPointerException e) {
-        continue;
-      }
-
-      Pose3d robotPosition =
-          PhotonUtils.estimateFieldToRobotAprilTag(
-              target.getBestCameraToTarget(), targetFieldPosition, cameraPosition);
-      measurements.add(
-          new VisionMeasurement(
-              robotPosition.toPose2d(),
-              target.getPoseAmbiguity(),
-              piplineResult.getTimestampSeconds()));
-    }
-
-    return null;
+  public VisionMeasurement measure() {
+    
+    var potentialEstimatedPose = estimator.update();
+    if(potentialEstimatedPose.isEmpty()) return null;
+    var estimatedPose = potentialEstimatedPose.get();
+    VisionMeasurement ouput = new VisionMeasurement(estimatedPose.estimatedPose.toPose2d(), 0.1, estimatedPose.timestampSeconds);
+    if(cameraPositionFieldObject != null) cameraPositionFieldObject.setPose(ouput.measurement);
+    return ouput;
   }
 
   // public VisionMeasurement[] measure() {
