@@ -13,7 +13,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
@@ -24,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.networktables.Pose2DPublisher;
 import frc.robot.networktables.Topics;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 public class FieldPositioningSystem extends SubsystemBase {
@@ -36,7 +36,6 @@ public class FieldPositioningSystem extends SubsystemBase {
   private Supplier<SwerveModuleState[]> swerveOdomSupplier;
   private SwerveDrivePoseEstimator swerveDriveOdometry;
   private CameraInterperter[] cameras;
-  private boolean discardOutlierRejectionForNextIteration = false;
   private final Pose2DPublisher pub = Topics.PoseTopic().publish();
 
   class FieldPositioningSystemError extends RuntimeException {
@@ -71,12 +70,9 @@ public class FieldPositioningSystem extends SubsystemBase {
   }
 
   private void enableCameraDebug(int targetCameraIndex) {
-    final FieldObject2d rawRobotPose =
-        field.getObject("Robot Pose From Camera Raw ID:" + targetCameraIndex);
     final FieldObject2d rawCameraPose = field.getObject("Camera Pose ID:" + targetCameraIndex);
 
     cameras[targetCameraIndex].setCameraFieldObject(rawCameraPose);
-    cameras[targetCameraIndex].setRobotFieldObject(rawRobotPose);
 
     System.out.println("Starting Camera Debug for camera ID:" + targetCameraIndex);
   }
@@ -180,9 +176,10 @@ public class FieldPositioningSystem extends SubsystemBase {
   /** Run vision estimation on cameras. */
   private void doVisionEstimation() {
     for (CameraInterperter interperter : cameras) {
-      VisionMeasurement measurement = interperter.measure();
-      if (measurement == null) continue;
-
+      Optional<VisionMeasurement> potentialMeasurement = interperter.measure();
+      if (potentialMeasurement.isEmpty()) continue;
+      VisionMeasurement measurement = potentialMeasurement.get();
+      
       Matrix<N3, N1> stdevMatrix =
           VecBuilder.fill(measurement.stdev, measurement.stdev, measurement.stdev);
       Translation2d measuredLocation = measurement.measurement.getTranslation();
@@ -190,25 +187,13 @@ public class FieldPositioningSystem extends SubsystemBase {
       final double correctionDistance =
           measuredLocation.getDistance(swerveDriveOdometry.getEstimatedPosition().getTranslation());
 
-      // if (correctionDistance > FPSConfiguration.CAMER_OUTLIER_DISTANCE) {
-      //   continue;
-      // }
+      if (correctionDistance > FPSConfiguration.CAMER_OUTLIER_DISTANCE) {
+        continue;
+      }
 
       swerveDriveOdometry.addVisionMeasurement(
           new Pose2d(measuredLocation, getRotionFromIMU()), measurement.timeRecorded, stdevMatrix);
 
-      double[] poseRaw =
-          NetworkTableInstance.getDefault()
-              .getTable("photonvision")
-              .getSubTable("Test1")
-              .getEntry("targetPose")
-              .getDoubleArray(new double[3]);
-
-      // System.out.println(poseRaw[0] + " " + poseRaw[1]);
-      // Pose2d pose = new Pose2d(poseRaw[0], poseRaw[1], new Rotation2d(poseRaw[2]));
-      // swerveDriveOdometry.addVisionMeasurement(
-      //     pose.plus(new Transform2d(new Translation2d(1, 1), new Rotation2d(Math.PI))),
-      //     Timer.getFPGATimestamp());
       field.setRobotPose(measurement.measurement);
     }
   }
