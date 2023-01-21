@@ -20,8 +20,7 @@ class CameraInterperter {
   public CameraInterperter(
       Transform3d cameraPosition,
       AprilTagFieldLayout aprilTagLayout,
-      String cameraName,
-      Supplier<Rotation2d> yaw) {
+      String cameraName) {
     photonCamera = new PhotonCamera(cameraName);
     estimator = new PhotonPoseEstimator(
         aprilTagLayout, PoseStrategy.CLOSEST_TO_LAST_POSE, photonCamera, cameraPosition);
