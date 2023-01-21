@@ -181,25 +181,22 @@ public class FieldPositioningSystem extends SubsystemBase {
   private void doVisionEstimation() {
     for (CameraInterperter interperter : cameras) {
       VisionMeasurement measurement = interperter.measure();
-      if(measurement == null) continue;
+      if (measurement == null) continue;
 
       Matrix<N3, N1> stdevMatrix =
           VecBuilder.fill(measurement.stdev, measurement.stdev, measurement.stdev);
       Translation2d measuredLocation = measurement.measurement.getTranslation();
-      
+
       final double correctionDistance =
-          measuredLocation.getDistance(
-              swerveDriveOdometry.getEstimatedPosition().getTranslation());
+          measuredLocation.getDistance(swerveDriveOdometry.getEstimatedPosition().getTranslation());
 
       // if (correctionDistance > FPSConfiguration.CAMER_OUTLIER_DISTANCE) {
       //   continue;
       // }
-      
+
       swerveDriveOdometry.addVisionMeasurement(
-          new Pose2d(measuredLocation, getRotionFromIMU()),
-          measurement.timeRecorded,
-          stdevMatrix);
-        
+          new Pose2d(measuredLocation, getRotionFromIMU()), measurement.timeRecorded, stdevMatrix);
+
       double[] poseRaw =
           NetworkTableInstance.getDefault()
               .getTable("photonvision")
@@ -213,7 +210,6 @@ public class FieldPositioningSystem extends SubsystemBase {
       //     pose.plus(new Transform2d(new Translation2d(1, 1), new Rotation2d(Math.PI))),
       //     Timer.getFPGATimestamp());
       field.setRobotPose(measurement.measurement);
-    
     }
   }
 

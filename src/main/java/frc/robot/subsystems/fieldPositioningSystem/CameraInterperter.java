@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.function.Supplier;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonUtils;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
@@ -39,8 +38,9 @@ class CameraInterperter {
     this.aprilTagLayout = aprilTagLayout;
     yawSupplier = yaw;
     photonCamera = new PhotonCamera(cameraName);
-    estimator = new PhotonPoseEstimator(aprilTagLayout, PoseStrategy.CLOSEST_TO_LAST_POSE, photonCamera, cameraPosition);
-
+    estimator =
+        new PhotonPoseEstimator(
+            aprilTagLayout, PoseStrategy.CLOSEST_TO_LAST_POSE, photonCamera, cameraPosition);
   }
 
   public void setCameraFieldObject(FieldObject2d cameraFieldObject2d) {
@@ -52,12 +52,14 @@ class CameraInterperter {
   }
 
   public VisionMeasurement measure() {
-    
+
     var potentialEstimatedPose = estimator.update();
-    if(potentialEstimatedPose.isEmpty()) return null;
+    if (potentialEstimatedPose.isEmpty()) return null;
     var estimatedPose = potentialEstimatedPose.get();
-    VisionMeasurement ouput = new VisionMeasurement(estimatedPose.estimatedPose.toPose2d(), 0.1, estimatedPose.timestampSeconds);
-    if(cameraPositionFieldObject != null) cameraPositionFieldObject.setPose(ouput.measurement);
+    VisionMeasurement ouput =
+        new VisionMeasurement(
+            estimatedPose.estimatedPose.toPose2d(), 0.1, estimatedPose.timestampSeconds);
+    if (cameraPositionFieldObject != null) cameraPositionFieldObject.setPose(ouput.measurement);
     return ouput;
   }
 
