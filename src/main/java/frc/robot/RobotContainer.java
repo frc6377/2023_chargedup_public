@@ -42,7 +42,7 @@ public class RobotContainer {
             drivetrainSubsystem,
             () -> MathUtil.applyDeadband(-driveController.getLeftY(), 0.05),
             () -> MathUtil.applyDeadband(-driveController.getLeftX(), 0.05),
-            () -> MathUtil.applyDeadband(-driveController.getRightX(), 0.05),
+            () -> Math.pow(MathUtil.applyDeadband(driveController.getRightX(), 0.05), 2)*Math.copySign(1, -driveController.getRightX()),
             () -> fieldPositioningSystem.getCurrentRobotRotationXY()));
 
     configureBindings();
