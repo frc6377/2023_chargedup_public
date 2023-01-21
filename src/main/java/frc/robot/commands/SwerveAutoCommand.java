@@ -7,7 +7,9 @@ import com.pathplanner.lib.PathPoint;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.FieldPoses;
@@ -24,7 +26,7 @@ public class SwerveAutoCommand extends SequentialCommandGroup {
       String pathTofollow, DrivetrainSubsystem drivetrainSubsystem, Boolean isFirstPath) {
     PathPlannerTrajectory trajectory = PathPlanner.loadPath(pathTofollow, 4.5, 2.5);
 
-    new SwerveAutoCommand(trajectory, drivetrainSubsystem, isFirstPath);
+    fredrick(trajectory, drivetrainSubsystem, isFirstPath);
   }
 
   private boolean behindSafeLine(double xPosition) {
@@ -55,29 +57,36 @@ public class SwerveAutoCommand extends SequentialCommandGroup {
     // Check the safe line. If we are not behind it, then choose to go
     // high or low based on where we are relative to the center of the
     // charge station.
-    if (!behindSafeLine(currentPose.getX())) {
+    if (false) {
       if (currentPose.getY() > FieldPoses.ChargeStationYCenter) {
         points.add(
             new PathPoint(
                 fieldPoses.getUpperSafePoint().getTranslation(),
+                fieldPoses.getUpperSafePoint().getRotation(),
                 fieldPoses.getUpperSafePoint().getRotation()));
       } else {
         points.add(
             new PathPoint(
                 fieldPoses.getLowerSafePoint().getTranslation(),
+                fieldPoses.getLowerSafePoint().getRotation(),
                 fieldPoses.getLowerSafePoint().getRotation()));
       }
     }
+    SmartDashboard.putString(
+        "target pose ",
+        targetPose.getX() + " " + targetPose.getY() + " " + targetPose.getRotation().getDegrees());
     points.add(
         new PathPoint(
-            targetPose.getTranslation(), targetPose.getRotation(), targetPose.getRotation()));
+            targetPose.getTranslation(), new Rotation2d(Math.PI), new Rotation2d(Math.PI)));
 
     var constraints = new PathConstraints(MaxVelocity, MaxAcceleration);
     var trajectory = PathPlanner.generatePath(constraints, points);
-    new SwerveAutoCommand(trajectory, drivetrainSubsystem, false);
+    System.out.println(trajectory.getEndState().poseMeters);
+
+    fredrick(trajectory, drivetrainSubsystem, false);
   }
 
-  public SwerveAutoCommand(
+  private void fredrick(
       PathPlannerTrajectory trajectory,
       DrivetrainSubsystem drivetrainSubsystem,
       Boolean isFirstPath) {

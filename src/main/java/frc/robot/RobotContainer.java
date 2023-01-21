@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DefaultDriveCommand;
+import frc.robot.commands.SwerveAutoCommand;
 import frc.robot.subsystems.DeploySubsystem;
 import frc.robot.subsystems.EndAffectorSubsystem;
 import frc.robot.subsystems.arm.ArmSubsystem;
@@ -43,10 +44,13 @@ public class RobotContainer {
             () -> MathUtil.applyDeadband(-driveController.getLeftX(), 0.05),
             () -> MathUtil.applyDeadband(-driveController.getRightX(), 0.05),
             () -> fieldPositioningSystem.getCurrentRobotRotationXY()));
+
     configureBindings();
   }
 
   private void configureBindings() {
+
+    FieldPoses poses = new FieldPoses();
 
     Trigger intakeButton = driver.leftTrigger(0.3);
     Trigger shootButton = driver.rightTrigger(0.3);
@@ -54,6 +58,7 @@ public class RobotContainer {
     Trigger gunnerMidButton = gunner.x();
     Trigger driverHighButton = driver.a();
     Trigger driverMidButton = driver.x();
+    Trigger driverGoButton = driver.b();
 
     intakeButton.whileTrue(
         Commands.startEnd(() -> endAffector.intake(), () -> endAffector.idle(), endAffector));
@@ -77,6 +82,8 @@ public class RobotContainer {
     gunnerMidButton
         .or(driverMidButton)
         .whileTrue(Commands.startEnd(() -> arm.setMid(), () -> arm.setLow(), arm));
+    Command runHumans = new SwerveAutoCommand(poses.getBay(7), drivetrainSubsystem);
+    driverGoButton.whileTrue(runHumans);
   }
 
   public Command getAutonomousCommand() {

@@ -1,12 +1,13 @@
 package frc.robot.subsystems.fieldPositioningSystem;
 
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 
 class CameraInformation {
   private String name;
-  private Pose3d cameraLocation;
+  private Transform3d cameraLocation;
   /**
    * Coordinates are in meters relative to robot center.
    *
@@ -23,16 +24,19 @@ class CameraInformation {
       final double y,
       final double z,
       final double yaw,
-      final double pitch) {
+      final double pitch,
+      final double roll) {
     this.name = name;
-    cameraLocation = new Pose3d(new Translation3d(x, y, z), new Rotation3d(0, pitch, yaw));
+    cameraLocation =
+        new Transform3d(
+            new Translation3d(x, y, z), new Rotation3d(Units.degreesToRadians(roll), pitch, yaw));
   }
 
   public String getName() {
     return name;
   }
 
-  public Pose3d getCameraLocation() {
+  public Transform3d getCameraLocation() {
     return cameraLocation;
   }
 }
