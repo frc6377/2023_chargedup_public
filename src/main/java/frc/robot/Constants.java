@@ -79,10 +79,27 @@ public final class Constants {
   public static final double armKf = 0.000156 * 10;
   public static final int armMaxvelo = 2;
   public static final int armMaxAccel = 1;
-
-  public static final double armPositionLow = -3;
-  public static final double armPositionMid = -10.428622245788574 - 3;
-  public static final double armPositionHigh = -10.428622245788574 - 7;
+  // added new functions from line 83-98 for rotational motor and extension motor.
+  // TODO: convert arm rotation values to radians
+  public static final double armRotationStowed = -5;
+  public static final double armRotationLow = -3;
+  public static final double armRotationMid = -10.428622245788574 - 3;
+  public static final double armRotationHigh = -10.428622245788574 - 7;
+  public static final double armRotationalTicksToRadians = Math.PI / 50;
+  // TODO: decide on actual values for this
+  public static final double armLengthStowed = -5;
+  public static final double armLengthLow = -3;
+  public static final double armLengthMid = -10.428622245788574 - 3;
+  public static final double armLengthHigh = -10.428622245788574 - 7;
+  // TODO: Calculate actual value.
+  public static final double armLengthTicksToMeters = 0;
+  // TODO: Measure the arm and put that value in here
+  public static final double armLengthAtZeroTicks = 0.7;
+  // TODO: Get actual value(is the weight of the arm multiplied by the number needed to convert
+  public static final double rotationArmGearRatio = 100;
+  public static final double stalledTorque = 2.6;
+  public static final double armWeight = 4.3;
+  public static final double armAngleAtRest = Math.toRadians(9.3);
 
   public static final double endAffectorIntakespeed = 0.4;
   public static final double endAffectorOutakespeed = 0.3;
