@@ -193,8 +193,6 @@ public class FieldPositioningSystem extends SubsystemBase {
 
       swerveDriveOdometry.addVisionMeasurement(
           new Pose2d(measuredLocation, getRotionFromIMU()), measurement.timeRecorded, stdevMatrix);
-
-      field.setRobotPose(measurement.measurement);
     }
   }
 

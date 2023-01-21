@@ -27,8 +27,7 @@ class FPSHardware {
           new CameraInterperter(
               camInfo.getCameraLocation(),
               this.fieldPositioningSystem.aprilTagFieldLayout,
-              camInfo.getName(),
-              () -> FPS.getCurrentRobotRotationXY());
+              camInfo.getName());
     }
     FPS.setCameras(interperters);
   }
