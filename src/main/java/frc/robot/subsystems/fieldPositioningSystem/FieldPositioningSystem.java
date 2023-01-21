@@ -179,7 +179,7 @@ public class FieldPositioningSystem extends SubsystemBase {
       Optional<VisionMeasurement> potentialMeasurement = interperter.measure();
       if (potentialMeasurement.isEmpty()) continue;
       VisionMeasurement measurement = potentialMeasurement.get();
-      
+
       Matrix<N3, N1> stdevMatrix =
           VecBuilder.fill(measurement.stdev, measurement.stdev, measurement.stdev);
       Translation2d measuredLocation = measurement.measurement.getTranslation();
