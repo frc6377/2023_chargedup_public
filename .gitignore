@@ -167,3 +167,6 @@ simgui*
 networktables.json
 networktables.json.bck
 *.code-workspace
+.idea
+local.properties
+*.iml

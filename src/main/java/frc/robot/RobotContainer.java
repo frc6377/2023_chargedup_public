@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DefaultDriveCommand;
-import frc.robot.commands.SwerveAutoCommand;
+import frc.robot.commands.SwerveAutoFactory;
 import frc.robot.subsystems.DeploySubsystem;
 import frc.robot.subsystems.EndAffectorSubsystem;
 import frc.robot.subsystems.arm.ArmSubsystem;
@@ -30,6 +30,8 @@ public class RobotContainer {
 
   private final FieldPositioningSystem fieldPositioningSystem = new FieldPositioningSystem();
   private final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem(null);
+  private final SwerveAutoFactory autoCommand =
+      new SwerveAutoFactory(fieldPositioningSystem::resetRobotPosition, drivetrainSubsystem);
 
   public RobotContainer() {
     deploySubsystem.Log();
@@ -42,7 +44,9 @@ public class RobotContainer {
             drivetrainSubsystem,
             () -> MathUtil.applyDeadband(-driveController.getLeftY(), 0.05),
             () -> MathUtil.applyDeadband(-driveController.getLeftX(), 0.05),
-            () -> Math.pow(MathUtil.applyDeadband(driveController.getRightX(), 0.05), 2)*Math.copySign(1, -driveController.getRightX()),
+            () ->
+                Math.pow(MathUtil.applyDeadband(driveController.getRightX(), 0.05), 2)
+                    * Math.copySign(1, -driveController.getRightX()),
             () -> fieldPositioningSystem.getCurrentRobotRotationXY()));
 
     configureBindings();
@@ -82,12 +86,13 @@ public class RobotContainer {
     gunnerMidButton
         .or(driverMidButton)
         .whileTrue(Commands.startEnd(() -> arm.setMid(), () -> arm.setLow(), arm));
-    Command runHumans = new SwerveAutoCommand(poses.getBay(7), drivetrainSubsystem);
-    driverGoButton.whileTrue(runHumans);
+    // Command runHumans = new SwerveAutoCommand(poses.getBay(7), drivetrainSubsystem);
+    // driverGoButton.whileTrue(runHumans);
   }
 
   public Command getAutonomousCommand() {
     // AutoRoutines should be used to add more auto routines that we'll execute.
-    return AutoRoutines.Noop();
+
+    return autoCommand.generateCommand("PickFirstElementRed", true);
   }
 }

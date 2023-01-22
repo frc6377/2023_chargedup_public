@@ -128,4 +128,8 @@ public final class Constants {
   public static final PodName BACK_LEFT_POD_NAME = PodName.A;
 
   public static final PodName BACK_RIGHT_POD_NAME = PodName.D;
+
+  public static final double autoMaxVelocity = 4.5;
+
+  public static final double autoMaxAcceleration = 2.5;
 }
