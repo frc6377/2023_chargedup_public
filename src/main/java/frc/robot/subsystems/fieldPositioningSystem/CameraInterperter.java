@@ -19,7 +19,7 @@ class CameraInterperter {
     photonCamera = new PhotonCamera(cameraName);
     estimator =
         new PhotonPoseEstimator(
-            aprilTagLayout, PoseStrategy.CLOSEST_TO_LAST_POSE, photonCamera, cameraPosition);
+            aprilTagLayout, PoseStrategy.AVERAGE_BEST_TARGETS, photonCamera, cameraPosition);
   }
 
   public void setCameraFieldObject(FieldObject2d cameraFieldObject2d) {
