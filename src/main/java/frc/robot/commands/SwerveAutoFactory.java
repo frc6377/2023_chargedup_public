@@ -63,13 +63,13 @@ public class SwerveAutoFactory {
     // Check the safe line. If we are not behind it, then choose to go
     // high or low based on where we are relative to the center of the
     // charge station.
-    // if (false) {
-    //   Pose2d safePose =
-    //       (currentPose.getY() > FieldPoses.ChargeStationYCenter)
-    //           ? fieldPoses.getUpperSafePoint()
-    //           : fieldPoses.getLowerSafePoint();
-    //   points.add(poseToPathPoint(safePose));
-    // }
+    if (!behindSafeLine(currentPose.getX())) {
+      Pose2d safePose =
+          (currentPose.getY() > FieldPoses.ChargeStationYCenter)
+              ? fieldPoses.getUpperSafePoint()
+              : fieldPoses.getLowerSafePoint();
+      points.add(poseToPathPoint(safePose, -1, safePose.getRotation()));
+    }
 
     SmartDashboard.putString(
         "target pose ",
@@ -126,11 +126,13 @@ public class SwerveAutoFactory {
       double xPosition) { // checks if we are behind the "safe line" which is defined as a line
     // perpendicular to the driver such that when we are behind said line we
     // cannot hit the charging station
-
+    SmartDashboard.putBoolean("isRed", fieldPoses.isRed());
     if (fieldPoses.isRed()) {
       return xPosition > FieldPoses.RedSafeLineX;
     }
 
+    SmartDashboard.putNumber("currentPose", xPosition);
+    SmartDashboard.putNumber("bluSafeLine", FieldPoses.BlueSafeLineX);
     return xPosition < FieldPoses.BlueSafeLineX;
   }
 }
