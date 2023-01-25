@@ -58,7 +58,7 @@ public class SwerveAutoFactory {
             Math.hypot(
                 drivetrainSubsystem.getChassisSpeeds().vxMetersPerSecond,
                 drivetrainSubsystem.getChassisSpeeds()
-                    .vyMetersPerSecond))); // current drivetrain velocity
+                    .vyMetersPerSecond), headingBetweenPoses(currentPose, targetPose))); // current drivetrain velocity
 
     // Check the safe line. If we are not behind it, then choose to go
     // high or low based on where we are relative to the center of the
@@ -109,16 +109,17 @@ public class SwerveAutoFactory {
         new InstantCommand(() -> drivetrainSubsystem.drive(new ChassisSpeeds())));
   }
 
-  private PathPoint poseToPathPoint(Pose2d pose) {
-    return poseToPathPoint(pose, 0);
-  }
-
-  private PathPoint poseToPathPoint(Pose2d pose, double velocityOverride) {
+  private PathPoint poseToPathPoint(Pose2d pose, double velocityOverride, Rotation2d heading) {
 
     // translation, rotation (direction of the path), holonomic rotation (where the robot is
     // facing), velocity override (initial velo)
     return new PathPoint(
-        pose.getTranslation(), pose.getRotation(), pose.getRotation(), velocityOverride);
+        pose.getTranslation(), heading, pose.getRotation(), velocityOverride);
+  }
+
+  private Rotation2d headingBetweenPoses(Pose2d pose1, Pose2d pose2){
+    double theta = Math.atan2(pose1.getY() - pose2.getY(), pose1.getX() - pose2.getX());
+    return new Rotation2d(theta + Math.PI);
   }
 
   private boolean behindSafeLine(
