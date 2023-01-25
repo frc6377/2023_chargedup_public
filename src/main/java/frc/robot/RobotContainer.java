@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DefaultDriveCommand;
@@ -88,12 +87,20 @@ public class RobotContainer {
     gunnerMidButton
         .or(driverMidButton)
         .whileTrue(Commands.startEnd(() -> arm.setMid(), () -> arm.setLow(), arm));
-     driverGoButton.whileTrue(Commands.runOnce(() -> CommandScheduler.getInstance().schedule(autoCommand.generateCommand(poses.getBay(7)))));
+    driverGoButton.whileTrue(
+        Commands.runOnce(
+            () ->
+                CommandScheduler.getInstance()
+                    .schedule(autoCommand.generateCommand(poses.getBay(7)))));
   }
 
   public Command getAutonomousCommand() {
     // AutoRoutines should be used to add more auto routines that we'll execute.
 
     return autoCommand.generateCommand("PickFirstElementRed", true);
+  }
+
+  public void createFieldPoses() {
+    autoCommand.createFieldPoses();
   }
 }

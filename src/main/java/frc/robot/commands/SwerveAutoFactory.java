@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 
 public class SwerveAutoFactory {
   private final Pose2DSubscriber sub = Topics.PoseTopic().subscribe(new Pose2d());
-  private final FieldPoses fieldPoses = new FieldPoses();
+  private FieldPoses fieldPoses = null;
   public final double maxVelocity = Constants.autoMaxVelocity;
   public final double maxAcceleration = Constants.autoMaxAcceleration;
   private Consumer<Pose2d> poseReseter = null;
@@ -57,8 +57,8 @@ public class SwerveAutoFactory {
             currentPose,
             Math.hypot(
                 drivetrainSubsystem.getChassisSpeeds().vxMetersPerSecond,
-                drivetrainSubsystem.getChassisSpeeds()
-                    .vyMetersPerSecond), headingBetweenPoses(currentPose, targetPose))); // current drivetrain velocity
+                drivetrainSubsystem.getChassisSpeeds().vyMetersPerSecond),
+            headingBetweenPoses(currentPose, targetPose))); // current drivetrain velocity
 
     // Check the safe line. If we are not behind it, then choose to go
     // high or low based on where we are relative to the center of the
@@ -113,11 +113,10 @@ public class SwerveAutoFactory {
 
     // translation, rotation (direction of the path), holonomic rotation (where the robot is
     // facing), velocity override (initial velo)
-    return new PathPoint(
-        pose.getTranslation(), heading, pose.getRotation(), velocityOverride);
+    return new PathPoint(pose.getTranslation(), heading, pose.getRotation(), velocityOverride);
   }
 
-  private Rotation2d headingBetweenPoses(Pose2d pose1, Pose2d pose2){
+  private Rotation2d headingBetweenPoses(Pose2d pose1, Pose2d pose2) {
     double theta = Math.atan2(pose1.getY() - pose2.getY(), pose1.getX() - pose2.getX());
     return new Rotation2d(theta + Math.PI);
   }
@@ -134,5 +133,11 @@ public class SwerveAutoFactory {
     SmartDashboard.putNumber("currentPose", xPosition);
     SmartDashboard.putNumber("bluSafeLine", FieldPoses.BlueSafeLineX);
     return xPosition < FieldPoses.BlueSafeLineX;
+  }
+
+  public void createFieldPoses() {
+    if (fieldPoses == null) {
+      fieldPoses = new FieldPoses();
+    }
   }
 }
