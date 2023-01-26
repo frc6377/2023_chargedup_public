@@ -58,7 +58,6 @@ public class SwerveAutoFactory {
   public Command generateCommand(Pose2d targetPose) {
 
     createFieldPoses();
-    SmartDashboard.putBoolean("isred2", fieldPoses.isRed());
     Pose2d currentPose = sub.get();
     Pose2d firstTarget = targetPose;
     ArrayList<PathPoint> points = new ArrayList<PathPoint>();
@@ -129,11 +128,9 @@ public class SwerveAutoFactory {
     if (poseReseter != null && isFirstPath)
       poseReseter.accept(trajectory.getInitialHolonomicPose());
     drivetrainSubsystem.sendTrajectoryToNT(trajectory);
-    System.out.println("total time " + trajectory.getTotalTimeSeconds());
-    return new InstantCommand();
     
-   // return command.andThen(
-   //     new InstantCommand(() -> drivetrainSubsystem.drive(new ChassisSpeeds())));
+    return command.andThen(
+        new InstantCommand(() -> drivetrainSubsystem.drive(new ChassisSpeeds())));
   }
 
   private PathPoint poseToPathPoint(Pose2d pose, double velocityOverride, Rotation2d heading) {
@@ -152,13 +149,10 @@ public class SwerveAutoFactory {
       double xPosition) { // checks if we are behind the "safe line" which is defined as a line
     // perpendicular to the driver such that when we are behind said line we
     // cannot hit the charging station
-    SmartDashboard.putBoolean("isRed", fieldPoses.isRed());
     if (fieldPoses.isRed()) {
       return xPosition > FieldPoses.RedSafeLineX;
     }
 
-    SmartDashboard.putNumber("currentPose", xPosition);
-    SmartDashboard.putNumber("bluSafeLine", FieldPoses.BlueSafeLineX);
     return xPosition < FieldPoses.BlueSafeLineX;
   }
 
@@ -166,13 +160,11 @@ public class SwerveAutoFactory {
       double xPosition) { // checks if we are behind the "safe line" which is defined as a line
     // perpendicular to the driver such that when we are behind said line we
     // cannot hit the charging station
-    SmartDashboard.putBoolean("isRed", fieldPoses.isRed());
     if (fieldPoses.isRed()) {
       return xPosition > FieldPoses.RedSafeLineX - 2.7;
     }
 
-    SmartDashboard.putNumber("currentPose", xPosition);
-    SmartDashboard.putNumber("bluSafeLine", FieldPoses.BlueSafeLineX);
+    
     return xPosition < FieldPoses.BlueSafeLineX + 2.7;
   }
 
