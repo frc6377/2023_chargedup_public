@@ -20,13 +20,16 @@ import frc.robot.subsystems.fieldPositioningSystem.FieldPositioningSystem;
 
 public class RobotContainer {
   // Input controllers
-  private final XboxController driveController = new XboxController(0);
+  private final XboxController driveController =
+      new XboxController(DeviceConstants.driveControllerID);
   // Subsystems
   private final DeploySubsystem deploySubsystem = new DeploySubsystem();
-  CommandXboxController driver = new CommandXboxController(0);
-  CommandXboxController gunner = new CommandXboxController(1);
-  ArmSubsystem arm = new ArmSubsystem(11, 12);
-  EndAffectorSubsystem endAffector = new EndAffectorSubsystem(9, 10);
+  CommandXboxController driver = new CommandXboxController(DeviceConstants.driveControllerID);
+  CommandXboxController gunner = new CommandXboxController(DeviceConstants.gunnerControllerID);
+  ArmSubsystem arm = new ArmSubsystem(DeviceConstants.armRotateID, DeviceConstants.armExtendID);
+  EndAffectorSubsystem endAffector =
+      new EndAffectorSubsystem(
+          DeviceConstants.endAffectorLeftID, DeviceConstants.endAffectorRightID);
 
   private final FieldPositioningSystem fieldPositioningSystem = new FieldPositioningSystem();
   private final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem(null);
