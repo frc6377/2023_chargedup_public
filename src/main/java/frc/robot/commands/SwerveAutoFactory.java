@@ -42,13 +42,23 @@ public class SwerveAutoFactory {
 
   public Command generateCommand(String pathTofollow, boolean isFirstPath) {
 
+    createFieldPoses();
+
     PathPlannerTrajectory trajectory =
         PathPlanner.loadPath(pathTofollow, maxVelocity, maxAcceleration);
     return generateControllerCommand(isFirstPath, trajectory);
   }
 
+  public Command generateCommand(int bay){
+    createFieldPoses();
+    return generateCommand(fieldPoses.getBay(bay));
+  }
+
   // generates a trajectory on the fly from a given target pose
   public Command generateCommand(Pose2d targetPose) {
+
+    createFieldPoses();
+    SmartDashboard.putBoolean("isred2", fieldPoses.isRed());
     Pose2d currentPose = sub.get();
 
     ArrayList<PathPoint> points = new ArrayList<PathPoint>();
@@ -63,12 +73,23 @@ public class SwerveAutoFactory {
     // Check the safe line. If we are not behind it, then choose to go
     // high or low based on where we are relative to the center of the
     // charge station.
-    if (!behindSafeLine(currentPose.getX())) {
+
+    if (!pastChargeStation(currentPose.getX())){
+      Pose2d safePose =
+          (targetPose.getY() > FieldPoses.ChargeStationYCenter)
+              ? fieldPoses.getUpperSafePoint()
+              : fieldPoses.getLowerSafePoint();
+      
+      double stationOffset = (fieldPoses.isRed() ? -3 : 3);
+      points.add(poseToPathPoint(new Pose2d(safePose.getX() + stationOffset , safePose.getY(), safePose.getRotation()), -1, safePose.getRotation()));
+      points.add(poseToPathPoint(safePose, -1, safePose.getRotation()));
+    }
+    else if (!behindSafeLine(currentPose.getX())) {
       Pose2d safePose =
           (currentPose.getY() > FieldPoses.ChargeStationYCenter)
               ? fieldPoses.getUpperSafePoint()
               : fieldPoses.getLowerSafePoint();
-      points.add(poseToPathPoint(safePose, -1, safePose.getRotation()));
+      points.add(poseToPathPoint(new Pose2d(safePose.getX(), currentPose.getY(), safePose.getRotation()), -1, safePose.getRotation()));
     }
 
     SmartDashboard.putString(
@@ -105,6 +126,8 @@ public class SwerveAutoFactory {
       poseReseter.accept(trajectory.getInitialHolonomicPose());
     drivetrainSubsystem.sendTrajectoryToNT(trajectory);
     System.out.println("total time " + trajectory.getTotalTimeSeconds());
+    //return new InstantCommand();
+    
     return command.andThen(
         new InstantCommand(() -> drivetrainSubsystem.drive(new ChassisSpeeds())));
   }
@@ -133,6 +156,20 @@ public class SwerveAutoFactory {
     SmartDashboard.putNumber("currentPose", xPosition);
     SmartDashboard.putNumber("bluSafeLine", FieldPoses.BlueSafeLineX);
     return xPosition < FieldPoses.BlueSafeLineX;
+  }
+
+  private boolean pastChargeStation(
+      double xPosition) { // checks if we are behind the "safe line" which is defined as a line
+    // perpendicular to the driver such that when we are behind said line we
+    // cannot hit the charging station
+    SmartDashboard.putBoolean("isRed", fieldPoses.isRed());
+    if (fieldPoses.isRed()) {
+      return xPosition > FieldPoses.RedSafeLineX - 1.95;
+    }
+
+    SmartDashboard.putNumber("currentPose", xPosition);
+    SmartDashboard.putNumber("bluSafeLine", FieldPoses.BlueSafeLineX);
+    return xPosition < FieldPoses.BlueSafeLineX + 1.95;
   }
 
   public void createFieldPoses() {

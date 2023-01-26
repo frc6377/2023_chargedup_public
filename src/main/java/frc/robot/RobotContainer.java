@@ -91,7 +91,7 @@ public class RobotContainer {
         Commands.runOnce(
             () ->
                 CommandScheduler.getInstance()
-                    .schedule(autoCommand.generateCommand(poses.getBay(7)))));
+                    .schedule(autoCommand.generateCommand(2))));
   }
 
   public Command getAutonomousCommand() {
@@ -100,7 +100,4 @@ public class RobotContainer {
     return autoCommand.generateCommand("PickFirstElementRed", true);
   }
 
-  public void createFieldPoses() {
-    autoCommand.createFieldPoses();
-  }
 }

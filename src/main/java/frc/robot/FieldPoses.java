@@ -39,7 +39,7 @@ public class FieldPoses {
   public FieldPoses() {
     boolean isRed = isRed();
 
-    var xPosition = isRed ? 1.9 : 14.6;
+    var xPosition = isRed ? 14.6 : 1.9;
 
     // The following values are coordinate points describing the y-locations of the individual
     // grids. They are ordered assuming we are on the Blue team.
@@ -56,7 +56,7 @@ public class FieldPoses {
       bay[i] = new Pose2d(xPosition, yPosition.get(i), rotation);
     }
 
-    var safeXPose = isRed ? 14.3 : 2.6;
+    var safeXPose = isRed ? 14.24 : 2.3;
     upperSafePoint = new Pose2d(safeXPose, 4.65, rotation);
     lowerSafePoint = new Pose2d(safeXPose, 0.9, rotation);
   }
