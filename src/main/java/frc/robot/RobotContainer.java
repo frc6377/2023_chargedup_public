@@ -89,9 +89,7 @@ public class RobotContainer {
         .whileTrue(Commands.startEnd(() -> arm.setMid(), () -> arm.setLow(), arm));
     driverGoButton.whileTrue(
         Commands.runOnce(
-            () ->
-                CommandScheduler.getInstance()
-                    .schedule(autoCommand.generateCommand(2))));
+            () -> CommandScheduler.getInstance().schedule(autoCommand.generateCommand(2))));
   }
 
   public Command getAutonomousCommand() {
@@ -99,5 +97,4 @@ public class RobotContainer {
 
     return autoCommand.generateCommand("PickFirstElementRed", true);
   }
-
 }
