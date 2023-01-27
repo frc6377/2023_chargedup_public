@@ -127,8 +127,8 @@ public class SwerveAutoFactory {
     points.add(
         new PathPoint(
             targetPose.getTranslation(),
-            new Rotation2d(Math.PI),
-            new Rotation2d(Math.PI))); // TODO dont use fixed headings
+            targetPose.getRotation().rotateBy(new Rotation2d(Math.PI)),
+            targetPose.getRotation().rotateBy(new Rotation2d(Math.PI))));
 
     var constraints = new PathConstraints(maxVelocity, maxAcceleration);
     var trajectory = PathPlanner.generatePath(constraints, points);

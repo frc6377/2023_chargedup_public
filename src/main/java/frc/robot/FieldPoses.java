@@ -49,7 +49,7 @@ public class FieldPoses {
     if (isRed) {
       Collections.reverse(yPosition);
     }
-    var rotationValue = isRed ? 0 : Math.PI;
+    var rotationValue = isRed ? Math.PI : 0;
     var rotation = new Rotation2d(rotationValue);
 
     for (var i = 0; i < bay.length; i++) {
