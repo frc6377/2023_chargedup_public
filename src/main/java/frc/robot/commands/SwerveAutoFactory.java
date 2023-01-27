@@ -150,6 +150,7 @@ public class SwerveAutoFactory {
             new PIDController(1, 0, 0),
             thetaController,
             drivetrainSubsystem::updateAutoDemand,
+            false,
             drivetrainSubsystem);
 
     if (poseReseter != null
