@@ -18,10 +18,8 @@ public class StreamDeck {
   // the highest index will be selected.
   public int getSelected() {
     for (int i = 1; i <= numButtons; i++) {
-      if (streamDeck.getRawButtonPressed(i)) {
-        selected =
-            (i - 1); // The -1 is because the GenericHID class begins its indecises at 1 and I am
-        // sticking with the standard of starting them at 0.
+      if (streamDeck.getRawButtonPressed(i) && i % 5 != 0) {
+        selected = i;
       }
     }
     return selected;

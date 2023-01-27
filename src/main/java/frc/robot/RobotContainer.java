@@ -5,7 +5,6 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -23,11 +22,11 @@ import frc.robot.subsystems.fieldPositioningSystem.FieldPositioningSystem;
 public class RobotContainer {
   // Input controllers
   private final XboxController driveController = new XboxController(0);
+  private final StreamDeck streamDeck = new StreamDeck(2, 36);
   // Subsystems
   private final DeploySubsystem deploySubsystem = new DeploySubsystem();
   CommandXboxController driver = new CommandXboxController(0);
   CommandXboxController gunner = new CommandXboxController(1);
-  GenericHID streamDeck = new GenericHID(2);
   ArmSubsystem arm = new ArmSubsystem(11, 12);
   EndAffectorSubsystem endAffector = new EndAffectorSubsystem(9, 10);
 
@@ -91,12 +90,18 @@ public class RobotContainer {
         .whileTrue(Commands.startEnd(() -> arm.setMid(), () -> arm.setLow(), arm));
     driverGoButton.whileTrue(
         Commands.runOnce(
-            () -> CommandScheduler.getInstance().schedule(autoCommand.generateCommand(2))));
+            () -> CommandScheduler.getInstance().schedule(autoCommand.generateCommand(getBay()))));
   }
 
   public Command getAutonomousCommand() {
     // AutoRoutines should be used to add more auto routines that we'll execute.
 
     return autoCommand.generateCommand("PickFirstElementRed", true);
+  }
+
+  public int getBay() {
+    int selected = streamDeck.getSelected();
+    int grid = (selected / 15) * 3; // if we are in the left right or middle grid
+    return grid + selected % 15 % 3; // if we are in the "1, 2, or 3" bays per grid
   }
 }
