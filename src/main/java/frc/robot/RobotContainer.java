@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -26,6 +27,7 @@ public class RobotContainer {
   private final DeploySubsystem deploySubsystem = new DeploySubsystem();
   CommandXboxController driver = new CommandXboxController(0);
   CommandXboxController gunner = new CommandXboxController(1);
+  GenericHID streamDeck = new GenericHID(2);
   ArmSubsystem arm = new ArmSubsystem(11, 12);
   EndAffectorSubsystem endAffector = new EndAffectorSubsystem(9, 10);
 
