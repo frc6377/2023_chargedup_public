@@ -106,6 +106,15 @@ public final class Constants {
   public static final double endAffectorSlowOutakespeed = 0.075;
   public static final double endAffectorIdleSpeed = 0.1;
 
+  //Wrist 
+  public static final double wristKp = 0;
+  public static final double wristMaxVelo = 0;
+  public static final double wristMaxAccel = 0;
+  public static final double wristMomentOfInertia = 0;
+  public static final double wristGearRatio = 0;
+
+  
+
   /**
    * The left-to-right distance between the drivetrain wheels
    *
