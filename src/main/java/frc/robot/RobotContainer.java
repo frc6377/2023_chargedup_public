@@ -5,8 +5,10 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -35,7 +37,6 @@ public class RobotContainer {
       new EndAffectorSubsystem(
           DeviceConstants.endAffectorLeftID, DeviceConstants.endAffectorRightID);
   private final ColorSubsystem colorStrip = new ColorSubsystem(2);
-
   private final FieldPositioningSystem fieldPositioningSystem = new FieldPositioningSystem();
   private final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem(null);
   private final SwerveAutoFactory autoCommand =
@@ -111,8 +112,9 @@ public class RobotContainer {
     gunnerMidButton
         .or(driverMidButton)
         .whileTrue(Commands.startEnd(() -> arm.setMid(), () -> arm.setLow(), arm));
-    // Command runHumans = new SwerveAutoCommand(poses.getBay(7), drivetrainSubsystem);
-    // driverGoButton.whileTrue(runHumans);
+    driverGoButton.whileTrue(
+        Commands.runOnce(
+            () -> CommandScheduler.getInstance().schedule(autoCommand.generateCommand(2))));
   }
 
   public Command getAutonomousCommand() {
