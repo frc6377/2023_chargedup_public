@@ -1,6 +1,7 @@
 package frc.robot.subsystems.fieldPositioningSystem;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import java.util.Optional;
@@ -19,11 +20,15 @@ class CameraInterperter {
     photonCamera = new PhotonCamera(cameraName);
     estimator =
         new PhotonPoseEstimator(
-            aprilTagLayout, PoseStrategy.AVERAGE_BEST_TARGETS, photonCamera, cameraPosition);
+            aprilTagLayout, PoseStrategy.CLOSEST_TO_LAST_POSE, photonCamera, cameraPosition);
   }
 
   public void setCameraFieldObject(FieldObject2d cameraFieldObject2d) {
     cameraPositionFieldObject = cameraFieldObject2d;
+  }
+
+  public void setReferncePose(Pose3d refPose){
+    estimator.setLastPose(refPose);
   }
 
   public Optional<VisionMeasurement> measure() {

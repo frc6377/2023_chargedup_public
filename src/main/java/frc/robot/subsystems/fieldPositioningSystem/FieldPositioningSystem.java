@@ -6,6 +6,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -119,6 +120,8 @@ public class FieldPositioningSystem extends SubsystemBase {
             new Rotation2d(), // TODO: this and gyro angle should come from auto
             currentSwervePodPosition,
             new Pose2d());
+    Matrix<N3, N1> stdevMatrix = VecBuilder.fill(0.05,0.05,0.05);
+    swerveDriveOdometry.setVisionMeasurementStdDevs(stdevMatrix);
   }
 
   /** Called every 20ms to provide update the robots position */
@@ -180,8 +183,8 @@ public class FieldPositioningSystem extends SubsystemBase {
       if (potentialMeasurement.isEmpty()) continue;
       VisionMeasurement measurement = potentialMeasurement.get();
 
-      Matrix<N3, N1> stdevMatrix =
-          VecBuilder.fill(measurement.stdev, measurement.stdev, measurement.stdev);
+      // Matrix<N3, N1> stdevMatrix =
+      //     VecBuilder.fill(measurement.stdev, measurement.stdev, measurement.stdev);
       Translation2d measuredLocation = measurement.measurement.getTranslation();
 
       final double correctionDistance =
@@ -192,7 +195,13 @@ public class FieldPositioningSystem extends SubsystemBase {
       }
 
       swerveDriveOdometry.addVisionMeasurement(
-          new Pose2d(measuredLocation, getRotionFromIMU()), measurement.timeRecorded, stdevMatrix);
+          new Pose2d(measuredLocation, getRotionFromIMU()), measurement.timeRecorded);
+    }
+
+    Pose2d robotPose = swerveDriveOdometry.getEstimatedPosition();
+    Pose3d robotPose3d = new Pose3d(robotPose);
+    for(CameraInterperter camera : cameras){
+      camera.setReferncePose(robotPose3d);
     }
   }
 
