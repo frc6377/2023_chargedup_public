@@ -17,20 +17,26 @@ import frc.robot.commands.SwerveAutoFactory;
 import frc.robot.subsystems.DeploySubsystem;
 import frc.robot.subsystems.EndAffectorSubsystem;
 import frc.robot.subsystems.arm.ArmSubsystem;
+import frc.robot.subsystems.color.ColorSubsystem;
 import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
 import frc.robot.subsystems.fieldPositioningSystem.FieldPositioningSystem;
 
 public class RobotContainer {
   // Input controllers
-  private final XboxController driveController = new XboxController(0);
+  private final XboxController driveController =
+      new XboxController(DeviceConstants.driveControllerID);
   // Subsystems
   private final DeploySubsystem deploySubsystem = new DeploySubsystem();
-  CommandXboxController driver = new CommandXboxController(0);
-  CommandXboxController gunner = new CommandXboxController(1);
-  GenericHID streamDeck = new GenericHID(2);
-  ArmSubsystem arm = new ArmSubsystem(11, 12);
-  EndAffectorSubsystem endAffector = new EndAffectorSubsystem(9, 10);
-
+  private final CommandXboxController driver =
+      new CommandXboxController(DeviceConstants.driveControllerID);
+  private final CommandXboxController gunner =
+      new CommandXboxController(DeviceConstants.gunnerControllerID);
+  private final ArmSubsystem arm =
+      new ArmSubsystem(DeviceConstants.armRotateID, DeviceConstants.armExtendID);
+  private final EndAffectorSubsystem endAffector =
+      new EndAffectorSubsystem(
+          DeviceConstants.endAffectorLeftID, DeviceConstants.endAffectorRightID);
+  private final ColorSubsystem colorStrip = new ColorSubsystem(2);
   private final FieldPositioningSystem fieldPositioningSystem = new FieldPositioningSystem();
   private final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem(null);
   private final SwerveAutoFactory autoCommand =
@@ -38,7 +44,6 @@ public class RobotContainer {
 
   public RobotContainer() {
     deploySubsystem.Log();
-
     fieldPositioningSystem.setDriveTrainSupplier(
         () -> drivetrainSubsystem.getOdometry(), drivetrainSubsystem.getKinematics());
 
@@ -83,6 +88,24 @@ public class RobotContainer {
         .whileTrue(
             Commands.startEnd(
                 () -> endAffector.slowOutake(), () -> endAffector.halt(), endAffector));
+
+    driver
+        .povLeft()
+        .debounce(0.05)
+        .toggleOnTrue(Commands.runOnce(() -> colorStrip.positionColoring.Increment(), colorStrip));
+    driver
+        .povRight()
+        .debounce(0.05)
+        .toggleOnTrue(Commands.runOnce(() -> colorStrip.positionColoring.Decrement(), colorStrip));
+    driver
+        .povUp()
+        .debounce(0.05)
+        .toggleOnTrue(Commands.runOnce(() -> colorStrip.pieceColoring.toggleColor(), colorStrip));
+    driver
+        .povDown()
+        .debounce(0.05)
+        .toggleOnTrue(Commands.runOnce(() -> colorStrip.pieceColoring.toggleHeight(), colorStrip));
+
     gunnerHighButton
         .or(driverHighButton)
         .whileTrue(Commands.startEnd(() -> arm.setHigh(), () -> arm.setLow(), arm));
