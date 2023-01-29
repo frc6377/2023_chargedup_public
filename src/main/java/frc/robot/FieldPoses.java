@@ -14,7 +14,7 @@ import java.util.Collections;
  * membership and known positions of known field elements.
  */
 public class FieldPoses {
-  public static final double BlueSafeLineX = 2.3;
+  public static final double BlueSafeLineX = 2.8;
   public static final double RedSafeLineX = 14.2;
   public static final double ChargeStationYCenter = 2.8;
 
@@ -39,7 +39,7 @@ public class FieldPoses {
   public FieldPoses() {
     boolean isRed = isRed();
 
-    var xPosition = isRed ? 14.6 : 1.9;
+    var xPosition = isRed ? 14.6 : 2.35;
 
     // The following values are coordinate points describing the y-locations of the individual
     // grids. They are ordered assuming we are on the Blue team.
@@ -49,14 +49,14 @@ public class FieldPoses {
     if (isRed) {
       Collections.reverse(yPosition);
     }
-    var rotationValue = isRed ? Math.PI : 0;
+    var rotationValue = isRed ? 0 : Math.PI;
     var rotation = new Rotation2d(rotationValue);
 
     for (var i = 0; i < bay.length; i++) {
       bay[i] = new Pose2d(xPosition, yPosition.get(i), rotation);
     }
 
-    var safeXPose = isRed ? 14.24 : 2.3;
+    var safeXPose = isRed ? 14.24 : 2.4;
     upperSafePoint = new Pose2d(safeXPose, 4.65, rotation);
     lowerSafePoint = new Pose2d(safeXPose, 0.9, rotation);
   }

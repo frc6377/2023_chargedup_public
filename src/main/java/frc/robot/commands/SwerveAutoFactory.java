@@ -127,8 +127,8 @@ public class SwerveAutoFactory {
     points.add(
         new PathPoint(
             targetPose.getTranslation(),
-            targetPose.getRotation().rotateBy(new Rotation2d(Math.PI)),
-            targetPose.getRotation().rotateBy(new Rotation2d(Math.PI))).withPrevControlLength(0.1));
+            new Rotation2d(Math.PI),
+            new Rotation2d(Math.PI)).withPrevControlLength(0.1));
 
     var constraints = new PathConstraints(maxVelocity, maxAcceleration);
     var trajectory = PathPlanner.generatePath(constraints, points);
@@ -160,9 +160,8 @@ public class SwerveAutoFactory {
     drivetrainSubsystem.sendTrajectoryToNT(trajectory); // posts trajectory to dashboard
 
     // run the command and than stop the drivetrain. Just to make sure we arent moving at the end
-   // return command.andThen(
-   //     new InstantCommand(() -> drivetrainSubsystem.drive(new ChassisSpeeds())));
-   return new InstantCommand();
+    return command.andThen(
+        new InstantCommand(() -> drivetrainSubsystem.drive(new ChassisSpeeds())));
   }
 
   // converts a Pose2d to a PathPoint
