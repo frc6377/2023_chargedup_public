@@ -121,13 +121,13 @@ public final class Constants {
 
   public static final int DRIVETRAIN_PIGEON_ID = 1;
 
-  public static final PodName FRONT_LEFT_POD_NAME = PodName.B;
+  public static final PodName FRONT_LEFT_POD_NAME = PodName.F;
 
-  public static final PodName FRONT_RIGHT_POD_NAME = PodName.C;
+  public static final PodName FRONT_RIGHT_POD_NAME = PodName.H;
 
-  public static final PodName BACK_LEFT_POD_NAME = PodName.A;
+  public static final PodName BACK_LEFT_POD_NAME = PodName.E;
 
-  public static final PodName BACK_RIGHT_POD_NAME = PodName.D;
+  public static final PodName BACK_RIGHT_POD_NAME = PodName.G;
 
   public static final double autoMaxVelocity = 4.5;
 
