@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 public class StreamDeck {
   private GenericHID streamDeck;
   private int numButtons;
-  private int selected = 0;
+  private int selected = 2;
 
   public StreamDeck(int port, int numButtons) {
     this.streamDeck = new GenericHID(port);
