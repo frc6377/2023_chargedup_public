@@ -100,8 +100,8 @@ public class RobotContainer {
   }
 
   public int getBay() {
-    int selected = streamDeck.getSelected();
+    int selected = streamDeck.getSelected() - 1;
     int grid = (selected / 9) * 3; // if we are in the left right or middle grid
-    return grid + selected % 9 % 3; // if we are in the "1, 2, or 3" bays per grid
+    return 8 - (grid + (selected % 9 % 3)); // if we are in the "1, 2, or 3" bays per grid
   }
 }
