@@ -18,7 +18,7 @@ public enum PodLocation {
       case 1: // Front Left
         return 3;
       case 2: // Back Right
-        return 8;
+        return 7;
       case 3: // Back Left
         return 1;
       default:
@@ -33,7 +33,7 @@ public enum PodLocation {
       case 1: // Front Left
         return 4;
       case 2: // Back Right Turn
-        return 7;
+        return 8;
       case 3: // Back Left
         return 2;
       default:
