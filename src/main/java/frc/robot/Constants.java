@@ -131,5 +131,5 @@ public final class Constants {
 
   public static final double autoMaxVelocity = 4.5;
 
-  public static final double autoMaxAcceleration = 4.5;
+  public static final double autoMaxAcceleration = 2.5;
 }
