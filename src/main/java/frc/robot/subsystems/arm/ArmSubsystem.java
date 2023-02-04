@@ -110,6 +110,10 @@ public class ArmSubsystem extends SubsystemBase {
     ppc.setGoal(position);
   }
 
+  public void setPositionDegrees(double degrees){
+    setPosition(Math.toRadians(degrees)/Constants.armRotationalTicksToRadians);
+  }
+
   private double getPosition() {
     return encoder.getPosition();
   }
