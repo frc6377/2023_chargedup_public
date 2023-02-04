@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 public class StreamDeck {
   private GenericHID streamDeck;
   private int numButtons;
-  private int selected = 0;
+  private int selected = 2;
 
   public StreamDeck(int port, int numButtons) {
     this.streamDeck = new GenericHID(port);
@@ -19,9 +19,7 @@ public class StreamDeck {
   public int getSelected() {
     for (int i = 1; i <= numButtons; i++) {
       if (streamDeck.getRawButtonPressed(i)) {
-        selected =
-            (i - 1); // The -1 is because the GenericHID class begins its indecises at 1 and I am
-        // sticking with the standard of starting them at 0.
+        selected = i;
       }
     }
     return selected;

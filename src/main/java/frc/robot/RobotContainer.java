@@ -24,6 +24,7 @@ public class RobotContainer {
   // Input controllers
   private final XboxController driveController =
       new XboxController(DeviceConstants.driveControllerID);
+  private final StreamDeck streamDeck = new StreamDeck(2, 36);
   // Subsystems
   private final DeploySubsystem deploySubsystem = new DeploySubsystem();
   private final CommandXboxController driver =
@@ -113,12 +114,22 @@ public class RobotContainer {
         .whileTrue(Commands.startEnd(() -> arm.setMid(), () -> arm.setLow(), arm));
     driverGoButton.whileTrue(
         Commands.runOnce(
-            () -> CommandScheduler.getInstance().schedule(autoCommand.generateCommand(2))));
+            () -> CommandScheduler.getInstance().schedule(autoCommand.generateCommand(getBay()).until(this::isDriving))));
   }
 
   public Command getAutonomousCommand() {
     // AutoRoutines should be used to add more auto routines that we'll execute.
 
     return autoCommand.generateCommand("PickFirstElementRed", true);
+  }
+
+  public int getBay() {
+    int selected = streamDeck.getSelected() - 1;
+    int grid = (selected / 9) * 3; // if we are in the left right or middle grid
+    return 8 - (grid + (selected % 9 % 3)); // if we are in the "1, 2, or 3" bays per grid
+  }
+
+  private boolean isDriving(){
+    return 0.5 < Math.hypot(driveController.getLeftX(), driveController.getLeftY());
   }
 }
