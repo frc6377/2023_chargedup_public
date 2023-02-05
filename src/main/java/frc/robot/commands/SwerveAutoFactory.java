@@ -205,4 +205,10 @@ public class SwerveAutoFactory {
       fieldPoses = new FieldPoses();
     }
   }
+
+  private enum ZONE {
+    CLOSE,
+    MID,
+    FAR
+  }
 }

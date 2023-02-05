@@ -2,10 +2,12 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * Team membership is unknown until network tables are available. This class allows the system to
@@ -14,11 +16,26 @@ import java.util.Collections;
  * membership and known positions of known field elements.
  */
 public class FieldPoses {
+
+  private boolean isRed;
   public static final double BlueSafeLineX = 2.8;
   public static final double RedSafeLineX = 14.2;
   public static final double ChargeStationYCenter = 2.8;
 
-  private static final Pose2d[] bay = new Pose2d[9];
+  public static final Translation2d rightFarInflectionPoint;
+  public static final Translation2d rightCloseInflectionPoint;
+
+  public static final Translation2d rightStationFarInflectionPoint;
+  public static final Translation2d rightStationCloseInflectionPoint;
+
+  public static final Translation2d leftFarInflectionPoint;
+  public static final Translation2d leftCloseInflectionPoint;
+
+  public static final Translation2d leftStationFarInflectionPoint;
+  public static final Translation2d leftStationCloseInflectionPoint;
+
+
+  private static final Translation2d[] bay = new Translation2d[9];
   private final Pose2d upperSafePoint; // point to avoid switch
   private final Pose2d lowerSafePoint; // other point to avoid switch
 
@@ -37,25 +54,21 @@ public class FieldPoses {
   }
 
   public FieldPoses() {
-    boolean isRed = isRed();
-
-    var xPosition = isRed ? 14.6 : 2.35;
+     this.isRed = isRed();
 
     // The following values are coordinate points describing the y-locations of the individual
     // grids. They are ordered assuming we are on the Blue team.
-    var yPosition = Arrays.asList(0.55, 1.05, 1.65, 2.15, 2.75, 3.3, 3.85, 4.45, 4.98);
+    List<Translation2d> relativeBays = Constants.deliveryBays;
 
     // We reverse the grid locations if we are on the Red team.
+    Rotation2d rotation;
     if (isRed) {
-      Collections.reverse(yPosition);
-    }
-    var rotationValue = isRed ? 0 : Math.PI;
-    var rotation = new Rotation2d(rotationValue);
-
-    for (var i = 0; i < bay.length; i++) {
-      bay[i] = new Pose2d(xPosition, yPosition.get(i), rotation);
+      Collections.reverse(relativeBays);
     }
 
+    createBays(relativeBays);
+
+ 
     var safeXPose = isRed ? 14.24 : 2.4;
     upperSafePoint = new Pose2d(safeXPose, 4.65, rotation);
     lowerSafePoint = new Pose2d(safeXPose, 0.9, rotation);
@@ -75,7 +88,7 @@ public class FieldPoses {
     return alliance == Alliance.Red;
   }
 
-  public Pose2d getBay(final int bayNumber) {
+  public Translation2d getBay(final int bayNumber) {
     return bay[bayNumber];
   }
 
@@ -85,5 +98,27 @@ public class FieldPoses {
 
   public Pose2d getLowerSafePoint() {
     return lowerSafePoint;
+  }
+
+  private void createBays (List<Translation2d> relativeBays) {
+    if (isRed){
+      for (int i = 0; i < relativeBays.size(); i++){
+        bay[i] = relativeToAbsolute(relativeBays.get(i));
+      }
+    }
+  }
+  private Translation2d relativeToAbsolute (Translation2d translation){
+    Translation2d absTranslation = translation;
+
+    if (isRed) {
+      translation = new Translation2d(Constants.fieldX - translation.getX(), translation.getY());
+    }
+
+    return translation;
+  }
+
+  public void createInflectionPoints (){
+
+    
   }
 }
