@@ -117,6 +117,8 @@ public final class Constants {
   public static final double wristRotationConeMid = -10.428622245788574 - 3;
   public static final double wristRotationConeHigh = -10.428622245788574 - 7;
 
+  public static final double wristTicksToRadians = Math.PI / 50; // TODO: Calculate the actual value
+
   public static final int wristID = 15;
   // TODO: Calculate actual value.
   public static final double armLengthTicksToMeters = 0;
@@ -132,6 +134,16 @@ public final class Constants {
   public static final double endAffectorOutakespeed = 0.3;
   public static final double endAffectorSlowOutakespeed = 0.075;
   public static final double endAffectorIdleSpeed = 0.1;
+
+  // Arm Rotation
+  public static final double armRotationKp = 0.099902;
+  public static final double armRotationMaxVelo = 15;
+  public static final double armRotationMaxAccel = 17.64705882;
+
+  // Arm Extension
+  public static final double armExtensionKp = 0;
+  public static final double armExtensionMaxVelo = 0;
+  public static final double armExtensionMaxAccel = 0;
 
   // Wrist
   public static final double wristKp = 0;

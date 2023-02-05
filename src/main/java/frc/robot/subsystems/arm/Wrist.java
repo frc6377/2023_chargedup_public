@@ -33,9 +33,9 @@ public class Wrist {
   public void setPositionDegrees(double degrees) {
     ppc.setGoal(degrees);
   }
-  // Shouldn't this take into account te rotation of the arm as a whole?
+  // Shouldn't this take into account the rotation of the arm as a whole?
   private double computeArbitraryFeetForward() {
-    double theta = encoder.getPosition() * Constants.armRotationalTicksToRadians;
+    double theta = encoder.getPosition() * Constants.wristTicksToRadians;
     return (Math.cos(theta) * Constants.wristMomentOfInertia * 9.8)
         / (Constants.stalledTorque * Constants.wristGearRatio);
   }

@@ -10,11 +10,11 @@ import frc.robot.Constants;
 
 class ArmExtender {
   // Extend PID values
-  private static final double EXTEND_PPC_KP = 0.4;
+  private static final double EXTEND_PPC_KP = Constants.armExtensionKp;
   private static final double EXTEND_PPC_KI = 0;
   private static final double EXTEND_PPC_KD = 0;
-  private static final double EXTEND_PPC_MAX_V = 30;
-  private static final double EXTEND_PPC_MAX_ACCEL = 30;
+  private static final double EXTEND_PPC_MAX_V = Constants.armExtensionMaxVelo;
+  private static final double EXTEND_PPC_MAX_ACCEL = Constants.armExtensionMaxAccel;
   private static final int EXTEND_COUNTS_PER_REV = 42;
   private static final int EXTEND_SMART_CURRENT_LIMIT = 40;
 
