@@ -4,10 +4,11 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Translation2d;
-import frc.robot.subsystems.drivetrain.config.PodName;
 import java.util.Arrays;
 import java.util.List;
+
+import edu.wpi.first.math.geometry.Translation2d;
+import frc.robot.subsystems.drivetrain.config.PodName;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -109,6 +110,8 @@ public final class Constants {
   public static final double endAffectorSlowOutakespeed = 0.075;
   public static final double endAffectorIdleSpeed = 0.1;
 
+
+
   /**
    * The left-to-right distance between the drivetrain wheels
    *
@@ -132,47 +135,53 @@ public final class Constants {
 
   public static final PodName BACK_RIGHT_POD_NAME = PodName.D;
 
+
   public static final double fieldX = 16.54;
   public static final double fieldY = 8.02;
+
 
   // otf pathing constants
   public static final double autoMaxVelocity = 4.5;
   public static final double autoMaxAcceleration = 2.5;
 
-  // relative distance from your alliance station wall or the left of the field depending on axis.
-  // Gets converted into absolute coordinates in FieldPoses.java
-  public static final double closeZoneboundary = 0;
-  public static final double midZoneboundary = 0;
-  public static final double farZoneboundary = 0;
+  // relative distance from your alliance station wall or the left of the field depending on axis. Gets converted into absolute coordinates in FieldPoses.java
+  public static final double closeProximityBoundary = 0;
+  public static final double midProximityBoundary = 0;
+  public static final double farProximityBoundary = 0;
 
-  public static final double rightZoneboundary = 0;
-  public static final double rightStationZoneboundary = 0;
-  public static final double leftZoneboundary = 0;
-  public static final double leftStationZoneboundary = 0;
+  //defined such that the blue driver station is to the left
+  public static final double bottomZoneBoundary = 0;
+  public static final double bottomStationZoneBoundary = 0;
+  public static final double topZoneBoundary = 0;
+  public static final double topStationZoneBoundary = 0;
 
-  public static final Translation2d rightFarInflectionPoint = new Translation2d(0, 0);
-  public static final Translation2d rightCloseInflectionPoint = new Translation2d(0, 0);
+  public static final Translation2d bottomFarInflectionPoint = new Translation2d(0, 0);
+  public static final Translation2d bottomCloseInflectionPoint = new Translation2d(0, 0);
 
-  public static final Translation2d rightStationFarInflectionPoint = new Translation2d(0, 0);
-  public static final Translation2d rightStationCloseInflectionPoint = new Translation2d(0, 0);
+  public static final Translation2d bottomStationFarInflectionPoint = new Translation2d(0, 0);
+  public static final Translation2d bottomStationCloseInflectionPoint = new Translation2d(0, 0);
 
-  public static final Translation2d leftFarInflectionPoint = new Translation2d(0, 0);
-  public static final Translation2d leftCloseInflectionPoint = new Translation2d(0, 0);
+  public static final Translation2d topFarInflectionPoint = new Translation2d(0, 0);
+  public static final Translation2d topCloseInflectionPoint = new Translation2d(0, 0);
 
-  public static final Translation2d leftStationFarInflectionPoint = new Translation2d(0, 0);
-  public static final Translation2d leftStationCloseInflectionPoint = new Translation2d(0, 0);
+  public static final Translation2d topStationFarInflectionPoint = new Translation2d(0, 0);
+  public static final Translation2d topStationCloseInflectionPoint = new Translation2d(0, 0);
+  
 
-  public static final List<Translation2d> deliveryBays =
-      Arrays.asList(
-          new Translation2d(0, 0),
-          new Translation2d(0, 0),
-          new Translation2d(0, 0),
-          new Translation2d(0, 0),
-          new Translation2d(0, 0),
-          new Translation2d(0, 0),
-          new Translation2d(0, 0),
-          new Translation2d(0, 0));
+  public static final List<Translation2d> deliveryBays = Arrays.asList(
+
+    new Translation2d(0 , 0),
+    new Translation2d(0 , 0),
+    new Translation2d(0 , 0),
+    new Translation2d(0 , 0),
+    new Translation2d(0 , 0),
+    new Translation2d(0 , 0),
+    new Translation2d(0 , 0),
+    new Translation2d(0 , 0)
+  );
 
   public static final Translation2d doubleSubstation = new Translation2d(0, 0);
   public static final Translation2d singleSubstation = new Translation2d(0, 0);
+
+
 }

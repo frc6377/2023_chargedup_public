@@ -16,15 +16,15 @@ public class FieldPoses {
 
   private boolean isRed;
 
-  public final double closeZoneBoundary;
-  public final double midZoneBoundary;
-  public final double farZoneBoundary;
+  public final double closeProximityBoundary;
+  public final double midProximityBoundary;
+  public final double farProximityBoundary;
 
-  public final double rightZoneBoundary = Constants.rightZoneBoundary;
-  public final double rightStationZoneBoundary = Constants.rightStationZoneBoundary;
-  public final double leftZoneBoundary = Constants.leftZoneBoundary;
-  public final double leftStationZoneBoundary = Constants.leftStationZoneBoundary;
-
+  public final double rightZoneBoundary;
+  public final double rightStationZoneBoundary;
+  public final double leftZoneBoundary;
+  public final double leftStationZoneBoundary;
+  //defined such that the blue driver station is to the left
   public final Translation2d rightFarInflectionPoint;
   public final Translation2d rightCloseInflectionPoint;
 
@@ -77,28 +77,28 @@ public class FieldPoses {
     return leftStationFarInflectionPoint;
   }
 
-  public final double getRightZoneBoundary() {
+  public final double getBottomZoneBoundary() {
     return rightZoneBoundary;
   }
 
-  public final double getRightStationZoneBoundary() {
+  public final double getBottomStationZoneBoundary() {
     return rightStationZoneBoundary;
   }
 
-  public final double getLeftZoneBoundary() {
+  public final double getTopZoneBoundary() {
     return leftZoneBoundary;
   }
 
-  public final double getCloseZoneBoundary() {
-    return closeZoneBoundary;
+  public final double getCloseProximityBoundary() {
+    return closeProximityBoundary;
   }
 
-  public final double getMidZoneBoundary() {
-    return midZoneBoundary;
+  public final double getMidProximityBoundary() {
+    return midProximityBoundary;
   }
 
-  public final double getFarZoneBoundary() {
-    return farZoneBoundary;
+  public final double getFarProximityBoundary() {
+    return farProximityBoundary;
   }
 
   public final Translation2d getSingleSubstation() {
@@ -119,25 +119,31 @@ public class FieldPoses {
     // initialize all attributes such that they are absolute
     createBays(relativeBays);
 
+    rightZoneBoundary = (isRed) ? Constants.topZoneBoundary : Constants.bottomZoneBoundary;
+    rightStationZoneBoundary = (isRed) ? Constants.topStationZoneBoundary :  Constants.bottomStationZoneBoundary;
+    leftZoneBoundary = (isRed) ? Constants.bottomZoneBoundary : Constants.topZoneBoundary;
+    leftStationZoneBoundary = (isRed) ? Constants.bottomStationZoneBoundary : Constants.topStationZoneBoundary;
+
+
     singleSubstation = relativeToAbsolute(Constants.singleSubstation);
     doubleSubstation = relativeToAbsolute(Constants.doubleSubstation);
 
-    rightFarInflectionPoint = relativeToAbsolute(Constants.rightFarInflectionPoint);
-    rightCloseInflectionPoint = relativeToAbsolute(Constants.rightCloseInflectionPoint);
+    rightFarInflectionPoint = relativeToAbsolute(Constants.bottomFarInflectionPoint);
+    rightCloseInflectionPoint = relativeToAbsolute(Constants.bottomCloseInflectionPoint);
 
-    rightStationFarInflectionPoint = relativeToAbsolute(Constants.rightStationFarInflectionPoint);
+    rightStationFarInflectionPoint = relativeToAbsolute(Constants.bottomStationFarInflectionPoint);
     rightStationCloseInflectionPoint =
-        relativeToAbsolute(Constants.rightStationCloseInflectionPoint);
+        relativeToAbsolute(Constants.bottomStationCloseInflectionPoint);
 
-    leftFarInflectionPoint = relativeToAbsolute(Constants.leftFarInflectionPoint);
-    leftCloseInflectionPoint = relativeToAbsolute(Constants.leftCloseInflectionPoint);
+    leftFarInflectionPoint = relativeToAbsolute(Constants.topFarInflectionPoint);
+    leftCloseInflectionPoint = relativeToAbsolute(Constants.topCloseInflectionPoint);
 
-    leftStationFarInflectionPoint = relativeToAbsolute(Constants.leftStationFarInflectionPoint);
-    leftStationCloseInflectionPoint = relativeToAbsolute(Constants.leftStationCloseInflectionPoint);
+    leftStationFarInflectionPoint = relativeToAbsolute(Constants.topStationFarInflectionPoint);
+    leftStationCloseInflectionPoint = relativeToAbsolute(Constants.topStationCloseInflectionPoint);
 
-    closeZoneBoundary = relativeToAbsolute(Constants.closeZoneBoundary);
-    midZoneBoundary = relativeToAbsolute(Constants.midZoneBoundary);
-    farZoneBoundary = relativeToAbsolute(Constants.farZoneBoundary);
+    closeProximityBoundary = relativeToAbsolute(Constants.closeProximityBoundary);
+    midProximityBoundary = relativeToAbsolute(Constants.midProximityBoundary);
+    farProximityBoundary = relativeToAbsolute(Constants.farProximityBoundary);
   }
 
   /*

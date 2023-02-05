@@ -8,6 +8,7 @@ import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -63,9 +64,12 @@ public class SwerveAutoFactory {
   }
 
   // generates a trajectory on the fly from a given target pose
-  public Command generateCommand(Pose2d targetPose) {
+  public Command generateGridCommand(int targetBay) {
 
     createFieldPoses(); // create a field poses object if we dont have one already
+    Translation2d targetPose = fieldPoses.getBay(targetBay);
+
+    Rotation2d deliveryRotation = (fieldPoses.isRed() ? new Rotation2d(0) : new Rotation2d(Math.PI));
     Pose2d currentPose = sub.get();
     Pose2d firstTarget =
         targetPose; // this variable tracks the pose of the second control point in the trajectory
@@ -76,26 +80,25 @@ public class SwerveAutoFactory {
     // along the Y axis and also it means we need to align ourself with one of the stations
     // "channels"
 
-    if (!pastChargeStation(
-        currentPose
-            .getX())) { // because we can move in the Y axis we can choose the fastest path to the
-      // target
-      Pose2d safePose =
-          (targetPose.getY() > FieldPoses.ChargeStationYCenter)
-              ? fieldPoses.getUpperSafePoint()
-              : fieldPoses.getLowerSafePoint();
+    ZONE currZone = getZone(currentPose.getY());
+    PROXIMITY currProx = getProx(currentPose.getX());
 
-      double stationOffset =
-          (fieldPoses.isRed()
-              ? -3
-              : 3); // pretty gross, will fix in refactor. basically instead of having 2 safe points
-      // we just offset the safe point we have by the length of the station with some
-      // extra tolerance
-      Pose2d firstSafePoint =
-          new Pose2d(safePose.getX() + stationOffset, safePose.getY(), safePose.getRotation());
-      points.add(poseToPathPoint(firstSafePoint, -1, safePose.getRotation()));
-      points.add(poseToPathPoint(safePose, -1, headingBetweenPoses(safePose, targetPose)));
-      firstTarget = firstSafePoint;
+    //build our midpoints first
+    switch (currProx){
+      case CLOSE: //if close we have no midpoints
+        break; 
+      case MID:
+        Translation2d inflection = new Translation2d(fieldPoses.closeProximityBoundary, currentPose.getX()); //if we are in mid we cannot move in the y axis. So just go straight until we enter close
+        points.add(1, poseToPathPoint(new Pose2d(inflection, headingBetweenPoses(currentPose.getTranslation(), inflection)), -1, deliveryRotation));
+        break;
+
+      case FAR:
+      Translation2d inflection1;
+      Translation2d inflection2;
+
+      if (targetBay  <= 1){
+
+      }
     }
 
     // checks if we are between the wall and the station because that means we dont have freedom
@@ -126,10 +129,9 @@ public class SwerveAutoFactory {
         targetPose.getX() + " " + targetPose.getY() + " " + targetPose.getRotation().getDegrees());
     points.add(
         new PathPoint(
-                targetPose.getTranslation(),
-                new Rotation2d(Math.PI), // TODO these from target
-                new Rotation2d(Math.PI))
-            .withPrevControlLength(0.1));
+            targetPose.getTranslation(), 
+            new Rotation2d(Math.PI), //TODO these from target
+            new Rotation2d(Math.PI)).withPrevControlLength(0.1));
 
     var constraints = new PathConstraints(maxVelocity, maxAcceleration);
     var trajectory = PathPlanner.generatePath(constraints, points);
@@ -174,8 +176,8 @@ public class SwerveAutoFactory {
   }
 
   // computes the angle between two poses. Used so points have headings that point to the next point
-  private Rotation2d headingBetweenPoses(Pose2d pose1, Pose2d pose2) {
-    double theta = Math.atan2(pose1.getY() - pose2.getY(), pose1.getX() - pose2.getX());
+  private Rotation2d headingBetweenPoses(Translation2d translation1, Translation2d translation2) {
+    double theta = Math.atan2(translation1.getY() - translation2.getY(), translation1.getX() - translation2.getX());
     return new Rotation2d(theta + Math.PI);
   }
 
@@ -207,9 +209,55 @@ public class SwerveAutoFactory {
     }
   }
 
-  private enum ZONE {
+  private PROXIMITY getProx (double x){
+
+    // built on the principle x > y = -x < -y. Because we must check if greater on red and if lesser on blue we negate both sides of the equation to effectively flip the comparison
+    int mult = (fieldPoses.isRed()) ? -1 : 1;
+    x *= mult;
+
+    if (x < fieldPoses.closeProximityBoundary*mult){
+      return PROXIMITY.CLOSE;
+    }
+
+    if (x < fieldPoses.midProximityBoundary*mult){
+      return PROXIMITY.CLOSE;
+    }
+
+    return PROXIMITY.FAR;
+  }
+
+  private ZONE getZone (double y){
+
+    // built on the principle x > y = -x < -y. Because we must check if greater on red and if lesser on blue we negate both sides of the equation to effectively flip the comparison
+    int mult = (fieldPoses.isRed()) ? -1 : 1;
+    y *= mult;
+
+    if (y < fieldPoses.rightZoneBoundary*mult){
+      return ZONE.RIGHT;
+    }
+
+    if (y < fieldPoses.rightStationZoneBoundary*mult){
+      return ZONE.RIGHT_STATION;
+    }
+
+    if (y < fieldPoses.leftStationZoneBoundary*mult){
+      return ZONE.LEFT_STATION;
+    }
+
+    return ZONE.LEFT;
+  }
+
+  private enum PROXIMITY {
     CLOSE,
     MID,
     FAR
+  }
+
+  private enum ZONE {
+    // defined such that the blue driver station is to the left
+    LEFT,
+    LEFT_STATION,
+    RIGHT,
+    RIGHT_STATION
   }
 }
