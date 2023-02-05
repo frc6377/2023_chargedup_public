@@ -8,7 +8,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import frc.robot.Constants;
 
-class ArmExtender{
+class ArmExtender {
   // Extend PID values
   private static final double EXTEND_PPC_KP = 0.4;
   private static final double EXTEND_PPC_KI = 0;
@@ -23,18 +23,18 @@ class ArmExtender{
   private final RelativeEncoder extendEncoder;
   private final ProfiledPIDController extendPpc;
 
-  public ArmExtender(final int extendId1,final int extendId2) {
+  public ArmExtender(final int extendId1, final int extendId2) {
     extendPpc =
         new ProfiledPIDController(
             EXTEND_PPC_KP,
             EXTEND_PPC_KI,
             EXTEND_PPC_KD,
             new TrapezoidProfile.Constraints(EXTEND_PPC_MAX_V, EXTEND_PPC_MAX_ACCEL));
-            extendMotorLead = new CANSparkMax(extendId1, MotorType.kBrushless);
-            extendMotorLead.restoreFactoryDefaults();
-            extendMotorFollow = new CANSparkMax(extendId2, MotorType.kBrushless);
-            extendMotorFollow.restoreFactoryDefaults();
-            extendMotorFollow.follow(extendMotorLead);
+    extendMotorLead = new CANSparkMax(extendId1, MotorType.kBrushless);
+    extendMotorLead.restoreFactoryDefaults();
+    extendMotorFollow = new CANSparkMax(extendId2, MotorType.kBrushless);
+    extendMotorFollow.restoreFactoryDefaults();
+    extendMotorFollow.follow(extendMotorLead);
     extendEncoder =
         extendMotorLead.getEncoder(SparkMaxRelativeEncoder.Type.kHallSensor, EXTEND_COUNTS_PER_REV);
 

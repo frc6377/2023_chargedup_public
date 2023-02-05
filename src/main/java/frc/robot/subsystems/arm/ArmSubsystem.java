@@ -21,21 +21,22 @@ public class ArmSubsystem extends SubsystemBase {
 
   public ArmSubsystem() {
     System.out.println("Starting Construct ArmSubsystem");
-    //TODO: add current limits for arm rotation, extension, wrist.
-    ppc = new ProfiledPIDController(0.099902, 0, 0, new TrapezoidProfile.Constraints(15, 17.64705882));
+    // TODO: add current limits for arm rotation, extension, wrist.
+    ppc =
+        new ProfiledPIDController(
+            0.099902, 0, 0, new TrapezoidProfile.Constraints(15, 17.64705882));
     armMotorLead = new CANSparkMax(Constants.armRotationID1, MotorType.kBrushless);
     armMotorLead.restoreFactoryDefaults();
     armMotorFollow = new CANSparkMax(Constants.armRotationID2, MotorType.kBrushless);
     armMotorFollow.restoreFactoryDefaults();
     armMotorFollow.follow(armMotorLead);
-    //TODO: determine the correct value for countsPerRev for this encoder
+    // TODO: determine the correct value for countsPerRev for this encoder
     encoder = armMotorLead.getEncoder(SparkMaxRelativeEncoder.Type.kHallSensor, 42);
 
     armMotorLead.setSmartCurrentLimit(40);
 
-
     // TODO: when we have a real extension arm, change this to `ActiveArmExtender`
-    extender = new ArmExtender(Constants.armLengthID1,Constants.armLengthID2);
+    extender = new ArmExtender(Constants.armLengthID1, Constants.armLengthID2);
     wrist = new Wrist(Constants.wristID);
 
     System.out.println("Complete Construct ArmSubsystem");
@@ -69,6 +70,7 @@ public class ArmSubsystem extends SubsystemBase {
     extender.setLength(Constants.armLengthCubeHigh);
     wrist.setPositionDegrees(Constants.wristRotationCubeHigh);
   }
+
   public void setConeMid() {
     setPosition(Constants.armRotationConeMid);
     extender.setLength(Constants.armLengthConeMid);
@@ -100,8 +102,8 @@ public class ArmSubsystem extends SubsystemBase {
     ppc.setGoal(position);
   }
 
-  public void setPositionDegrees(double degrees){
-    setPosition(Math.toRadians(degrees)/Constants.armRotationalTicksToRadians);
+  public void setPositionDegrees(double degrees) {
+    setPosition(Math.toRadians(degrees) / Constants.armRotationalTicksToRadians);
   }
 
   private double getPosition() {

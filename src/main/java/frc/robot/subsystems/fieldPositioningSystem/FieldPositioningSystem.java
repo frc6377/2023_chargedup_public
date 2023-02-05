@@ -120,7 +120,7 @@ public class FieldPositioningSystem extends SubsystemBase {
             new Rotation2d(), // TODO: this and gyro angle should come from auto
             currentSwervePodPosition,
             new Pose2d());
-    Matrix<N3, N1> stdevMatrix = VecBuilder.fill(0.05,0.05,0.05);
+    Matrix<N3, N1> stdevMatrix = VecBuilder.fill(0.05, 0.05, 0.05);
     swerveDriveOdometry.setVisionMeasurementStdDevs(stdevMatrix);
   }
 
@@ -200,7 +200,7 @@ public class FieldPositioningSystem extends SubsystemBase {
 
     Pose2d robotPose = swerveDriveOdometry.getEstimatedPosition();
     Pose3d robotPose3d = new Pose3d(robotPose);
-    for(CameraInterperter camera : cameras){
+    for (CameraInterperter camera : cameras) {
       camera.setReferncePose(robotPose3d);
     }
   }

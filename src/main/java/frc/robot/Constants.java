@@ -21,6 +21,12 @@ public final class Constants {
   public static final int Degrees180 = 180;
   public static final int Degrees270 = 270;
 
+  public static final int driverControllerID = 0;
+  public static final int gunnerControllerID = -1;
+  public static final int streamDeckID = 1;
+  // TODO: add real value for the motor ID
+  public static final int endAffectorID = 9;
+
   public static final int TeamNumber = 6377;
 
   public static final double MetersToInches = 39.3701;
@@ -81,16 +87,37 @@ public final class Constants {
   public static final int armMaxAccel = 1;
   // added new functions from line 83-98 for rotational motor and extension motor.
   // TODO: convert arm rotation values to radians
+  // TODO: decide on actual values for arm length, rotation, and wrist rotation values and IDs
   public static final double armRotationStowed = -5;
   public static final double armRotationLow = -3;
   public static final double armRotationCubeMid = -10.428622245788574 - 3;
   public static final double armRotationCubeHigh = -10.428622245788574 - 7;
+  public static final double armRotationConeMid = -10.428622245788574 - 3;
+  public static final double armRotationConeHigh = -10.428622245788574 - 7;
+
+  public static final int armRotationID1 = 11;
+  public static final int armRotationID2 = 12;
+
   public static final double armRotationalTicksToRadians = Math.PI / 50;
-  // TODO: decide on actual values for this
+
   public static final double armLengthStowed = -5;
   public static final double armLengthLow = -3;
   public static final double armLengthCubeMid = -10.428622245788574 - 3;
   public static final double armLengthCubeHigh = -10.428622245788574 - 7;
+  public static final double armLengthConeMid = -10.428622245788574 - 3;
+  public static final double armLengthConeHigh = -10.428622245788574 - 7;
+
+  public static final int armLengthID1 = 13;
+  public static final int armLengthID2 = 14;
+
+  public static final double wristRotationLow = -3;
+  public static final double wristRotationStowed = -5;
+  public static final double wristRotationCubeMid = -10.428622245788574 - 3;
+  public static final double wristRotationCubeHigh = -10.428622245788574 - 7;
+  public static final double wristRotationConeMid = -10.428622245788574 - 3;
+  public static final double wristRotationConeHigh = -10.428622245788574 - 7;
+
+  public static final int wristID = 15;
   // TODO: Calculate actual value.
   public static final double armLengthTicksToMeters = 0;
   // TODO: Measure the arm and put that value in here
@@ -106,14 +133,12 @@ public final class Constants {
   public static final double endAffectorSlowOutakespeed = 0.075;
   public static final double endAffectorIdleSpeed = 0.1;
 
-  //Wrist 
+  // Wrist
   public static final double wristKp = 0;
   public static final double wristMaxVelo = 0;
   public static final double wristMaxAccel = 0;
   public static final double wristMomentOfInertia = 0;
   public static final double wristGearRatio = 0;
-
-  
 
   /**
    * The left-to-right distance between the drivetrain wheels
