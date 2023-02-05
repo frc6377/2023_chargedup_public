@@ -21,6 +21,13 @@ public final class Constants {
   public static final int Degrees180 = 180;
   public static final int Degrees270 = 270;
 
+  public static final int driverControllerID = 0;
+  // This is -1 to disable it as it is not currently going to be used.
+  public static final int gunnerControllerID = -1;
+  public static final int streamDeckID = 1;
+  // TODO: add real value for the motor ID
+  public static final int endAffectorID = 9;
+
   public static final int TeamNumber = 6377;
 
   public static final double MetersToInches = 39.3701;
@@ -81,19 +88,43 @@ public final class Constants {
   public static final int armMaxAccel = 1;
   // added new functions from line 83-98 for rotational motor and extension motor.
   // TODO: convert arm rotation values to radians
+  // TODO: decide on actual values for arm length, rotation, and wrist rotation values and IDs
   public static final double armRotationStowed = -5;
   public static final double armRotationLow = -3;
-  public static final double armRotationMid = -10.428622245788574 - 3;
-  public static final double armRotationHigh = -10.428622245788574 - 7;
+  public static final double armRotationCubeMid = -10.428622245788574 - 3;
+  public static final double armRotationCubeHigh = -10.428622245788574 - 7;
+  public static final double armRotationConeMid = -10.428622245788574 - 3;
+  public static final double armRotationConeHigh = -10.428622245788574 - 7;
+  public static final int armRotationCurrentLimit = 40;
+
+  public static final int armRotationID1 = -1;
+  public static final int armRotationID2 = -1;
+
   public static final double armRotationalTicksToRadians = Math.PI / 50;
-  // TODO: decide on actual values for this
+
   public static final double armLengthStowed = -5;
   public static final double armLengthLow = -3;
-  public static final double armLengthMid = -10.428622245788574 - 3;
-  public static final double armLengthHigh = -10.428622245788574 - 7;
-  // TODO: Calculate actual value.
+  public static final double armLengthCubeMid = -10.428622245788574 - 3;
+  public static final double armLengthCubeHigh = -10.428622245788574 - 7;
+  public static final double armLengthConeMid = -10.428622245788574 - 3;
+  public static final double armLengthConeHigh = -10.428622245788574 - 7;
+  public static final int armExtensionCurrentLimit = 40;
+
+  public static final int armExtenderID = -1;
+
+  public static final double wristRotationLow = -3;
+  public static final double wristRotationStowed = -5;
+  public static final double wristRotationCubeMid = -10.428622245788574 - 3;
+  public static final double wristRotationCubeHigh = -10.428622245788574 - 7;
+  public static final double wristRotationConeMid = -10.428622245788574 - 3;
+  public static final double wristRotationConeHigh = -10.428622245788574 - 7;
+  public static final int wristCurrentLimit = 30;
+  public static final int wristStatorLimit = 40;
+
+  public static final double wristTicksToRadians = Math.PI / 50; // TODO: Calculate the actual value
+
+  public static final int wristID = -1;
   public static final double armLengthTicksToMeters = 0;
-  // TODO: Measure the arm and put that value in here
   public static final double armLengthAtZeroTicks = 0.7;
   // TODO: Get actual value(is the weight of the arm multiplied by the number needed to convert
   public static final double rotationArmGearRatio = 100;
@@ -106,14 +137,22 @@ public final class Constants {
   public static final double endAffectorSlowOutakespeed = 0.075;
   public static final double endAffectorIdleSpeed = 0.1;
 
-  //Wrist 
+  // Arm Rotation
+  public static final double armRotationKp = 0.099902;
+  public static final double armRotationMaxVelo = 15;
+  public static final double armRotationMaxAccel = 17.64705882;
+
+  // Arm Extension
+  public static final double armExtensionKp = 0;
+  public static final double armExtensionMaxVelo = 0;
+  public static final double armExtensionMaxAccel = 0;
+
+  // Wrist
   public static final double wristKp = 0;
   public static final double wristMaxVelo = 0;
   public static final double wristMaxAccel = 0;
   public static final double wristMomentOfInertia = 0;
   public static final double wristGearRatio = 0;
-
-  
 
   /**
    * The left-to-right distance between the drivetrain wheels

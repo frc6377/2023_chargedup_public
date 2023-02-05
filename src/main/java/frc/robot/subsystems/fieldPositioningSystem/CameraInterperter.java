@@ -27,7 +27,7 @@ class CameraInterperter {
     cameraPositionFieldObject = cameraFieldObject2d;
   }
 
-  public void setReferncePose(Pose3d refPose){
+  public void setReferncePose(Pose3d refPose) {
     estimator.setLastPose(refPose);
   }
 
