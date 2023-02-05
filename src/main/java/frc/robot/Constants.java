@@ -142,42 +142,43 @@ public final class Constants {
 
   // relative distance from your alliance station wall or the left of the field depending on axis.
   // Gets converted into absolute coordinates in FieldPoses.java
-  public static final double closeProximityBoundary = 0;
-  public static final double midProximityBoundary = 0;
-  public static final double farProximityBoundary = 0;
+  public static final double closeProximityBoundary = 2.4;
+  public static final double midProximityBoundary = 5.4;
+  public static final double farProximityBoundary = 999; //this doesnt need an upper bound
 
   // defined such that the blue driver station is to the left
-  public static final double bottomZoneBoundary = 0;
-  public static final double bottomStationZoneBoundary = 0;
-  public static final double topZoneBoundary = 0;
-  public static final double topStationZoneBoundary = 0;
+  public static final double bottomZoneBoundary = 1.54;
+  public static final double bottomStationZoneBoundary = 3.978656;
+  public static final double topZoneBoundary = 2.76;
+  public static final double topStationZoneBoundary = 999; //this doesnt need an upper bound
 
-  public static final Translation2d bottomFarInflectionPoint = new Translation2d(0, 0);
-  public static final Translation2d bottomCloseInflectionPoint = new Translation2d(0, 0);
+  public static final Translation2d bottomFarInflectionPoint = new Translation2d(5.4, 0.75);
+  public static final Translation2d bottomCloseInflectionPoint = new Translation2d(2.4, 0.75);
 
-  public static final Translation2d bottomStationFarInflectionPoint = new Translation2d(0, 0);
-  public static final Translation2d bottomStationCloseInflectionPoint = new Translation2d(0, 0);
+  public static final Translation2d bottomStationFarInflectionPoint = new Translation2d(5.4, 2.27);
+  public static final Translation2d bottomStationCloseInflectionPoint = new Translation2d(2.4, 2.27);
 
-  public static final Translation2d topFarInflectionPoint = new Translation2d(0, 0);
-  public static final Translation2d topCloseInflectionPoint = new Translation2d(0, 0);
+  public static final Translation2d topFarInflectionPoint = new Translation2d(5.4, 4.73);
+  public static final Translation2d topCloseInflectionPoint = new Translation2d(2.4, 4.73);
 
-  public static final Translation2d topStationFarInflectionPoint = new Translation2d(0, 0);
-  public static final Translation2d topStationCloseInflectionPoint = new Translation2d(0, 0);
-
+  public static final Translation2d topStationFarInflectionPoint = new Translation2d(5.4, 3.18);
+  public static final Translation2d topStationCloseInflectionPoint = new Translation2d(2.4, 3.18);
+  
   public static final List<Translation2d> deliveryBays =
       Arrays.asList(
-          new Translation2d(0, 0),
-          new Translation2d(0, 0),
-          new Translation2d(0, 0),
-          new Translation2d(0, 0),
-          new Translation2d(0, 0),
-          new Translation2d(0, 0),
-          new Translation2d(0, 0),
-          new Translation2d(0, 0));
+          new Translation2d(1.85718, 0.511626),
+          new Translation2d(1.85718, 1.071626),
+          new Translation2d(1.85718, 1.631626),
+          new Translation2d(1.85718, 2.188026),
+          new Translation2d(1.85718, 2.748026),
+          new Translation2d(1.85718, 3.308026),
+          new Translation2d(1.85718, 3.864426),
+          new Translation2d(1.85718, 4.424426),
+          new Translation2d(1.85718, 4.984426));
 
-  public static final Translation2d doubleSubstation = new Translation2d(0, 0);
-  public static final Translation2d singleSubstation = new Translation2d(0, 0);
+  public static final Translation2d doubleSubstation = new Translation2d(15.7, 7.32);
+  public static final Translation2d singleSubstation = new Translation2d(14.24, 7.2);
 
-  public static final Rotation2d singleSubRotation = new Rotation2d(Math.PI * (3 / 2));
+  public static final Rotation2d singleSubRotation = new Rotation2d(Math.PI/2);
   public static final Rotation2d deliveryRotation = new Rotation2d(Math.PI);
 }

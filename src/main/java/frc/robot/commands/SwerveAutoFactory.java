@@ -23,7 +23,6 @@ import java.util.function.Consumer;
 // TODO
 // reseting pose breaks field north. May not be an issue with this class
 // general tuning
-// move magic numbers to constants
 
 public class SwerveAutoFactory {
   private final Pose2DSubscriber sub = Topics.PoseTopic().subscribe(new Pose2d());
