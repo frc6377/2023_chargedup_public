@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants;
@@ -71,6 +72,9 @@ public class SwerveAutoFactory {
     ZONE currentZone = getZone(currentPose.getY());
     PROXIMITY currentProximity = getProx(currentPose.getX());
 
+    SmartDashboard.putString("proximity", currentProximity.name());
+    SmartDashboard.putString("zone", currentZone.name());
+
     // build our midpoints first
     switch (currentProximity) {
       case CLOSE: // if close we have no midpoints
@@ -80,10 +84,9 @@ public class SwerveAutoFactory {
             new Translation2d(
                 fieldPoses.closeProximityBoundary,
                 currentPose
-                    .getX()); // if we are in mid we cannot move in the y axis. So just go straight
+                    .getY()); // if we are in mid we cannot move in the y axis. So just go straight
         // until we enter close
         points.add(
-            1,
             poseToPathPoint(
                 new Pose2d(
                     inflection, headingBetweenPoints(currentPose.getTranslation(), inflection)),
@@ -132,14 +135,12 @@ public class SwerveAutoFactory {
         }
         firstTarget = inflection1;
         points.add(
-            1,
             poseToPathPoint(
                 new Pose2d(
                     inflection1, headingBetweenPoints(currentPose.getTranslation(), inflection1)),
                 -1,
                 deliveryRotation));
         points.add(
-            2,
             poseToPathPoint(
                 new Pose2d(
                     inflection2, headingBetweenPoints(currentPose.getTranslation(), inflection2)),
@@ -268,7 +269,7 @@ public class SwerveAutoFactory {
     }
 
     if (x < fieldPoses.midProximityBoundary * mult) {
-      return PROXIMITY.CLOSE;
+      return PROXIMITY.MID;
     }
 
     return PROXIMITY.FAR;

@@ -144,26 +144,27 @@ public final class Constants {
   // Gets converted into absolute coordinates in FieldPoses.java
   public static final double closeProximityBoundary = 2.4;
   public static final double midProximityBoundary = 5.4;
-  public static final double farProximityBoundary = 999; //this doesnt need an upper bound
+  public static final double farProximityBoundary = 999; // this doesnt need an upper bound
 
   // defined such that the blue driver station is to the left
   public static final double bottomZoneBoundary = 1.54;
   public static final double bottomStationZoneBoundary = 3.978656;
   public static final double topZoneBoundary = 2.76;
-  public static final double topStationZoneBoundary = 999; //this doesnt need an upper bound
+  public static final double topStationZoneBoundary = 999; // this doesnt need an upper bound
 
   public static final Translation2d bottomFarInflectionPoint = new Translation2d(5.4, 0.75);
   public static final Translation2d bottomCloseInflectionPoint = new Translation2d(2.4, 0.75);
 
   public static final Translation2d bottomStationFarInflectionPoint = new Translation2d(5.4, 2.27);
-  public static final Translation2d bottomStationCloseInflectionPoint = new Translation2d(2.4, 2.27);
+  public static final Translation2d bottomStationCloseInflectionPoint =
+      new Translation2d(2.4, 2.27);
 
   public static final Translation2d topFarInflectionPoint = new Translation2d(5.4, 4.73);
   public static final Translation2d topCloseInflectionPoint = new Translation2d(2.4, 4.73);
 
   public static final Translation2d topStationFarInflectionPoint = new Translation2d(5.4, 3.18);
   public static final Translation2d topStationCloseInflectionPoint = new Translation2d(2.4, 3.18);
-  
+
   public static final List<Translation2d> deliveryBays =
       Arrays.asList(
           new Translation2d(1.85718, 0.511626),
@@ -179,6 +180,6 @@ public final class Constants {
   public static final Translation2d doubleSubstation = new Translation2d(15.7, 7.32);
   public static final Translation2d singleSubstation = new Translation2d(14.24, 7.2);
 
-  public static final Rotation2d singleSubRotation = new Rotation2d(Math.PI/2);
+  public static final Rotation2d singleSubRotation = new Rotation2d(Math.PI / 2);
   public static final Rotation2d deliveryRotation = new Rotation2d(Math.PI);
 }
