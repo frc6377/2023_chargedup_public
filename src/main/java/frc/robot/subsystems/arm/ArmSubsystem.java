@@ -14,8 +14,7 @@ public class ArmSubsystem extends SubsystemBase {
   private final CANSparkMax armMotorFollow;
   private final ProfiledPIDController armPPC;
 
-  private final CANSparkMax extendMotorLead;
-  private final CANSparkMax extendMotorFollow;
+  private final CANSparkMax extendMotor;
   private final ProfiledPIDController extendPPC;
 
   private final CANSparkMax wristMotor;
@@ -44,12 +43,9 @@ public class ArmSubsystem extends SubsystemBase {
             0,
             new TrapezoidProfile.Constraints(
                 Constants.armExtensionMaxVelo, Constants.armExtensionMaxAccel));
-    extendMotorLead = new CANSparkMax(Constants.armLengthID1, MotorType.kBrushless);
-    extendMotorLead.restoreFactoryDefaults();
-    extendMotorFollow = new CANSparkMax(Constants.armLengthID2, MotorType.kBrushless);
-    extendMotorFollow.restoreFactoryDefaults();
-    extendMotorFollow.follow(extendMotorLead);
-    extendMotorLead.setSmartCurrentLimit(Constants.armExtensionCurrentLimit);
+    extendMotor = new CANSparkMax(Constants.armExtenderID, MotorType.kBrushless);
+    extendMotor.restoreFactoryDefaults();
+    extendMotor.setSmartCurrentLimit(Constants.armExtensionCurrentLimit);
 
     wristPPC =
         new ProfiledPIDController(
@@ -69,7 +65,7 @@ public class ArmSubsystem extends SubsystemBase {
     armMotorLead.set(
         armPPC.calculate(armMotorLead.getEncoder().getPosition())
             - computeRotationArbitraryFeetForward());
-    extendMotorLead.set(extendPPC.calculate(extendMotorLead.getEncoder().getPosition()));
+    extendMotor.set(extendPPC.calculate(extendMotor.getEncoder().getPosition()));
     wristMotor.set(
         wristPPC.calculate(wristMotor.getEncoder().getPosition())
             + computeWristArbitraryFeetForward());
@@ -120,7 +116,7 @@ public class ArmSubsystem extends SubsystemBase {
   private double computeRotationArbitraryFeetForward() {
     double theta = armMotorLead.getEncoder().getPosition() * Constants.armRotationalTicksToRadians;
     double armLength =
-        extendMotorLead.getEncoder().getPosition() * Constants.armLengthTicksToMeters
+        extendMotor.getEncoder().getPosition() * Constants.armLengthTicksToMeters
             + Constants.armLengthAtZeroTicks;
     return (Math.cos(theta - Math.toRadians(Constants.armAngleAtRest))
             * armLength

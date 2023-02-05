@@ -22,7 +22,8 @@ public final class Constants {
   public static final int Degrees270 = 270;
 
   public static final int driverControllerID = 0;
-  public static final int gunnerControllerID = -1;
+  public static final int gunnerControllerID =
+      -1; // This is -1 to disable it as it is not currently going to be used.
   public static final int streamDeckID = 1;
   // TODO: add real value for the motor ID
   public static final int endAffectorID = 9;
@@ -96,8 +97,8 @@ public final class Constants {
   public static final double armRotationConeHigh = -10.428622245788574 - 7;
   public static final int armRotationCurrentLimit = 0;
 
-  public static final int armRotationID1 = 11;
-  public static final int armRotationID2 = 12;
+  public static final int armRotationID1 = -1;
+  public static final int armRotationID2 = -1;
 
   public static final double armRotationalTicksToRadians = Math.PI / 50;
 
@@ -109,8 +110,7 @@ public final class Constants {
   public static final double armLengthConeHigh = -10.428622245788574 - 7;
   public static final int armExtensionCurrentLimit = 0;
 
-  public static final int armLengthID1 = 13;
-  public static final int armLengthID2 = 14;
+  public static final int armExtenderID = -1;
 
   public static final double wristRotationLow = -3;
   public static final double wristRotationStowed = -5;
@@ -122,10 +122,8 @@ public final class Constants {
 
   public static final double wristTicksToRadians = Math.PI / 50; // TODO: Calculate the actual value
 
-  public static final int wristID = 15;
-  // TODO: Calculate actual value.
+  public static final int wristID = -1;
   public static final double armLengthTicksToMeters = 0;
-  // TODO: Measure the arm and put that value in here
   public static final double armLengthAtZeroTicks = 0.7;
   // TODO: Get actual value(is the weight of the arm multiplied by the number needed to convert
   public static final double rotationArmGearRatio = 100;
