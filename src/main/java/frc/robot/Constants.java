@@ -94,6 +94,7 @@ public final class Constants {
   public static final double armRotationCubeHigh = -10.428622245788574 - 7;
   public static final double armRotationConeMid = -10.428622245788574 - 3;
   public static final double armRotationConeHigh = -10.428622245788574 - 7;
+  public static final int armRotationCurrentLimit = 0;
 
   public static final int armRotationID1 = 11;
   public static final int armRotationID2 = 12;
@@ -106,6 +107,7 @@ public final class Constants {
   public static final double armLengthCubeHigh = -10.428622245788574 - 7;
   public static final double armLengthConeMid = -10.428622245788574 - 3;
   public static final double armLengthConeHigh = -10.428622245788574 - 7;
+  public static final int armExtensionCurrentLimit = 0;
 
   public static final int armLengthID1 = 13;
   public static final int armLengthID2 = 14;
@@ -116,6 +118,7 @@ public final class Constants {
   public static final double wristRotationCubeHigh = -10.428622245788574 - 7;
   public static final double wristRotationConeMid = -10.428622245788574 - 3;
   public static final double wristRotationConeHigh = -10.428622245788574 - 7;
+  public static final int wristCurrentLimit = 0;
 
   public static final double wristTicksToRadians = Math.PI / 50; // TODO: Calculate the actual value
 

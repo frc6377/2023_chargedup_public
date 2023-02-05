@@ -13,12 +13,16 @@ public class ArmSubsystem extends SubsystemBase {
   private final CANSparkMax armMotorLead;
   private final CANSparkMax armMotorFollow;
   private final ProfiledPIDController armPPC;
-  private final ArmExtender extender;
-  private final Wrist wrist;
+
+  private final CANSparkMax extendMotorLead;
+  private final CANSparkMax extendMotorFollow;
+  private final ProfiledPIDController extendPPC;
+
+  private final CANSparkMax wristMotor;
+  private final ProfiledPIDController wristPPC;
 
   public ArmSubsystem() {
     System.out.println("Starting Construct ArmSubsystem");
-    // TODO: add current limits for arm rotation, extension, wrist.
     armPPC =
         new ProfiledPIDController(
             Constants.armRotationKp,
@@ -31,11 +35,31 @@ public class ArmSubsystem extends SubsystemBase {
     armMotorFollow = new CANSparkMax(Constants.armRotationID2, MotorType.kBrushless);
     armMotorFollow.restoreFactoryDefaults();
     armMotorFollow.follow(armMotorLead);
+    armMotorLead.setSmartCurrentLimit(Constants.armRotationCurrentLimit);
 
-    armMotorLead.setSmartCurrentLimit(40);
+    extendPPC =
+        new ProfiledPIDController(
+            Constants.armExtensionKp,
+            0,
+            0,
+            new TrapezoidProfile.Constraints(
+                Constants.armExtensionMaxVelo, Constants.armExtensionMaxAccel));
+    extendMotorLead = new CANSparkMax(Constants.armLengthID1, MotorType.kBrushless);
+    extendMotorLead.restoreFactoryDefaults();
+    extendMotorFollow = new CANSparkMax(Constants.armLengthID2, MotorType.kBrushless);
+    extendMotorFollow.restoreFactoryDefaults();
+    extendMotorFollow.follow(extendMotorLead);
+    extendMotorLead.setSmartCurrentLimit(Constants.armExtensionCurrentLimit);
 
-    extender = new ArmExtender(Constants.armLengthID1, Constants.armLengthID2);
-    wrist = new Wrist(Constants.wristID);
+    wristPPC =
+        new ProfiledPIDController(
+            Constants.wristKp,
+            0,
+            0,
+            new TrapezoidProfile.Constraints(Constants.wristMaxVelo, Constants.wristMaxAccel));
+    wristMotor = new CANSparkMax(Constants.wristID, MotorType.kBrushless);
+    wristMotor.restoreFactoryDefaults();
+    wristMotor.setSmartCurrentLimit(Constants.wristCurrentLimit);
 
     System.out.println("Complete Construct ArmSubsystem");
   }
@@ -45,44 +69,46 @@ public class ArmSubsystem extends SubsystemBase {
     armMotorLead.set(
         armPPC.calculate(armMotorLead.getEncoder().getPosition())
             - computeRotationArbitraryFeetForward());
+    extendMotorLead.set(extendPPC.calculate(extendMotorLead.getEncoder().getPosition()));
+    wristMotor.set(
+        wristPPC.calculate(wristMotor.getEncoder().getPosition())
+            + computeWristArbitraryFeetForward());
   }
 
   public void setStowed() {
     armPPC.setGoal(Constants.armRotationStowed);
-    extender.setLength(Constants.armLengthStowed);
-    // extenderPPC.setGoal
-    wrist.setPositionDegrees(Constants.wristRotationStowed);
-    // wristPPC.setGoal(degresToTicks(Constants.writstRotationStowed)
+    extendPPC.setGoal(Constants.armLengthStowed);
+    wristPPC.setGoal(Constants.wristRotationStowed);
   }
 
   public void setLow() {
     armPPC.setGoal(Constants.armRotationLow);
-    extender.setLength(Constants.armLengthLow);
-    wrist.setPositionDegrees(Constants.wristRotationLow);
+    extendPPC.setGoal(Constants.armLengthLow);
+    wristPPC.setGoal(Constants.wristRotationLow);
   }
 
   public void setCubeMid() {
     armPPC.setGoal(Constants.armRotationCubeMid);
-    extender.setLength(Constants.armLengthCubeMid);
-    wrist.setPositionDegrees(Constants.wristRotationCubeMid);
+    extendPPC.setGoal(Constants.armLengthCubeMid);
+    wristPPC.setGoal(Constants.wristRotationCubeMid);
   }
 
   public void setCubeHigh() {
     armPPC.setGoal(Constants.armRotationCubeHigh);
-    extender.setLength(Constants.armLengthCubeHigh);
-    wrist.setPositionDegrees(Constants.wristRotationCubeHigh);
+    extendPPC.setGoal(Constants.armLengthCubeHigh);
+    wristPPC.setGoal(Constants.wristRotationCubeHigh);
   }
 
   public void setConeMid() {
     armPPC.setGoal(Constants.armRotationConeMid);
-    extender.setLength(Constants.armLengthConeMid);
-    wrist.setPositionDegrees(Constants.wristRotationConeMid);
+    extendPPC.setGoal(Constants.armLengthConeMid);
+    wristPPC.setGoal(Constants.wristRotationConeMid);
   }
 
   public void setConeHigh() {
     armPPC.setGoal(Constants.armRotationConeHigh);
-    extender.setLength(Constants.armLengthConeHigh);
-    wrist.setPositionDegrees(Constants.wristRotationConeHigh);
+    extendPPC.setGoal(Constants.armLengthConeHigh);
+    wristPPC.setGoal(Constants.wristRotationConeHigh);
   }
 
   /**
@@ -93,18 +119,20 @@ public class ArmSubsystem extends SubsystemBase {
    */
   private double computeRotationArbitraryFeetForward() {
     double theta = armMotorLead.getEncoder().getPosition() * Constants.armRotationalTicksToRadians;
-    double armLength = extender.getLength();
+    double armLength =
+        extendMotorLead.getEncoder().getPosition() * Constants.armLengthTicksToMeters
+            + Constants.armLengthAtZeroTicks;
     return (Math.cos(theta - Math.toRadians(Constants.armAngleAtRest))
             * armLength
             * Constants.armWeight)
         / (Constants.stalledTorque * Constants.rotationArmGearRatio);
   }
-  // TODO: Change this from setting a single motor to
-  private void setRotation(double position) {
-    armPPC.setGoal(position);
-  }
 
-  public void setRotationDegrees(double degrees) {
-    setRotation(Math.toRadians(degrees) / Constants.armRotationalTicksToRadians);
+  private double computeWristArbitraryFeetForward() {
+    double theta =
+        wristMotor.getEncoder().getPosition() * Constants.wristTicksToRadians
+            + armMotorLead.getEncoder().getPosition() * Constants.armRotationalTicksToRadians;
+    return (Math.cos(theta) * Constants.wristMomentOfInertia * 9.8)
+        / (Constants.stalledTorque * Constants.wristGearRatio);
   }
 }
