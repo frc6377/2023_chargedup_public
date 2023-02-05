@@ -1,94 +1,116 @@
 package frc.robot.subsystems.arm;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.DemandType;
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxRelativeEncoder;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.networktables.DoubleTopic;
-import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class ArmSubsystem extends SubsystemBase {
-  private final ShuffleboardTab tab = Shuffleboard.getTab("Arm");
 
   // Hardware
-  private final CANSparkMax motor;
-  private final RelativeEncoder encoder;
-  private final ProfiledPIDController ppc;
-  private final ArmExtender extender;
+  private final CANSparkMax armMotorLead;
+  private final CANSparkMax armMotorFollow;
+  private final ProfiledPIDController armPPC;
 
-  // Dashboard elements
-  private GenericEntry armHighEntry;
-  private GenericEntry armMidEntry;
-  private GenericEntry armLowEntry;
+  private final CANSparkMax extendMotor;
+  private final ProfiledPIDController extendPPC;
 
-  public ArmSubsystem(int rotateID, int extendID) {
+  private final WPI_TalonFX wristMotor;
+  private double wristMotorGoal;
+
+  public ArmSubsystem() {
     System.out.println("Starting Construct ArmSubsystem");
+    armPPC =
+        new ProfiledPIDController(
+            Constants.armRotationKp,
+            0,
+            0,
+            new TrapezoidProfile.Constraints(
+                Constants.armRotationMaxVelo, Constants.armRotationMaxAccel));
+    armMotorLead = new CANSparkMax(Constants.armRotationID1, MotorType.kBrushless);
+    armMotorLead.restoreFactoryDefaults();
+    armMotorFollow = new CANSparkMax(Constants.armRotationID2, MotorType.kBrushless);
+    armMotorFollow.restoreFactoryDefaults();
+    armMotorFollow.follow(armMotorLead);
+    armMotorLead.setSmartCurrentLimit(Constants.armRotationCurrentLimit);
 
-    ppc = new ProfiledPIDController(0.4, 0, 0, new TrapezoidProfile.Constraints(30, 30));
-    motor = new CANSparkMax(rotateID, MotorType.kBrushless);
-    motor.restoreFactoryDefaults();
-    encoder = motor.getEncoder(SparkMaxRelativeEncoder.Type.kHallSensor, 42);
+    extendPPC =
+        new ProfiledPIDController(
+            Constants.armExtensionKp,
+            0,
+            0,
+            new TrapezoidProfile.Constraints(
+                Constants.armExtensionMaxVelo, Constants.armExtensionMaxAccel));
+    extendMotor = new CANSparkMax(Constants.armExtenderID, MotorType.kBrushless);
+    extendMotor.restoreFactoryDefaults();
+    extendMotor.setSmartCurrentLimit(Constants.armExtensionCurrentLimit);
 
-    motor.setSmartCurrentLimit(40);
-
-    var layout = tab.getLayout("Height", BuiltInLayouts.kGrid);
-    layout.addDouble("Current", this::getPosition).withWidget(BuiltInWidgets.kDial);
-    armHighEntry =
-        layout
-            .addPersistent("High Value", -Constants.armRotationHigh)
-            .getEntry(DoubleTopic.kTypeString);
-    armMidEntry =
-        layout
-            .addPersistent("Mid Value", -Constants.armRotationMid)
-            .getEntry(DoubleTopic.kTypeString);
-    armLowEntry =
-        layout
-            .addPersistent("Low Value", -Constants.armRotationLow)
-            .getEntry(DoubleTopic.kTypeString);
-
-    // TODO: when we have a real extension arm, change this to `ActiveArmExtender`
-    extender = new DisabledArmExtender(extendID);
+    wristMotor = new WPI_TalonFX(Constants.wristID);
+    wristMotor.configStatorCurrentLimit(
+        new StatorCurrentLimitConfiguration(
+            true, Constants.wristStatorLimit, Constants.wristStatorLimit, 1));
+    wristMotor.configSupplyCurrentLimit(
+        new SupplyCurrentLimitConfiguration(
+            true, Constants.wristCurrentLimit, Constants.wristCurrentLimit, 1));
+    wristMotorGoal = Constants.wristRotationStowed;
 
     System.out.println("Complete Construct ArmSubsystem");
   }
 
   @Override
   public void periodic() {
-    motor.set(ppc.calculate(encoder.getPosition()) - computeArbitraryFeetForward());
-    SmartDashboard.putNumber("encoder pos", encoder.getPosition());
-    SmartDashboard.putNumber("ppc error", ppc.getPositionError());
-    SmartDashboard.putNumber("setpoint", ppc.getSetpoint().position);
-    SmartDashboard.putNumber("goal", ppc.getGoal().position);
-    SmartDashboard.putNumber("arbitrary ffw", computeArbitraryFeetForward());
+    armMotorLead.set(
+        armPPC.calculate(armMotorLead.getEncoder().getPosition())
+            - computeRotationArbitraryFeetForward());
+    extendMotor.set(extendPPC.calculate(extendMotor.getEncoder().getPosition()));
+    wristMotor.set(
+        ControlMode.MotionMagic,
+        wristMotorGoal,
+        DemandType.ArbitraryFeedForward,
+        computeWristArbitraryFeetForward());
   }
 
   public void setStowed() {
-    setPosition(armLowEntry.getDouble(Constants.armRotationStowed));
-    extender.setLength(Constants.armLengthStowed);
+    armPPC.setGoal(Constants.armRotationStowed);
+    extendPPC.setGoal(Constants.armLengthStowed);
+    wristMotorGoal = Constants.wristRotationStowed;
   }
 
   public void setLow() {
-    setPosition(Constants.armRotationLow);
-    extender.setLength(Constants.armLengthLow);
+    armPPC.setGoal(Constants.armRotationLow);
+    extendPPC.setGoal(Constants.armLengthLow);
+    wristMotorGoal = Constants.wristRotationLow;
   }
 
-  public void setMid() {
-    setPosition(Constants.armRotationMid);
-    extender.setLength(Constants.armLengthMid);
+  public void setCubeMid() {
+    armPPC.setGoal(Constants.armRotationCubeMid);
+    extendPPC.setGoal(Constants.armLengthCubeMid);
+    wristMotorGoal = Constants.wristRotationCubeMid;
   }
 
-  public void setHigh() {
-    setPosition(Constants.armRotationHigh);
-    extender.setLength(Constants.armLengthHigh);
+  public void setCubeHigh() {
+    armPPC.setGoal(Constants.armRotationCubeHigh);
+    extendPPC.setGoal(Constants.armLengthCubeHigh);
+    wristMotorGoal = Constants.wristRotationCubeHigh;
+  }
+
+  public void setConeMid() {
+    armPPC.setGoal(Constants.armRotationConeMid);
+    extendPPC.setGoal(Constants.armLengthConeMid);
+    wristMotorGoal = Constants.wristRotationConeMid;
+  }
+
+  public void setConeHigh() {
+    armPPC.setGoal(Constants.armRotationConeHigh);
+    extendPPC.setGoal(Constants.armLengthConeHigh);
+    wristMotorGoal = Constants.wristRotationConeHigh;
   }
 
   /**
@@ -97,20 +119,22 @@ public class ArmSubsystem extends SubsystemBase {
    *
    * @return The power needed to keep the arme stable, in ?electrical output units?.
    */
-  private double computeArbitraryFeetForward() {
-    double theta = encoder.getPosition() * Constants.armRotationalTicksToRadians;
-    double armLength = extender.getLength();
+  private double computeRotationArbitraryFeetForward() {
+    double theta = armMotorLead.getEncoder().getPosition() * Constants.armRotationalTicksToRadians;
+    double armLength =
+        extendMotor.getEncoder().getPosition() * Constants.armLengthTicksToMeters
+            + Constants.armLengthAtZeroTicks;
     return (Math.cos(theta - Math.toRadians(Constants.armAngleAtRest))
             * armLength
             * Constants.armWeight)
         / (Constants.stalledTorque * Constants.rotationArmGearRatio);
   }
 
-  private void setPosition(double position) {
-    ppc.setGoal(position);
-  }
-
-  private double getPosition() {
-    return encoder.getPosition();
+  private double computeWristArbitraryFeetForward() {
+    double theta =
+        wristMotor.getSelectedSensorPosition() * Constants.wristTicksToRadians
+            + armMotorLead.getEncoder().getPosition() * Constants.armRotationalTicksToRadians;
+    return (Math.cos(theta) * Constants.wristMomentOfInertia * 9.8)
+        / (Constants.stalledTorque * Constants.wristGearRatio);
   }
 }

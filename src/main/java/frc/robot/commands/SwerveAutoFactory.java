@@ -187,6 +187,7 @@ public class SwerveAutoFactory {
             headingBetweenPoints(currentPose.getTranslation(), endPoint.getTranslation())
                 .rotateBy(new Rotation2d(Math.PI))));
 
+
     PathConstraints constraints = new PathConstraints(maxVelocity, maxAcceleration);
     PathPlannerTrajectory trajectory = PathPlanner.generatePath(constraints, points);
 

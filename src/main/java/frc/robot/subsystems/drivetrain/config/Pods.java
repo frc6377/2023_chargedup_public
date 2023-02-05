@@ -24,6 +24,33 @@ public class Pods {
     Pods.addPod(
         PodName.D,
         new PodConstantsBuilder().setEncoderID(7).setEncoderOffset(-Math.toRadians(196.0)));
+
+    // Unconfigured, please test and add correct values
+    Pods.addPod(
+        PodName.F,
+        new PodConstantsBuilder()
+            .setEncoderID(11)
+            .setEncoderOffset(-Math.toRadians(296.4 + 180.0)));
+
+    Pods.addPod(
+        PodName.G,
+        new PodConstantsBuilder()
+            .setEncoderID(13)
+            .setEncoderOffset(-Math.toRadians(336.4 - 180.0)));
+
+    Pods.addPod(
+        PodName.H,
+        new PodConstantsBuilder()
+            .setEncoderID(15)
+            .setEncoderOffset(-Math.toRadians(210.3 + 180.0)));
+
+    Pods.addPod(
+        PodName.E,
+        new PodConstantsBuilder().setEncoderID(9).setEncoderOffset(-Math.toRadians(202.0 - 90.0)));
+
+    Pods.addPod(
+        PodName.J,
+        new PodConstantsBuilder().setEncoderID(17).setEncoderOffset(-Math.toRadians(213.4)));
   }
 
   public static void addPod(PodName name, PodConstantsBuilder constants) {
