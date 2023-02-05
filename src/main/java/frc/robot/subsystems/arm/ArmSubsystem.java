@@ -6,89 +6,79 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxRelativeEncoder;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.networktables.DoubleTopic;
-import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class ArmSubsystem extends SubsystemBase {
-  private final ShuffleboardTab tab = Shuffleboard.getTab("Arm");
 
   // Hardware
-  private final CANSparkMax motor;
+  private final CANSparkMax armMotorLead;
+  private final CANSparkMax armMotorFollow;
   private final RelativeEncoder encoder;
   private final ProfiledPIDController ppc;
   private final ArmExtender extender;
+  private final Wrist wrist;
 
-  // Dashboard elements
-  private GenericEntry armHighEntry;
-  private GenericEntry armMidEntry;
-  private GenericEntry armLowEntry;
-
-  public ArmSubsystem(int rotateID, int extendID) {
+  public ArmSubsystem() {
     System.out.println("Starting Construct ArmSubsystem");
+    //TODO: add current limits for arm rotation, extension, wrist.
+    ppc = new ProfiledPIDController(0.099902, 0, 0, new TrapezoidProfile.Constraints(15, 17.64705882));
+    armMotorLead = new CANSparkMax(Constants.armRotationID1, MotorType.kBrushless);
+    armMotorLead.restoreFactoryDefaults();
+    armMotorFollow = new CANSparkMax(Constants.armRotationID2, MotorType.kBrushless);
+    armMotorFollow.restoreFactoryDefaults();
+    armMotorFollow.follow(armMotorLead);
+    //TODO: determine the correct value for countsPerRev for this encoder
+    encoder = armMotorLead.getEncoder(SparkMaxRelativeEncoder.Type.kHallSensor, 42);
 
-    ppc = new ProfiledPIDController(0.4, 0, 0, new TrapezoidProfile.Constraints(30, 30));
-    motor = new CANSparkMax(rotateID, MotorType.kBrushless);
-    motor.restoreFactoryDefaults();
-    encoder = motor.getEncoder(SparkMaxRelativeEncoder.Type.kHallSensor, 42);
+    armMotorLead.setSmartCurrentLimit(40);
 
-    motor.setSmartCurrentLimit(40);
-
-    var layout = tab.getLayout("Height", BuiltInLayouts.kGrid);
-    layout.addDouble("Current", this::getPosition).withWidget(BuiltInWidgets.kDial);
-    armHighEntry =
-        layout
-            .addPersistent("High Value", -Constants.armRotationHigh)
-            .getEntry(DoubleTopic.kTypeString);
-    armMidEntry =
-        layout
-            .addPersistent("Mid Value", -Constants.armRotationMid)
-            .getEntry(DoubleTopic.kTypeString);
-    armLowEntry =
-        layout
-            .addPersistent("Low Value", -Constants.armRotationLow)
-            .getEntry(DoubleTopic.kTypeString);
 
     // TODO: when we have a real extension arm, change this to `ActiveArmExtender`
-    extender = new DisabledArmExtender(extendID);
+    extender = new ArmExtender(Constants.armLengthID1,Constants.armLengthID2);
+    wrist = new Wrist(Constants.wristID);
 
     System.out.println("Complete Construct ArmSubsystem");
   }
 
   @Override
   public void periodic() {
-    motor.set(ppc.calculate(encoder.getPosition()) - computeArbitraryFeetForward());
-    SmartDashboard.putNumber("encoder pos", encoder.getPosition());
-    SmartDashboard.putNumber("ppc error", ppc.getPositionError());
-    SmartDashboard.putNumber("setpoint", ppc.getSetpoint().position);
-    SmartDashboard.putNumber("goal", ppc.getGoal().position);
-    SmartDashboard.putNumber("arbitrary ffw", computeArbitraryFeetForward());
+    armMotorLead.set(ppc.calculate(encoder.getPosition()) - computeArbitraryFeetForward());
   }
 
   public void setStowed() {
-    setPosition(armLowEntry.getDouble(Constants.armRotationStowed));
+    setPosition(Constants.armRotationStowed);
     extender.setLength(Constants.armLengthStowed);
+    wrist.setPositionDegrees(Constants.wristRotationStowed);
   }
 
   public void setLow() {
     setPosition(Constants.armRotationLow);
     extender.setLength(Constants.armLengthLow);
+    wrist.setPositionDegrees(Constants.wristRotationLow);
   }
 
-  public void setMid() {
-    setPosition(Constants.armRotationMid);
-    extender.setLength(Constants.armLengthMid);
+  public void setCubeMid() {
+    setPosition(Constants.armRotationCubeMid);
+    extender.setLength(Constants.armLengthCubeMid);
+    wrist.setPositionDegrees(Constants.wristRotationCubeMid);
   }
 
-  public void setHigh() {
-    setPosition(Constants.armRotationHigh);
-    extender.setLength(Constants.armLengthHigh);
+  public void setCubeHigh() {
+    setPosition(Constants.armRotationCubeHigh);
+    extender.setLength(Constants.armLengthCubeHigh);
+    wrist.setPositionDegrees(Constants.wristRotationCubeHigh);
+  }
+  public void setConeMid() {
+    setPosition(Constants.armRotationConeMid);
+    extender.setLength(Constants.armLengthConeMid);
+    wrist.setPositionDegrees(Constants.wristRotationConeMid);
+  }
+
+  public void setConeHigh() {
+    setPosition(Constants.armRotationConeHigh);
+    extender.setLength(Constants.armLengthConeHigh);
+    wrist.setPositionDegrees(Constants.wristRotationConeHigh);
   }
 
   /**

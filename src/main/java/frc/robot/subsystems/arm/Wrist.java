@@ -1,16 +1,13 @@
 package frc.robot.subsystems.arm;
 
-import javax.swing.SpringLayout.Constraints;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.EncoderType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxRelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 
 public class Wrist {
@@ -33,7 +30,7 @@ public class Wrist {
     public void setPositionDegrees (double degrees){
         ppc.setGoal(degrees);
     }
-
+    //Shouldn't this take into account te rotation of the arm as a whole?
     private double computeArbitraryFeetForward() {
         double theta = encoder.getPosition() * Constants.armRotationalTicksToRadians;
         return (Math.cos(theta)

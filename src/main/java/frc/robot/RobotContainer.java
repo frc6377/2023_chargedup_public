@@ -23,19 +23,20 @@ import frc.robot.subsystems.fieldPositioningSystem.FieldPositioningSystem;
 public class RobotContainer {
   // Input controllers
   private final XboxController driveController =
-      new XboxController(DeviceConstants.driveControllerID);
+      new XboxController(Constants.driverControllerID);
   private final StreamDeck streamDeck = new StreamDeck(2, 36);
   // Subsystems
   private final DeploySubsystem deploySubsystem = new DeploySubsystem();
   private final CommandXboxController driver =
-      new CommandXboxController(DeviceConstants.driveControllerID);
+      new CommandXboxController(Constants.driverControllerID);
   private final CommandXboxController gunner =
-      new CommandXboxController(DeviceConstants.gunnerControllerID);
+      new CommandXboxController(Constants.gunnerControllerID);
   private final ArmSubsystem arm =
-      new ArmSubsystem(DeviceConstants.armRotateID, DeviceConstants.armExtendID);
+      new ArmSubsystem();
+      //TODO: Fix to make EndAffector Subsystem only use 1 motor because there will only BE 1 motor.
   private final EndAffectorSubsystem endAffector =
       new EndAffectorSubsystem(
-          DeviceConstants.endAffectorLeftID, DeviceConstants.endAffectorRightID);
+          Constants.endAffectorID, Constants.endAffectorID);
   private final ColorSubsystem colorStrip = new ColorSubsystem(2);
   private final FieldPositioningSystem fieldPositioningSystem = new FieldPositioningSystem();
   private final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem(null);
@@ -108,10 +109,10 @@ public class RobotContainer {
 
     gunnerHighButton
         .or(driverHighButton)
-        .whileTrue(Commands.startEnd(() -> arm.setHigh(), () -> arm.setLow(), arm));
+        .whileTrue(Commands.startEnd(() -> arm.setCubeHigh(), () -> arm.setLow(), arm));
     gunnerMidButton
         .or(driverMidButton)
-        .whileTrue(Commands.startEnd(() -> arm.setMid(), () -> arm.setLow(), arm));
+        .whileTrue(Commands.startEnd(() -> arm.setCubeMid(), () -> arm.setLow(), arm));
     driverGoButton.whileTrue(
         Commands.runOnce(
             () -> CommandScheduler.getInstance().schedule(autoCommand.generateCommand(getBay()).until(this::isDriving))));

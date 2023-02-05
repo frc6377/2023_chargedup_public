@@ -83,14 +83,14 @@ public final class Constants {
   // TODO: convert arm rotation values to radians
   public static final double armRotationStowed = -5;
   public static final double armRotationLow = -3;
-  public static final double armRotationMid = -10.428622245788574 - 3;
-  public static final double armRotationHigh = -10.428622245788574 - 7;
+  public static final double armRotationCubeMid = -10.428622245788574 - 3;
+  public static final double armRotationCubeHigh = -10.428622245788574 - 7;
   public static final double armRotationalTicksToRadians = Math.PI / 50;
   // TODO: decide on actual values for this
   public static final double armLengthStowed = -5;
   public static final double armLengthLow = -3;
-  public static final double armLengthMid = -10.428622245788574 - 3;
-  public static final double armLengthHigh = -10.428622245788574 - 7;
+  public static final double armLengthCubeMid = -10.428622245788574 - 3;
+  public static final double armLengthCubeHigh = -10.428622245788574 - 7;
   // TODO: Calculate actual value.
   public static final double armLengthTicksToMeters = 0;
   // TODO: Measure the arm and put that value in here
