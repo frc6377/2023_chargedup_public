@@ -2,7 +2,6 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.FieldPoses;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
 
@@ -10,7 +9,6 @@ public class AutoDeliveryCommand extends SequentialCommandGroup {
   private final ArmSubsystem arm;
   private final DrivetrainSubsystem drive;
   private final SendableChooser<Integer> deliveryChooser = new SendableChooser<>();
-  private final FieldPoses poses = new FieldPoses();
   private final SwerveAutoFactory autoGenerator;
 
   public AutoDeliveryCommand(ArmSubsystem arm, DrivetrainSubsystem drive) {
@@ -18,7 +16,7 @@ public class AutoDeliveryCommand extends SequentialCommandGroup {
     this.arm = arm;
     this.autoGenerator = new SwerveAutoFactory(null, drive);
     addOptions();
-    addCommands(this.autoGenerator.generateCommand(poses.GetBay(deliveryChooser.getSelected())));
+    addCommands(this.autoGenerator.generateGridCommand(deliveryChooser.getSelected()));
   }
 
   private void addOptions() {

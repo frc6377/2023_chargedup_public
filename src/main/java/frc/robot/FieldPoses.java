@@ -24,7 +24,7 @@ public class FieldPoses {
   public final double rightStationZoneBoundary;
   public final double leftZoneBoundary;
   public final double leftStationZoneBoundary;
-  //defined such that the blue driver station is to the left
+  // defined such that the blue driver station is to the left
   public final Translation2d rightFarInflectionPoint;
   public final Translation2d rightCloseInflectionPoint;
 
@@ -120,10 +120,11 @@ public class FieldPoses {
     createBays(relativeBays);
 
     rightZoneBoundary = (isRed) ? Constants.topZoneBoundary : Constants.bottomZoneBoundary;
-    rightStationZoneBoundary = (isRed) ? Constants.topStationZoneBoundary :  Constants.bottomStationZoneBoundary;
+    rightStationZoneBoundary =
+        (isRed) ? Constants.topStationZoneBoundary : Constants.bottomStationZoneBoundary;
     leftZoneBoundary = (isRed) ? Constants.bottomZoneBoundary : Constants.topZoneBoundary;
-    leftStationZoneBoundary = (isRed) ? Constants.bottomStationZoneBoundary : Constants.topStationZoneBoundary;
-
+    leftStationZoneBoundary =
+        (isRed) ? Constants.bottomStationZoneBoundary : Constants.topStationZoneBoundary;
 
     singleSubstation = relativeToAbsolute(Constants.singleSubstation);
     doubleSubstation = relativeToAbsolute(Constants.doubleSubstation);

@@ -116,7 +116,7 @@ public class RobotContainer {
         Commands.runOnce(
             () ->
                 CommandScheduler.getInstance()
-                    .schedule(autoCommand.generateCommand(getBay()).until(this::isDriving))));
+                    .schedule(autoCommand.generateGridCommand(getBay()).until(this::isDriving))));
   }
 
   public Command getAutonomousCommand() {
