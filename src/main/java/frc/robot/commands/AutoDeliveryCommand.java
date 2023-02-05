@@ -18,7 +18,7 @@ public class AutoDeliveryCommand extends SequentialCommandGroup {
     this.arm = arm;
     this.autoGenerator = new SwerveAutoFactory(null, drive);
     addOptions();
-    addCommands(this.autoGenerator.generateCommand(poses.GetPose(deliveryChooser.getSelected())));
+    addCommands(this.autoGenerator.generateCommand(poses.GetBay(deliveryChooser.getSelected())));
   }
 
   private void addOptions() {

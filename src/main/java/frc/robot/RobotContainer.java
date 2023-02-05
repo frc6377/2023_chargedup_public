@@ -114,7 +114,9 @@ public class RobotContainer {
         .whileTrue(Commands.startEnd(() -> arm.setMid(), () -> arm.setLow(), arm));
     driverGoButton.whileTrue(
         Commands.runOnce(
-            () -> CommandScheduler.getInstance().schedule(autoCommand.generateCommand(getBay()).until(this::isDriving))));
+            () ->
+                CommandScheduler.getInstance()
+                    .schedule(autoCommand.generateCommand(getBay()).until(this::isDriving))));
   }
 
   public Command getAutonomousCommand() {
@@ -129,7 +131,7 @@ public class RobotContainer {
     return 8 - (grid + (selected % 9 % 3)); // if we are in the "1, 2, or 3" bays per grid
   }
 
-  private boolean isDriving(){
+  private boolean isDriving() {
     return 0.5 < Math.hypot(driveController.getLeftX(), driveController.getLeftY());
   }
 }

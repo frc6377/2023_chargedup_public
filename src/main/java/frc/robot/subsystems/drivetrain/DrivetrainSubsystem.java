@@ -29,8 +29,13 @@ import java.util.function.DoubleSupplier;
 
 public class DrivetrainSubsystem extends SubsystemBase {
 
-
-    private final SwerveModuleState[] xStates = new SwerveModuleState[]{new SwerveModuleState(0, new Rotation2d(Math.PI/4)), new SwerveModuleState(0, new Rotation2d(Math.PI/4 + Math.PI/2)), new SwerveModuleState(0, new Rotation2d(Math.PI/4 + Math.PI- Math.PI/2)), new SwerveModuleState(0, new Rotation2d(Math.PI/4 + Math.PI + Math.PI/2 - Math.PI/2))};
+  private final SwerveModuleState[] xStates =
+      new SwerveModuleState[] {
+        new SwerveModuleState(0, new Rotation2d(Math.PI / 4)),
+        new SwerveModuleState(0, new Rotation2d(Math.PI / 4 + Math.PI / 2)),
+        new SwerveModuleState(0, new Rotation2d(Math.PI / 4 + Math.PI - Math.PI / 2)),
+        new SwerveModuleState(0, new Rotation2d(Math.PI / 4 + Math.PI + Math.PI / 2 - Math.PI / 2))
+      };
   /**
    * The maximum voltage that will be delivered to the drive motors.
    *
@@ -247,12 +252,12 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    
+
     SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
 
-    if (
-        Math.hypot(m_chassisSpeeds.vxMetersPerSecond, m_chassisSpeeds.vyMetersPerSecond) == 0 && m_chassisSpeeds.omegaRadiansPerSecond ==0) {
-        states = xStates;
+    if (Math.hypot(m_chassisSpeeds.vxMetersPerSecond, m_chassisSpeeds.vyMetersPerSecond) == 0
+        && m_chassisSpeeds.omegaRadiansPerSecond == 0) {
+      states = xStates;
     }
 
     SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_VELOCITY_METERS_PER_SECOND);
