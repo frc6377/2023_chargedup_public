@@ -39,14 +39,8 @@ public class SwerveAutoFactory {
     this.drivetrainSubsystem = drivetrainSubsystem;
   }
 
-  // probably unecessary but it can stay for now
-  public SwerveAutoFactory(DrivetrainSubsystem drivetrainSubsystem) {
-    this.poseReseter = null;
-    this.drivetrainSubsystem = drivetrainSubsystem;
-  }
-
   // loads a trajectory from file and hands it to the command generator
-  public Command generateCommand(String pathTofollow, boolean isFirstPath) {
+  public Command generateCommandFromFile(String pathTofollow, boolean isFirstPath) {
 
     createFieldPoses(); // create a field poses object if we dont have one already
 
@@ -64,8 +58,7 @@ public class SwerveAutoFactory {
     createFieldPoses(); // create a field poses object if we dont have one already
     Translation2d targetPose = fieldPoses.getBay(targetBay);
 
-    Rotation2d deliveryRotation =
-        (fieldPoses.isRed() ? new Rotation2d(0) : new Rotation2d(Math.PI));
+    Rotation2d deliveryRotation = fieldPoses.getDeliveryRotation();
     Pose2d currentPose = sub.get();
     Translation2d firstTarget =
         targetPose; // this variable tracks the pose of the second control point in the trajectory
@@ -76,11 +69,11 @@ public class SwerveAutoFactory {
     // along the Y axis and also it means we need to align ourself with one of the stations
     // "channels"
 
-    ZONE currZone = getZone(currentPose.getY());
-    PROXIMITY currProx = getProx(currentPose.getX());
+    ZONE currentZone = getZone(currentPose.getY());
+    PROXIMITY currentProximity = getProx(currentPose.getX());
 
     // build our midpoints first
-    switch (currProx) {
+    switch (currentProximity) {
       case CLOSE: // if close we have no midpoints
         break;
       case MID:
@@ -111,7 +104,7 @@ public class SwerveAutoFactory {
           inflection1 = fieldPoses.leftFarInflectionPoint;
           inflection2 = fieldPoses.leftCloseInflectionPoint;
         } else {
-          switch (getZone(currentPose.getY())) {
+          switch (currentZone) {
             case LEFT:
               inflection1 = fieldPoses.leftFarInflectionPoint;
               inflection2 = fieldPoses.leftCloseInflectionPoint;
@@ -169,10 +162,47 @@ public class SwerveAutoFactory {
     points.add(
         new PathPoint(targetPose, deliveryRotation, deliveryRotation).withPrevControlLength(0.2));
 
-    var constraints = new PathConstraints(maxVelocity, maxAcceleration);
-    var trajectory = PathPlanner.generatePath(constraints, points);
+    PathConstraints constraints = new PathConstraints(maxVelocity, maxAcceleration);
+    PathPlannerTrajectory trajectory = PathPlanner.generatePath(constraints, points);
 
     return generateControllerCommand(false, trajectory);
+  }
+
+  private Command generateCommandFromPoint(Pose2d endPoint) {
+
+    ArrayList<PathPoint> points = new ArrayList<PathPoint>();
+    Pose2d currentPose = sub.get();
+
+    points.add(
+        poseToPathPoint(
+            currentPose,
+            Math.hypot(
+                drivetrainSubsystem.getChassisSpeeds().vxMetersPerSecond,
+                drivetrainSubsystem.getChassisSpeeds().vyMetersPerSecond),
+            headingBetweenPoints(currentPose.getTranslation(), endPoint.getTranslation())));
+    points.add(
+        poseToPathPoint(
+            endPoint,
+            -1,
+            headingBetweenPoints(currentPose.getTranslation(), endPoint.getTranslation())
+                .rotateBy(new Rotation2d(Math.PI))));
+
+    PathConstraints constraints = new PathConstraints(maxVelocity, maxAcceleration);
+    PathPlannerTrajectory trajectory = PathPlanner.generatePath(constraints, points);
+
+    return generateControllerCommand(false, trajectory);
+  }
+
+  public Command generateSingleSubCommand() {
+    createFieldPoses();
+    return generateCommandFromPoint(
+        new Pose2d(fieldPoses.getSingleSubstation(), fieldPoses.getSingleSubRotation()));
+  }
+
+  public Command generateDoubleSubCommand() {
+    createFieldPoses();
+    return generateCommandFromPoint(
+        new Pose2d(fieldPoses.getDoubleSubstation(), fieldPoses.getDeliveryRotation()));
   }
 
   public Command generateControllerCommand(boolean isFirstPath, PathPlannerTrajectory trajectory) {
@@ -274,7 +304,6 @@ public class SwerveAutoFactory {
   }
 
   private enum ZONE {
-    // defined such that the blue driver station is to the left
     LEFT,
     LEFT_STATION,
     RIGHT,

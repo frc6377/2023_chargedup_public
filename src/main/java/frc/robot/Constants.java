@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.subsystems.drivetrain.config.PodName;
 import java.util.Arrays;
@@ -176,4 +177,7 @@ public final class Constants {
 
   public static final Translation2d doubleSubstation = new Translation2d(0, 0);
   public static final Translation2d singleSubstation = new Translation2d(0, 0);
+
+  public static final Rotation2d singleSubRotation = new Rotation2d(Math.PI * (3 / 2));
+  public static final Rotation2d deliveryRotation = new Rotation2d(Math.PI);
 }

@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -41,6 +42,9 @@ public class FieldPoses {
 
   private final Translation2d singleSubstation;
   private final Translation2d doubleSubstation;
+
+  private final Rotation2d deliveryRotation;
+  private final Rotation2d singleSubRotation = Constants.singleSubRotation;
 
   class NullAllianceException extends RuntimeException {}
 
@@ -109,6 +113,14 @@ public class FieldPoses {
     return doubleSubstation;
   }
 
+  public final Rotation2d getSingleSubRotation() {
+    return singleSubRotation;
+  }
+
+  public final Rotation2d getDeliveryRotation() {
+    return deliveryRotation;
+  }
+
   public FieldPoses() {
     this.isRed = isRed();
 
@@ -116,6 +128,10 @@ public class FieldPoses {
     // grids. They are ordered assuming we are on the Blue team.
     List<Translation2d> relativeBays = Constants.deliveryBays;
 
+    deliveryRotation =
+        (isRed)
+            ? Constants.deliveryRotation.rotateBy(new Rotation2d(Math.PI))
+            : Constants.deliveryRotation;
     // initialize all attributes such that they are absolute
     createBays(relativeBays);
 
