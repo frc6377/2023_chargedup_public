@@ -22,8 +22,8 @@ public final class Constants {
   public static final int Degrees270 = 270;
 
   public static final int driverControllerID = 0;
-  public static final int gunnerControllerID =
-      -1; // This is -1 to disable it as it is not currently going to be used.
+  // This is -1 to disable it as it is not currently going to be used.
+  public static final int gunnerControllerID = -1;
   public static final int streamDeckID = 1;
   // TODO: add real value for the motor ID
   public static final int endAffectorID = 9;
@@ -95,7 +95,7 @@ public final class Constants {
   public static final double armRotationCubeHigh = -10.428622245788574 - 7;
   public static final double armRotationConeMid = -10.428622245788574 - 3;
   public static final double armRotationConeHigh = -10.428622245788574 - 7;
-  public static final int armRotationCurrentLimit = 0;
+  public static final int armRotationCurrentLimit = 40;
 
   public static final int armRotationID1 = -1;
   public static final int armRotationID2 = -1;
@@ -108,7 +108,7 @@ public final class Constants {
   public static final double armLengthCubeHigh = -10.428622245788574 - 7;
   public static final double armLengthConeMid = -10.428622245788574 - 3;
   public static final double armLengthConeHigh = -10.428622245788574 - 7;
-  public static final int armExtensionCurrentLimit = 0;
+  public static final int armExtensionCurrentLimit = 40;
 
   public static final int armExtenderID = -1;
 
@@ -118,7 +118,8 @@ public final class Constants {
   public static final double wristRotationCubeHigh = -10.428622245788574 - 7;
   public static final double wristRotationConeMid = -10.428622245788574 - 3;
   public static final double wristRotationConeHigh = -10.428622245788574 - 7;
-  public static final int wristCurrentLimit = 0;
+  public static final int wristCurrentLimit = 30;
+  public static final int wristStatorLimit = 40;
 
   public static final double wristTicksToRadians = Math.PI / 50; // TODO: Calculate the actual value
 

@@ -1,5 +1,10 @@
 package frc.robot.subsystems.arm;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.DemandType;
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -17,8 +22,8 @@ public class ArmSubsystem extends SubsystemBase {
   private final CANSparkMax extendMotor;
   private final ProfiledPIDController extendPPC;
 
-  private final CANSparkMax wristMotor;
-  private final ProfiledPIDController wristPPC;
+  private final WPI_TalonFX wristMotor;
+  private double wristMotorGoal;
 
   public ArmSubsystem() {
     System.out.println("Starting Construct ArmSubsystem");
@@ -47,15 +52,14 @@ public class ArmSubsystem extends SubsystemBase {
     extendMotor.restoreFactoryDefaults();
     extendMotor.setSmartCurrentLimit(Constants.armExtensionCurrentLimit);
 
-    wristPPC =
-        new ProfiledPIDController(
-            Constants.wristKp,
-            0,
-            0,
-            new TrapezoidProfile.Constraints(Constants.wristMaxVelo, Constants.wristMaxAccel));
-    wristMotor = new CANSparkMax(Constants.wristID, MotorType.kBrushless);
-    wristMotor.restoreFactoryDefaults();
-    wristMotor.setSmartCurrentLimit(Constants.wristCurrentLimit);
+    wristMotor = new WPI_TalonFX(Constants.wristID);
+    wristMotor.configStatorCurrentLimit(
+        new StatorCurrentLimitConfiguration(
+            true, Constants.wristStatorLimit, Constants.wristStatorLimit, 1));
+    wristMotor.configSupplyCurrentLimit(
+        new SupplyCurrentLimitConfiguration(
+            true, Constants.wristCurrentLimit, Constants.wristCurrentLimit, 1));
+    wristMotorGoal = Constants.wristRotationStowed;
 
     System.out.println("Complete Construct ArmSubsystem");
   }
@@ -67,44 +71,46 @@ public class ArmSubsystem extends SubsystemBase {
             - computeRotationArbitraryFeetForward());
     extendMotor.set(extendPPC.calculate(extendMotor.getEncoder().getPosition()));
     wristMotor.set(
-        wristPPC.calculate(wristMotor.getEncoder().getPosition())
-            + computeWristArbitraryFeetForward());
+        ControlMode.MotionMagic,
+        wristMotorGoal,
+        DemandType.ArbitraryFeedForward,
+        computeWristArbitraryFeetForward());
   }
 
   public void setStowed() {
     armPPC.setGoal(Constants.armRotationStowed);
     extendPPC.setGoal(Constants.armLengthStowed);
-    wristPPC.setGoal(Constants.wristRotationStowed);
+    wristMotorGoal = Constants.wristRotationStowed;
   }
 
   public void setLow() {
     armPPC.setGoal(Constants.armRotationLow);
     extendPPC.setGoal(Constants.armLengthLow);
-    wristPPC.setGoal(Constants.wristRotationLow);
+    wristMotorGoal = Constants.wristRotationLow;
   }
 
   public void setCubeMid() {
     armPPC.setGoal(Constants.armRotationCubeMid);
     extendPPC.setGoal(Constants.armLengthCubeMid);
-    wristPPC.setGoal(Constants.wristRotationCubeMid);
+    wristMotorGoal = Constants.wristRotationCubeMid;
   }
 
   public void setCubeHigh() {
     armPPC.setGoal(Constants.armRotationCubeHigh);
     extendPPC.setGoal(Constants.armLengthCubeHigh);
-    wristPPC.setGoal(Constants.wristRotationCubeHigh);
+    wristMotorGoal = Constants.wristRotationCubeHigh;
   }
 
   public void setConeMid() {
     armPPC.setGoal(Constants.armRotationConeMid);
     extendPPC.setGoal(Constants.armLengthConeMid);
-    wristPPC.setGoal(Constants.wristRotationConeMid);
+    wristMotorGoal = Constants.wristRotationConeMid;
   }
 
   public void setConeHigh() {
     armPPC.setGoal(Constants.armRotationConeHigh);
     extendPPC.setGoal(Constants.armLengthConeHigh);
-    wristPPC.setGoal(Constants.wristRotationConeHigh);
+    wristMotorGoal = Constants.wristRotationConeHigh;
   }
 
   /**
@@ -126,7 +132,7 @@ public class ArmSubsystem extends SubsystemBase {
 
   private double computeWristArbitraryFeetForward() {
     double theta =
-        wristMotor.getEncoder().getPosition() * Constants.wristTicksToRadians
+        wristMotor.getSelectedSensorPosition() * Constants.wristTicksToRadians
             + armMotorLead.getEncoder().getPosition() * Constants.armRotationalTicksToRadians;
     return (Math.cos(theta) * Constants.wristMomentOfInertia * 9.8)
         / (Constants.stalledTorque * Constants.wristGearRatio);
