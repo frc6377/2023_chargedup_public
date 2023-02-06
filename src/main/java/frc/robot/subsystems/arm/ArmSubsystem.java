@@ -43,7 +43,7 @@ public class ArmSubsystem extends SubsystemBase {
     armMotor1.setSmartCurrentLimit(Constants.armRotationCurrentLimit);
 
     armMotor2.follow(armMotor1);
-    // armMotor2.setSmartCurrentLimit(Constants.armRotationCurrentLimit);
+    armMotor2.setSmartCurrentLimit(Constants.armRotationCurrentLimit);
 
     extendPPC =
         new ProfiledPIDController(
