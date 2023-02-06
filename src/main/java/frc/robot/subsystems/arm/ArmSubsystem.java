@@ -35,12 +35,15 @@ public class ArmSubsystem extends SubsystemBase {
             new TrapezoidProfile.Constraints(
                 Constants.armRotationMaxVelo, Constants.armRotationMaxAccel));
     armMotor1 = new CANSparkMax(Constants.armRotationID1, MotorType.kBrushless);
-    armMotor1.restoreFactoryDefaults();
     armMotor2 = new CANSparkMax(Constants.armRotationID2, MotorType.kBrushless);
+
+    armMotor1.restoreFactoryDefaults();
     armMotor2.restoreFactoryDefaults();
-    armMotor2.follow(armMotor1);
+
     armMotor1.setSmartCurrentLimit(Constants.armRotationCurrentLimit);
-    armMotor2.setSmartCurrentLimit(Constants.armRotationCurrentLimit);
+
+    armMotor2.follow(armMotor1);
+    // armMotor2.setSmartCurrentLimit(Constants.armRotationCurrentLimit);
 
     extendPPC =
         new ProfiledPIDController(

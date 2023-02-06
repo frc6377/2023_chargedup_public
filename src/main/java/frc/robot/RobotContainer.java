@@ -66,8 +66,10 @@ public class RobotContainer {
     Trigger shootButton = driver.rightTrigger(0.3);
     Trigger gunnerHighButton = gunner.a();
     Trigger gunnerMidButton = gunner.x();
+    Trigger gunnerLowButton = gunner.y();
     Trigger driverHighButton = driver.a();
     Trigger driverMidButton = driver.x();
+    Trigger driverLowButton = driver.y();
     Trigger driverGoButton = driver.b();
 
     intakeButton.whileTrue(
@@ -106,10 +108,13 @@ public class RobotContainer {
 
     gunnerHighButton
         .or(driverHighButton)
-        .whileTrue(Commands.startEnd(() -> arm.setCubeHigh(), () -> arm.setLow(), arm));
+        .onTrue(Commands.runOnce(() -> arm.setCubeHigh(), arm));
     gunnerMidButton
         .or(driverMidButton)
-        .whileTrue(Commands.startEnd(() -> arm.setCubeMid(), () -> arm.setLow(), arm));
+        .onTrue(Commands.runOnce(() -> arm.setCubeMid(), arm));
+    gunnerLowButton
+        .or(driverLowButton)
+        .onTrue(Commands.runOnce(() -> arm.setLow(), arm));
     driverGoButton.whileTrue(
         Commands.runOnce(
             () ->
