@@ -42,7 +42,8 @@ public class ArmSubsystem extends SubsystemBase {
 
     armMotor1.setSmartCurrentLimit(Constants.armRotationCurrentLimit);
 
-    armMotor2.follow(armMotor1);
+    // We haven't been able to gett following to work.
+    // armMotor2.follow(armMotor1);
     armMotor2.setSmartCurrentLimit(Constants.armRotationCurrentLimit);
 
     extendPPC =
@@ -76,6 +77,9 @@ public class ArmSubsystem extends SubsystemBase {
     armMotor1.set(
         armPPC1.calculate(armMotor1.getEncoder().getPosition())
             - computeRotationArbitraryFeetForward());
+    armMotor2.set(
+        -1 * (armPPC1.calculate(armMotor1.getEncoder().getPosition())
+            - computeRotationArbitraryFeetForward()));
     extendMotor.set(extendPPC.calculate(extendMotor.getEncoder().getPosition()));
     wristMotor.set(
         ControlMode.MotionMagic,
