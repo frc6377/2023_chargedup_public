@@ -8,6 +8,7 @@ import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -23,7 +24,6 @@ import java.util.function.Consumer;
 // TODO
 // reseting pose breaks field north. May not be an issue with this class
 // general tuning
-// move magic numbers to constants
 
 public class SwerveAutoFactory {
   private final Pose2DSubscriber sub = Topics.PoseTopic().subscribe(new Pose2d());
@@ -39,14 +39,8 @@ public class SwerveAutoFactory {
     this.drivetrainSubsystem = drivetrainSubsystem;
   }
 
-  // probably unecessary but it can stay for now
-  public SwerveAutoFactory(DrivetrainSubsystem drivetrainSubsystem) {
-    this.poseReseter = null;
-    this.drivetrainSubsystem = drivetrainSubsystem;
-  }
-
   // loads a trajectory from file and hands it to the command generator
-  public Command generateCommand(String pathTofollow, boolean isFirstPath) {
+  public Command generateCommandFromFile(String pathTofollow, boolean isFirstPath) {
 
     createFieldPoses(); // create a field poses object if we dont have one already
 
@@ -57,17 +51,16 @@ public class SwerveAutoFactory {
 
   // this constructor just calls the target pose constructor, except it lets you directly reference
   // a delivery bay
-  public Command generateCommand(int bay) {
-    createFieldPoses(); // create a field poses object if we dont have one already
-    return generateCommand(fieldPoses.getBay(bay));
-  }
 
   // generates a trajectory on the fly from a given target pose
-  public Command generateCommand(Pose2d targetPose) {
+  public Command generateGridCommand(int targetBay) {
 
     createFieldPoses(); // create a field poses object if we dont have one already
+    Translation2d targetPose = fieldPoses.getBay(targetBay);
+
+    Rotation2d deliveryRotation = fieldPoses.getDeliveryRotation();
     Pose2d currentPose = sub.get();
-    Pose2d firstTarget =
+    Translation2d firstTarget =
         targetPose; // this variable tracks the pose of the second control point in the trajectory
     // so that our first control point's heading will face it
     ArrayList<PathPoint> points = new ArrayList<PathPoint>();
@@ -76,39 +69,84 @@ public class SwerveAutoFactory {
     // along the Y axis and also it means we need to align ourself with one of the stations
     // "channels"
 
-    if (!pastChargeStation(
-        currentPose
-            .getX())) { // because we can move in the Y axis we can choose the fastest path to the
-      // target
-      Pose2d safePose =
-          (targetPose.getY() > FieldPoses.ChargeStationYCenter)
-              ? fieldPoses.getUpperSafePoint()
-              : fieldPoses.getLowerSafePoint();
+    Zone currentZone = getZone(currentPose.getY());
+    Proximity currentProximity = getProx(currentPose.getX());
 
-      double stationOffset =
-          (fieldPoses.isRed()
-              ? -3
-              : 3); // pretty gross, will fix in refactor. basically instead of having 2 safe points
-      // we just offset the safe point we have by the length of the station with some
-      // extra tolerance
-      Pose2d firstSafePoint =
-          new Pose2d(safePose.getX() + stationOffset, safePose.getY(), safePose.getRotation());
-      points.add(poseToPathPoint(firstSafePoint, -1, safePose.getRotation()));
-      points.add(poseToPathPoint(safePose, -1, headingBetweenPoses(safePose, targetPose)));
-      firstTarget = firstSafePoint;
-    }
+    SmartDashboard.putString("proximity", currentProximity.name());
+    SmartDashboard.putString("zone", currentZone.name());
 
-    // checks if we are between the wall and the station because that means we dont have freedom
-    // along the Y axis
-    else if (!behindSafeLine(currentPose.getX())) {
-      Pose2d safePose =
-          (currentPose.getY() > FieldPoses.ChargeStationYCenter)
-              ? fieldPoses.getUpperSafePoint()
-              : fieldPoses.getLowerSafePoint();
-      Pose2d firstSafePoint =
-          new Pose2d(safePose.getX(), currentPose.getY(), safePose.getRotation());
-      points.add(poseToPathPoint(firstSafePoint, -1, safePose.getRotation()));
-      firstTarget = firstSafePoint;
+    // build our midpoints first
+    switch (currentProximity) {
+      case CLOSE: // if close we have no midpoints
+        break;
+      case MID:
+        Translation2d inflection =
+            new Translation2d(
+                fieldPoses.closeProximityBoundary,
+                currentPose
+                    .getY()); // if we are in mid we cannot move in the y axis. So just go straight
+        // until we enter close
+        points.add(
+            poseToPathPoint(
+                new Pose2d(
+                    inflection, headingBetweenPoints(currentPose.getTranslation(), inflection)),
+                -1,
+                deliveryRotation));
+        firstTarget = inflection;
+        break;
+
+      case FAR:
+        Translation2d inflection1;
+        Translation2d inflection2;
+
+        if (targetBay <= 1) {
+          inflection1 = fieldPoses.rightFarInflectionPoint;
+          inflection2 = fieldPoses.rightCloseInflectionPoint;
+        } else if (targetBay >= 7) {
+          inflection1 = fieldPoses.leftFarInflectionPoint;
+          inflection2 = fieldPoses.leftCloseInflectionPoint;
+        } else {
+          switch (currentZone) {
+            case LEFT:
+              inflection1 = fieldPoses.leftFarInflectionPoint;
+              inflection2 = fieldPoses.leftCloseInflectionPoint;
+              break;
+
+            case LEFT_STATION:
+              inflection1 = fieldPoses.leftStationFarInflectionPoint;
+              inflection2 = fieldPoses.leftStationCloseInflectionPoint;
+              break;
+
+            case RIGHT:
+              inflection1 = fieldPoses.rightFarInflectionPoint;
+              inflection2 = fieldPoses.rightCloseInflectionPoint;
+              break;
+
+            case RIGHT_STATION:
+              inflection1 = fieldPoses.rightStationFarInflectionPoint;
+              inflection2 = fieldPoses.rightStationCloseInflectionPoint;
+              break;
+
+            default:
+              System.out.println("NO ZONE FOUND");
+              inflection1 = null;
+              inflection2 = null;
+          }
+        }
+        firstTarget = inflection1;
+        points.add(
+            poseToPathPoint(
+                new Pose2d(
+                    inflection1, headingBetweenPoints(currentPose.getTranslation(), inflection1)),
+                -1,
+                deliveryRotation));
+        points.add(
+            poseToPathPoint(
+                new Pose2d(
+                    inflection2, headingBetweenPoints(currentPose.getTranslation(), inflection2)),
+                -1,
+                deliveryRotation));
+        break;
     }
 
     // constructs the first point last using the current drivetrain velocity
@@ -119,22 +157,52 @@ public class SwerveAutoFactory {
             Math.hypot(
                 drivetrainSubsystem.getChassisSpeeds().vxMetersPerSecond,
                 drivetrainSubsystem.getChassisSpeeds().vyMetersPerSecond),
-            headingBetweenPoses(currentPose, firstTarget)));
+            headingBetweenPoints(currentPose.getTranslation(), firstTarget)));
 
-    SmartDashboard.putString(
-        "target pose ",
-        targetPose.getX() + " " + targetPose.getY() + " " + targetPose.getRotation().getDegrees());
     points.add(
-        new PathPoint(
-                targetPose.getTranslation(),
-                new Rotation2d(Math.PI), // TODO these from target
-                new Rotation2d(Math.PI))
-            .withPrevControlLength(0.1));
+        new PathPoint(targetPose, deliveryRotation, deliveryRotation).withPrevControlLength(0.2));
 
-    var constraints = new PathConstraints(maxVelocity, maxAcceleration);
-    var trajectory = PathPlanner.generatePath(constraints, points);
+    PathConstraints constraints = new PathConstraints(maxVelocity, maxAcceleration);
+    PathPlannerTrajectory trajectory = PathPlanner.generatePath(constraints, points);
 
     return generateControllerCommand(false, trajectory);
+  }
+
+  private Command generateCommandFromPoint(Pose2d endPoint) {
+
+    ArrayList<PathPoint> points = new ArrayList<PathPoint>();
+    Pose2d currentPose = sub.get();
+
+    points.add(
+        poseToPathPoint(
+            currentPose,
+            Math.hypot(
+                drivetrainSubsystem.getChassisSpeeds().vxMetersPerSecond,
+                drivetrainSubsystem.getChassisSpeeds().vyMetersPerSecond),
+            headingBetweenPoints(currentPose.getTranslation(), endPoint.getTranslation())));
+    points.add(
+        poseToPathPoint(
+            endPoint,
+            -1,
+            headingBetweenPoints(currentPose.getTranslation(), endPoint.getTranslation())
+                .rotateBy(new Rotation2d(Math.PI))));
+
+    PathConstraints constraints = new PathConstraints(maxVelocity, maxAcceleration);
+    PathPlannerTrajectory trajectory = PathPlanner.generatePath(constraints, points);
+
+    return generateControllerCommand(false, trajectory);
+  }
+
+  public Command generateSingleSubCommand() {
+    createFieldPoses();
+    return generateCommandFromPoint(
+        new Pose2d(fieldPoses.getSingleSubstation(), fieldPoses.getSingleSubRotation()));
+  }
+
+  public Command generateDoubleSubCommand() {
+    createFieldPoses();
+    return generateCommandFromPoint(
+        new Pose2d(fieldPoses.getDoubleSubstation(), fieldPoses.getDeliveryRotation()));
   }
 
   public Command generateControllerCommand(boolean isFirstPath, PathPlannerTrajectory trajectory) {
@@ -155,9 +223,11 @@ public class SwerveAutoFactory {
             drivetrainSubsystem);
 
     if (poseReseter != null
-        && isFirstPath) // checks if we have a pose reseter and if we want to reset our pose. If we
+        && isFirstPath) { // checks if we have a pose reseter and if we want to reset our pose. If
+      // we
       // do we want to overwrite whatever the kalman filter has. Mostly for auton
       poseReseter.accept(trajectory.getInitialHolonomicPose());
+    }
     drivetrainSubsystem.sendTrajectoryToNT(trajectory); // posts trajectory to dashboard
 
     // run the command and than stop the drivetrain. Just to make sure we arent moving at the end
@@ -174,29 +244,11 @@ public class SwerveAutoFactory {
   }
 
   // computes the angle between two poses. Used so points have headings that point to the next point
-  private Rotation2d headingBetweenPoses(Pose2d pose1, Pose2d pose2) {
-    double theta = Math.atan2(pose1.getY() - pose2.getY(), pose1.getX() - pose2.getX());
+  private Rotation2d headingBetweenPoints(Translation2d translation1, Translation2d translation2) {
+    double theta =
+        Math.atan2(
+            translation1.getY() - translation2.getY(), translation1.getX() - translation2.getX());
     return new Rotation2d(theta + Math.PI);
-  }
-
-  private boolean behindSafeLine(
-      double xPosition) { // checks if we are behind the "safe line" which is defined as a line
-    // perpendicular to the driver such that when we are behind said line we
-    // cannot hit the charging station
-    if (fieldPoses.isRed()) {
-      return xPosition > FieldPoses.RedSafeLineX;
-    }
-
-    return xPosition < FieldPoses.BlueSafeLineX;
-  }
-
-  private boolean pastChargeStation(
-      double xPosition) { // checks if we are behind the charge station
-    if (fieldPoses.isRed()) {
-      return xPosition > FieldPoses.RedSafeLineX - 2.7;
-    }
-
-    return xPosition < FieldPoses.BlueSafeLineX + 2.7;
   }
 
   // constructs a field poses object if we dont have already. This is done because if this object is
@@ -205,5 +257,58 @@ public class SwerveAutoFactory {
     if (fieldPoses == null) {
       fieldPoses = new FieldPoses();
     }
+  }
+
+  private Proximity getProx(double x) {
+
+    // built on the principle x > y = -x < -y. Because we must check if greater on red and if lesser
+    // on blue we negate both sides of the equation to effectively flip the comparison
+    int mult = (fieldPoses.isRed()) ? -1 : 1;
+    x *= mult;
+
+    if (x < fieldPoses.closeProximityBoundary * mult) {
+      return Proximity.CLOSE;
+    }
+
+    if (x < fieldPoses.midProximityBoundary * mult) {
+      return Proximity.MID;
+    }
+
+    return Proximity.FAR;
+  }
+
+  private Zone getZone(double y) {
+
+    // built on the principle x > y = -x < -y. Because we must check if greater on red and if lesser
+    // on blue we negate both sides of the equation to effectively flip the comparison
+    int mult = (fieldPoses.isRed()) ? -1 : 1;
+    y *= mult;
+
+    if (y < fieldPoses.rightZoneBoundary * mult) {
+      return Zone.RIGHT;
+    }
+
+    if (y < fieldPoses.rightStationZoneBoundary * mult) {
+      return Zone.RIGHT_STATION;
+    }
+
+    if (y < fieldPoses.leftStationZoneBoundary * mult) {
+      return Zone.LEFT_STATION;
+    }
+
+    return Zone.LEFT;
+  }
+
+  private enum Proximity {
+    CLOSE,
+    MID,
+    FAR
+  }
+
+  private enum Zone {
+    LEFT,
+    LEFT_STATION,
+    RIGHT,
+    RIGHT_STATION
   }
 }

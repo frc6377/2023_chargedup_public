@@ -1,11 +1,11 @@
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * Team membership is unknown until network tables are available. This class allows the system to
@@ -14,51 +14,151 @@ import java.util.Collections;
  * membership and known positions of known field elements.
  */
 public class FieldPoses {
-  public static final double BlueSafeLineX = 2.8;
-  public static final double RedSafeLineX = 14.2;
-  public static final double ChargeStationYCenter = 2.8;
 
-  private static final Pose2d[] bay = new Pose2d[9];
-  private final Pose2d upperSafePoint; // point to avoid switch
-  private final Pose2d lowerSafePoint; // other point to avoid switch
+  private boolean isRed;
+
+  public final double closeProximityBoundary;
+  public final double midProximityBoundary;
+
+  public final double rightZoneBoundary;
+  public final double rightStationZoneBoundary;
+  public final double leftZoneBoundary;
+  public final double leftStationZoneBoundary;
+  // defined such that the blue driver station is to the left
+  public final Translation2d rightFarInflectionPoint;
+  public final Translation2d rightCloseInflectionPoint;
+
+  public final Translation2d rightStationFarInflectionPoint;
+  public final Translation2d rightStationCloseInflectionPoint;
+
+  public final Translation2d leftFarInflectionPoint;
+  public final Translation2d leftCloseInflectionPoint;
+
+  public final Translation2d leftStationFarInflectionPoint;
+  public final Translation2d leftStationCloseInflectionPoint;
+
+  private static final Translation2d[] bay = new Translation2d[9];
+
+  private final Translation2d singleSubstation;
+  private final Translation2d doubleSubstation;
+
+  private final Rotation2d deliveryRotation;
+  private final Rotation2d singleSubRotation = Constants.SINGLE_SUB_ROTATION;
+  private final Rotation2d doubleSubRotation;
 
   class NullAllianceException extends RuntimeException {}
 
-  public final Pose2d GetPose(int idx) {
-    return bay[idx];
+  // getters
+
+  public final Translation2d getRightFarInflectionPoint() {
+    return rightFarInflectionPoint;
   }
 
-  public final Pose2d UpperSafe() {
-    return upperSafePoint;
+  public final Translation2d getRightCloseInflectionPoint() {
+    return rightCloseInflectionPoint;
   }
 
-  public final Pose2d LowerSafe() {
-    return lowerSafePoint;
+  public final Translation2d getRightStationFarInflectionPoint() {
+    return rightStationFarInflectionPoint;
+  }
+
+  public final Translation2d getRightStationCloseInflectionPoint() {
+    return rightStationCloseInflectionPoint;
+  }
+
+  public final Translation2d getLeftFarInflectionPoint() {
+    return leftFarInflectionPoint;
+  }
+
+  public final Translation2d getLeftCloseInflectionPoint() {
+    return leftCloseInflectionPoint;
+  }
+
+  public final Translation2d getLeftStationFarInflectionPoint() {
+    return leftStationFarInflectionPoint;
+  }
+
+  public final double getBottomZoneBoundary() {
+    return rightZoneBoundary;
+  }
+
+  public final double getBottomStationZoneBoundary() {
+    return rightStationZoneBoundary;
+  }
+
+  public final double getTopZoneBoundary() {
+    return leftZoneBoundary;
+  }
+
+  public final double getCloseProximityBoundary() {
+    return closeProximityBoundary;
+  }
+
+  public final double getMidProximityBoundary() {
+    return midProximityBoundary;
+  }
+
+  public final Translation2d getSingleSubstation() {
+    return singleSubstation;
+  }
+
+  public final Translation2d getDoubleSubstation() {
+    return doubleSubstation;
+  }
+
+  public final Rotation2d getSingleSubRotation() {
+    return singleSubRotation;
+  }
+
+  public final Rotation2d getDeliveryRotation() {
+    return deliveryRotation;
   }
 
   public FieldPoses() {
-    boolean isRed = isRed();
-
-    var xPosition = isRed ? 14.6 : 2.35;
+    this.isRed = isRed();
 
     // The following values are coordinate points describing the y-locations of the individual
     // grids. They are ordered assuming we are on the Blue team.
-    var yPosition = Arrays.asList(0.55, 1.05, 1.65, 2.15, 2.75, 3.3, 3.85, 4.45, 4.98);
+    List<Translation2d> relativeBays = Constants.DELIVERY_BAYS;
 
-    // We reverse the grid locations if we are on the Red team.
-    if (isRed) {
-      Collections.reverse(yPosition);
-    }
-    var rotationValue = isRed ? 0 : Math.PI;
-    var rotation = new Rotation2d(rotationValue);
+    deliveryRotation =
+        (isRed)
+            ? Constants.DELIVERY_ROTATION.rotateBy(new Rotation2d(Math.PI))
+            : Constants.DELIVERY_ROTATION;
+    doubleSubRotation =
+        (isRed)
+            ? Constants.DOUBLE_SUB_ROTATION.rotateBy(new Rotation2d(Math.PI))
+            : Constants.DOUBLE_SUB_ROTATION;
+    // initialize all attributes such that they are absolute
+    createBays(relativeBays);
 
-    for (var i = 0; i < bay.length; i++) {
-      bay[i] = new Pose2d(xPosition, yPosition.get(i), rotation);
-    }
+    rightZoneBoundary = (isRed) ? Constants.TOP_ZONE_BOUNDARY : Constants.BOTTOM_ZONE_BOUNDARY;
+    rightStationZoneBoundary =
+        (isRed) ? Constants.TOP_STATION_ZONE_BOUNDARY : Constants.BOTTOM_STATION_ZONE_BOUNDARY;
+    leftZoneBoundary = (isRed) ? Constants.BOTTOM_ZONE_BOUNDARY : Constants.TOP_ZONE_BOUNDARY;
+    leftStationZoneBoundary =
+        (isRed) ? Constants.BOTTOM_STATION_ZONE_BOUNDARY : Constants.TOP_STATION_ZONE_BOUNDARY;
 
-    var safeXPose = isRed ? 14.24 : 2.4;
-    upperSafePoint = new Pose2d(safeXPose, 4.65, rotation);
-    lowerSafePoint = new Pose2d(safeXPose, 0.9, rotation);
+    singleSubstation = relativeToAbsolute(Constants.SINGLE_SUBSTATION);
+    doubleSubstation = relativeToAbsolute(Constants.DOUBLE_SUBSTATION);
+
+    rightFarInflectionPoint = relativeToAbsolute(Constants.BOTTOM_FAR_INFLECTION_POINT);
+    rightCloseInflectionPoint = relativeToAbsolute(Constants.BOTTOM_CLOSE_INFLECTION_POINT);
+
+    rightStationFarInflectionPoint =
+        relativeToAbsolute(Constants.BOTTOM_STATION_FAR_INFLECTION_POINT);
+    rightStationCloseInflectionPoint =
+        relativeToAbsolute(Constants.BOTTOM_STATION_CLOSE_INFLECTION_POINT);
+
+    leftFarInflectionPoint = relativeToAbsolute(Constants.TOP_FAR_INFLECTION_POINT);
+    leftCloseInflectionPoint = relativeToAbsolute(Constants.TOP_CLOSE_INFLECTION_POINT);
+
+    leftStationFarInflectionPoint = relativeToAbsolute(Constants.TOP_STATION_FAR_INFLECTION_POINT);
+    leftStationCloseInflectionPoint =
+        relativeToAbsolute(Constants.TOP_STATION_CLOSE_INFLECTION_POINT);
+
+    closeProximityBoundary = relativeToAbsolute(Constants.CLOSE_PROXIMITY_BOUNDARY);
+    midProximityBoundary = relativeToAbsolute(Constants.MID_PROXIMITY_BOUNDARY);
   }
 
   /*
@@ -75,15 +175,36 @@ public class FieldPoses {
     return alliance == Alliance.Red;
   }
 
-  public Pose2d getBay(final int bayNumber) {
+  public Translation2d getBay(final int bayNumber) {
     return bay[bayNumber];
   }
 
-  public Pose2d getUpperSafePoint() {
-    return upperSafePoint;
+  private void createBays(List<Translation2d> relativeBays) {
+    // because bays are ordered left to right they must be flipped based on alliance color
+    if (isRed) {
+      Collections.reverse(relativeBays);
+    }
+    for (int i = 0; i < relativeBays.size(); i++) {
+      bay[i] = relativeToAbsolute(relativeBays.get(i));
+    }
   }
 
-  public Pose2d getLowerSafePoint() {
-    return lowerSafePoint;
+  // mirrors a translation 2d object
+  private Translation2d relativeToAbsolute(Translation2d translation) {
+
+    if (isRed) {
+      translation = new Translation2d(Constants.FIELD_X - translation.getX(), translation.getY());
+    }
+
+    return translation;
+  }
+
+  // mirrors a distance from the alliance wall
+  private double relativeToAbsolute(double x) {
+    if (isRed) {
+      x = Constants.FIELD_X - x;
+    }
+
+    return x;
   }
 }

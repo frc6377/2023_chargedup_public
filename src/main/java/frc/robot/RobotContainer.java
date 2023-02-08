@@ -61,8 +61,6 @@ public class RobotContainer {
 
   private void configureBindings() {
 
-    FieldPoses poses = new FieldPoses();
-
     Trigger intakeButton = driver.leftTrigger(0.3);
     Trigger shootButton = driver.rightTrigger(0.3);
     Trigger gunnerHighButton = gunner.a();
@@ -111,13 +109,13 @@ public class RobotContainer {
         Commands.runOnce(
             () ->
                 CommandScheduler.getInstance()
-                    .schedule(autoCommand.generateCommand(getBay()).until(this::isDriving))));
+                    .schedule(autoCommand.generateGridCommand(getBay()).until(this::isDriving))));
   }
 
   public Command getAutonomousCommand() {
     // AutoRoutines should be used to add more auto routines that we'll execute.
 
-    return autoCommand.generateCommand("PickFirstElementRed", true);
+    return autoCommand.generateCommandFromFile("PickFirstElementRed", true);
   }
 
   public int getBay() {

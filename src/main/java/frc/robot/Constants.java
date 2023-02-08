@@ -4,7 +4,11 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.subsystems.drivetrain.config.PodName;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -164,7 +168,58 @@ public final class Constants {
 
   public static final PodName BACK_RIGHT_POD_NAME = PodName.G;
 
-  public static final double AUTO_MAX_VELOCITY = 4.5;
+  public static final double FIELD_X = 16.54;
+  public static final double FIELD_Y = 8.02;
 
+  // otf pathing constants
+  public static final double AUTO_MAX_VELOCITY = 4.5;
   public static final double AUTO_MAX_ACCELERATION = 2.5;
+
+  // relative distance from your alliance station wall or the left of the field depending on axis.
+  // Gets converted into absolute coordinates in FieldPoses.java
+  public static final double CLOSE_PROXIMITY_BOUNDARY = 2.4;
+  public static final double MID_PROXIMITY_BOUNDARY = 5.4;
+
+  // defined such that the blue driver station is to the left
+  public static final double BOTTOM_ZONE_BOUNDARY = 1.54;
+  public static final double BOTTOM_STATION_ZONE_BOUNDARY = 3.978656;
+  public static final double TOP_ZONE_BOUNDARY = 2.76;
+  public static final double TOP_STATION_ZONE_BOUNDARY = 8.02;
+
+  public static final Translation2d BOTTOM_FAR_INFLECTION_POINT = new Translation2d(5.4, 0.75);
+  public static final Translation2d BOTTOM_CLOSE_INFLECTION_POINT = new Translation2d(2.4, 0.75);
+
+  public static final Translation2d BOTTOM_STATION_FAR_INFLECTION_POINT =
+      new Translation2d(5.4, 2.27);
+  public static final Translation2d BOTTOM_STATION_CLOSE_INFLECTION_POINT =
+      new Translation2d(2.4, 2.27);
+
+  public static final Translation2d TOP_FAR_INFLECTION_POINT = new Translation2d(5.4, 4.73);
+  public static final Translation2d TOP_CLOSE_INFLECTION_POINT = new Translation2d(2.4, 4.73);
+
+  public static final Translation2d TOP_STATION_FAR_INFLECTION_POINT = new Translation2d(5.4, 3.18);
+  public static final Translation2d TOP_STATION_CLOSE_INFLECTION_POINT =
+      new Translation2d(2.4, 3.18);
+
+  // each bay is scoring location. 0 is defined as the rightmost bay. These positions are based on
+  // distance from the blue alliance station wall in the x axis, and distance from the field wall
+  // such that the blue alliance station is to the left
+  public static final List<Translation2d> DELIVERY_BAYS =
+      Arrays.asList(
+          new Translation2d(1.85718, 0.511626),
+          new Translation2d(1.85718, 1.071626),
+          new Translation2d(1.85718, 1.631626),
+          new Translation2d(1.85718, 2.188026),
+          new Translation2d(1.85718, 2.748026),
+          new Translation2d(1.85718, 3.308026),
+          new Translation2d(1.85718, 3.864426),
+          new Translation2d(1.85718, 4.424426),
+          new Translation2d(1.85718, 4.984426));
+
+  public static final Translation2d DOUBLE_SUBSTATION = new Translation2d(15.7, 7.32);
+  public static final Translation2d SINGLE_SUBSTATION = new Translation2d(14.24, 7.2);
+
+  public static final Rotation2d SINGLE_SUB_ROTATION = new Rotation2d(Math.PI / 2);
+  public static final Rotation2d DELIVERY_ROTATION = new Rotation2d(Math.PI);
+  public static final Rotation2d DOUBLE_SUB_ROTATION = new Rotation2d(0);
 }
