@@ -22,18 +22,19 @@ import frc.robot.subsystems.fieldPositioningSystem.FieldPositioningSystem;
 
 public class RobotContainer {
   // Input controllers
-  private final XboxController driveController = new XboxController(Constants.driverControllerID);
+  private final XboxController driveController = new XboxController(Constants.DRIVER_CONTROLLER_ID);
   private final StreamDeck streamDeck = new StreamDeck(2, 36);
   // Subsystems
   private final DeploySubsystem deploySubsystem = new DeploySubsystem();
   private final CommandXboxController driver =
-      new CommandXboxController(Constants.driverControllerID);
+      new CommandXboxController(Constants.DRIVER_CONTROLLER_ID);
   private final CommandXboxController gunner =
-      new CommandXboxController(Constants.gunnerControllerID);
+      new CommandXboxController(Constants.GUNNER_CONTROLLER_ID);
   private final ArmSubsystem arm = new ArmSubsystem();
   // TODO: Fix to make EndAffector Subsystem only use 1 motor because there will only BE 1 motor.
   private final EndAffectorSubsystem endAffector =
-      new EndAffectorSubsystem(Constants.endAffectorID, Constants.endAffectorID);
+      new EndAffectorSubsystem(Constants.END_AFFECTOR_ID);
+
   private final ColorSubsystem colorStrip = new ColorSubsystem(2);
   private final FieldPositioningSystem fieldPositioningSystem = new FieldPositioningSystem();
   private final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem(null);
@@ -48,11 +49,11 @@ public class RobotContainer {
     drivetrainSubsystem.setDefaultCommand(
         new DefaultDriveCommand(
             drivetrainSubsystem,
-            () -> MathUtil.applyDeadband(-driveController.getLeftY(), 0.05),
-            () -> MathUtil.applyDeadband(-driveController.getLeftX(), 0.05),
+            () -> Math.pow(MathUtil.applyDeadband(-driveController.getLeftY(), 0.05), 2) * Math.copySign(1, -driveController.getLeftY()),
+            () -> Math.pow(MathUtil.applyDeadband(-driveController.getLeftX(), 0.05), 2) * Math.copySign(1, -driveController.getLeftX()),
             () ->
-                Math.pow(MathUtil.applyDeadband(driveController.getRightX(), 0.05), 2)
-                    * Math.copySign(1, -driveController.getRightX()),
+                Math.pow(MathUtil.applyDeadband(driveController.getRightX(), 0.05), 3)
+                    ,
             () -> fieldPositioningSystem.getCurrentRobotRotationXY()));
 
     configureBindings();
@@ -64,8 +65,10 @@ public class RobotContainer {
     Trigger shootButton = driver.rightTrigger(0.3);
     Trigger gunnerHighButton = gunner.a();
     Trigger gunnerMidButton = gunner.x();
+    Trigger gunnerLowButton = gunner.y();
     Trigger driverHighButton = driver.a();
     Trigger driverMidButton = driver.x();
+    Trigger driverLowButton = driver.y();
     Trigger driverGoButton = driver.b();
 
     intakeButton.whileTrue(
@@ -102,12 +105,6 @@ public class RobotContainer {
         .debounce(0.05)
         .toggleOnTrue(Commands.runOnce(() -> colorStrip.pieceColoring.toggleHeight(), colorStrip));
 
-    gunnerHighButton
-        .or(driverHighButton)
-        .whileTrue(Commands.startEnd(() -> arm.setCubeHigh(), () -> arm.setLow(), arm));
-    gunnerMidButton
-        .or(driverMidButton)
-        .whileTrue(Commands.startEnd(() -> arm.setCubeMid(), () -> arm.setLow(), arm));
     driverGoButton.whileTrue(
         Commands.runOnce(
             () ->
