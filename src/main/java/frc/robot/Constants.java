@@ -88,7 +88,7 @@ public final class Constants {
   public static final double ARM_KF = 0.000156 * 10;
   public static final int ARM_MAX_VELO = 2;
   public static final int ARM_MAX_ACCEL = 1;
-  //TODO: rename to be in all caps+full names(also the extender and wrist)
+  // TODO: rename to be in all caps+full names(also the extender and wrist)
   // added new functions from line 83-98 for rotational motor and extension motor.
   // TODO: convert arm rotation values to radians
   // TODO: decide on actual values for arm length, rotation, and wrist rotation values and IDs
@@ -102,14 +102,15 @@ public final class Constants {
   public static final int ARM_EXTENSION_CURRENT_LIMIT = 40;
 
   public static final int ARM_EXTENDER_ID = 13;
-  
+
   public static final double ARM_EXTENSIONS_TICKS_TO_METERS = 0;
   public static final double ARM_LENGTH_AT_ZERO_TICKS = 0.7;
 
   public static final int WRIST_CURRENT_LIMIT = 30;
   public static final int WRIST_STATOR_LIMIT = 40;
 
-  public static final double WRIST_TICKS_TO_RADIANS = Math.PI / 50; // TODO: Calculate the actual value
+  public static final double WRIST_TICKS_TO_RADIANS =
+      Math.PI / 50; // TODO: Calculate the actual value
 
   public static final int WRIST_ID = 14;
   // TODO: Get actual value(is the weight of the arm multiplied by the number needed to convert

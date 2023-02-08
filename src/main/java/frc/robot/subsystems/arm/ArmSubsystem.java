@@ -74,7 +74,9 @@ public class ArmSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    double armMotorOutput = armPPC1.calculate(armMotor1.getEncoder().getPosition()) + computeRotationArbitraryFeetForward();
+    double armMotorOutput =
+        armPPC1.calculate(armMotor1.getEncoder().getPosition())
+            + computeRotationArbitraryFeetForward();
     armMotor1.set(armMotorOutput);
     armMotor2.set(-armMotorOutput);
     extendMotor.set(extendPPC.calculate(extendMotor.getEncoder().getPosition()));
@@ -86,9 +88,9 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public void setTarget(double armDegrees, double extendMeters, double wristDegrees) {
-    armPPC1.setGoal(Math.toRadians(armDegrees)/Constants.ARM_ROTATION_TICKS_TO_RADIANS);
-    extendPPC.setGoal(extendMeters/Constants.ARM_EXTENSIONS_TICKS_TO_METERS);
-    wristMotorGoal = Math.toRadians(wristDegrees)/Constants.WRIST_TICKS_TO_RADIANS;
+    armPPC1.setGoal(Math.toRadians(armDegrees) / Constants.ARM_ROTATION_TICKS_TO_RADIANS);
+    extendPPC.setGoal(extendMeters / Constants.ARM_EXTENSIONS_TICKS_TO_METERS);
+    wristMotorGoal = Math.toRadians(wristDegrees) / Constants.WRIST_TICKS_TO_RADIANS;
   }
 
   /**
@@ -97,7 +99,7 @@ public class ArmSubsystem extends SubsystemBase {
    *
    * @return The power needed to keep the arme stable, in ?electrical output units?.
    */
-  //TODO: move to I alpha instead of torque
+  // TODO: move to I alpha instead of torque
   private double computeRotationArbitraryFeetForward() {
     double theta = armMotor1.getEncoder().getPosition() * Constants.ARM_ROTATION_TICKS_TO_RADIANS;
     double armLength =
@@ -113,7 +115,7 @@ public class ArmSubsystem extends SubsystemBase {
     double theta =
         wristMotor.getSelectedSensorPosition() * Constants.WRIST_TICKS_TO_RADIANS
             + armMotor1.getEncoder().getPosition() * Constants.ARM_ROTATION_TICKS_TO_RADIANS;
-            
+
     return (Math.cos(theta) * Constants.WRIST_MOMENT_OF_INERTIA * 9.8)
         / (Constants.STALLED_TORQUE * Constants.WRIST_GEAR_RATIO);
   }
