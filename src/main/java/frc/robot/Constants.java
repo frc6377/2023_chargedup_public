@@ -32,6 +32,7 @@ public final class Constants {
   public static final int TEAM_NUMBER = 6377;
 
   public static final double METERS_TO_INCHES = 39.3701;
+
   /**
    * TalonFX number of ticks per 1 motor revolution
    *
