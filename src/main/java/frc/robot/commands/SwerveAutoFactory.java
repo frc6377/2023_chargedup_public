@@ -29,8 +29,8 @@ public class SwerveAutoFactory {
   private final Pose2DSubscriber sub = Topics.PoseTopic().subscribe(new Pose2d());
   private FieldPoses fieldPoses =
       null; // bad values if built on startup, so instead the generate command method populates this
-  public final double maxVelocity = Constants.autoMaxVelocity;
-  public final double maxAcceleration = Constants.autoMaxAcceleration;
+  public final double maxVelocity = Constants.AUTO_MAX_VELOCITY;
+  public final double maxAcceleration = Constants.AUTO_MAX_ACCELERATION;
   private Consumer<Pose2d> poseReseter = null;
   private DrivetrainSubsystem drivetrainSubsystem;
 

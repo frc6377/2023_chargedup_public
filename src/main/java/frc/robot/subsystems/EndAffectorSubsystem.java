@@ -22,20 +22,20 @@ public class EndAffectorSubsystem extends SubsystemBase {
 
   public void intake() {
 
-    rightMotor.set(-Constants.endAffectorIntakespeed);
-    leftMotor.set(Constants.endAffectorIntakespeed);
+    rightMotor.set(-Constants.END_AFFECTOR_INTAKE_SPEED);
+    leftMotor.set(Constants.END_AFFECTOR_INTAKE_SPEED);
   }
 
   public void fastOutake() {
 
-    rightMotor.set(Constants.endAffectorOutakespeed);
-    leftMotor.set(-Constants.endAffectorOutakespeed);
+    rightMotor.set(Constants.END_AFFECTOR_OUTTAKE_SPEED);
+    leftMotor.set(-Constants.END_AFFECTOR_OUTTAKE_SPEED);
   }
 
   public void slowOutake() {
 
-    rightMotor.set(Constants.endAffectorSlowOutakespeed);
-    leftMotor.set(-Constants.endAffectorSlowOutakespeed);
+    rightMotor.set(Constants.END_AFFECTOR_SLOW_OUTTAKE_SPEED);
+    leftMotor.set(-Constants.END_AFFECTOR_SLOW_OUTTAKE_SPEED);
   }
 
   public void halt() {
@@ -46,7 +46,7 @@ public class EndAffectorSubsystem extends SubsystemBase {
 
   public void idle() {
 
-    rightMotor.set(-Constants.endAffectorIdleSpeed);
-    leftMotor.set(Constants.endAffectorIdleSpeed);
+    rightMotor.set(-Constants.END_AFFECTOR_IDLE_SPEED);
+    leftMotor.set(Constants.END_AFFECTOR_IDLE_SPEED);
   }
 }
