@@ -29,8 +29,8 @@ public class SwerveAutoFactory {
   private final Pose2DSubscriber sub = Topics.PoseTopic().subscribe(new Pose2d());
   private FieldPoses fieldPoses =
       null; // bad values if built on startup, so instead the generate command method populates this
-  public final double maxVelocity = Constants.autoMaxVelocity;
-  public final double maxAcceleration = Constants.autoMaxAcceleration;
+  public final double maxVelocity = Constants.AUTO_MAX_VELOCITY;
+  public final double maxAcceleration = Constants.AUTO_MAX_ACCELERATION;
   private Consumer<Pose2d> poseReseter = null;
   private DrivetrainSubsystem drivetrainSubsystem;
 
@@ -69,8 +69,8 @@ public class SwerveAutoFactory {
     // along the Y axis and also it means we need to align ourself with one of the stations
     // "channels"
 
-    ZONE currentZone = getZone(currentPose.getY());
-    PROXIMITY currentProximity = getProx(currentPose.getX());
+    Zone currentZone = getZone(currentPose.getY());
+    Proximity currentProximity = getProx(currentPose.getX());
 
     SmartDashboard.putString("proximity", currentProximity.name());
     SmartDashboard.putString("zone", currentZone.name());
@@ -187,7 +187,6 @@ public class SwerveAutoFactory {
             headingBetweenPoints(currentPose.getTranslation(), endPoint.getTranslation())
                 .rotateBy(new Rotation2d(Math.PI))));
 
-
     PathConstraints constraints = new PathConstraints(maxVelocity, maxAcceleration);
     PathPlannerTrajectory trajectory = PathPlanner.generatePath(constraints, points);
 
@@ -224,9 +223,11 @@ public class SwerveAutoFactory {
             drivetrainSubsystem);
 
     if (poseReseter != null
-        && isFirstPath) // checks if we have a pose reseter and if we want to reset our pose. If we
+        && isFirstPath) { // checks if we have a pose reseter and if we want to reset our pose. If
+      // we
       // do we want to overwrite whatever the kalman filter has. Mostly for auton
       poseReseter.accept(trajectory.getInitialHolonomicPose());
+    }
     drivetrainSubsystem.sendTrajectoryToNT(trajectory); // posts trajectory to dashboard
 
     // run the command and than stop the drivetrain. Just to make sure we arent moving at the end
@@ -258,7 +259,7 @@ public class SwerveAutoFactory {
     }
   }
 
-  private PROXIMITY getProx(double x) {
+  private Proximity getProx(double x) {
 
     // built on the principle x > y = -x < -y. Because we must check if greater on red and if lesser
     // on blue we negate both sides of the equation to effectively flip the comparison
@@ -266,17 +267,17 @@ public class SwerveAutoFactory {
     x *= mult;
 
     if (x < fieldPoses.closeProximityBoundary * mult) {
-      return PROXIMITY.CLOSE;
+      return Proximity.CLOSE;
     }
 
     if (x < fieldPoses.midProximityBoundary * mult) {
-      return PROXIMITY.MID;
+      return Proximity.MID;
     }
 
-    return PROXIMITY.FAR;
+    return Proximity.FAR;
   }
 
-  private ZONE getZone(double y) {
+  private Zone getZone(double y) {
 
     // built on the principle x > y = -x < -y. Because we must check if greater on red and if lesser
     // on blue we negate both sides of the equation to effectively flip the comparison
@@ -284,27 +285,27 @@ public class SwerveAutoFactory {
     y *= mult;
 
     if (y < fieldPoses.rightZoneBoundary * mult) {
-      return ZONE.RIGHT;
+      return Zone.RIGHT;
     }
 
     if (y < fieldPoses.rightStationZoneBoundary * mult) {
-      return ZONE.RIGHT_STATION;
+      return Zone.RIGHT_STATION;
     }
 
     if (y < fieldPoses.leftStationZoneBoundary * mult) {
-      return ZONE.LEFT_STATION;
+      return Zone.LEFT_STATION;
     }
 
-    return ZONE.LEFT;
+    return Zone.LEFT;
   }
 
-  private enum PROXIMITY {
+  private enum Proximity {
     CLOSE,
     MID,
     FAR
   }
 
-  private enum ZONE {
+  private enum Zone {
     LEFT,
     LEFT_STATION,
     RIGHT,

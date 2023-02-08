@@ -19,7 +19,6 @@ public class FieldPoses {
 
   public final double closeProximityBoundary;
   public final double midProximityBoundary;
-  public final double farProximityBoundary;
 
   public final double rightZoneBoundary;
   public final double rightStationZoneBoundary;
@@ -44,14 +43,12 @@ public class FieldPoses {
   private final Translation2d doubleSubstation;
 
   private final Rotation2d deliveryRotation;
-  private final Rotation2d singleSubRotation = Constants.singleSubRotation;
+  private final Rotation2d singleSubRotation = Constants.SINGLE_SUB_ROTATION;
+  private final Rotation2d doubleSubRotation;
 
   class NullAllianceException extends RuntimeException {}
 
   // getters
-  public final Translation2d GetBay(int idx) {
-    return bay[idx];
-  }
 
   public final Translation2d getRightFarInflectionPoint() {
     return rightFarInflectionPoint;
@@ -101,10 +98,6 @@ public class FieldPoses {
     return midProximityBoundary;
   }
 
-  public final double getFarProximityBoundary() {
-    return farProximityBoundary;
-  }
-
   public final Translation2d getSingleSubstation() {
     return singleSubstation;
   }
@@ -126,41 +119,46 @@ public class FieldPoses {
 
     // The following values are coordinate points describing the y-locations of the individual
     // grids. They are ordered assuming we are on the Blue team.
-    List<Translation2d> relativeBays = Constants.deliveryBays;
+    List<Translation2d> relativeBays = Constants.DELIVERY_BAYS;
 
     deliveryRotation =
         (isRed)
-            ? Constants.deliveryRotation.rotateBy(new Rotation2d(Math.PI))
-            : Constants.deliveryRotation;
+            ? Constants.DELIVERY_ROTATION.rotateBy(new Rotation2d(Math.PI))
+            : Constants.DELIVERY_ROTATION;
+    doubleSubRotation =
+        (isRed)
+            ? Constants.DOUBLE_SUB_ROTATION.rotateBy(new Rotation2d(Math.PI))
+            : Constants.DOUBLE_SUB_ROTATION;
     // initialize all attributes such that they are absolute
     createBays(relativeBays);
 
-    rightZoneBoundary = (isRed) ? Constants.topZoneBoundary : Constants.bottomZoneBoundary;
+    rightZoneBoundary = (isRed) ? Constants.TOP_ZONE_BOUNDARY : Constants.BOTTOM_ZONE_BOUNDARY;
     rightStationZoneBoundary =
-        (isRed) ? Constants.topStationZoneBoundary : Constants.bottomStationZoneBoundary;
-    leftZoneBoundary = (isRed) ? Constants.bottomZoneBoundary : Constants.topZoneBoundary;
+        (isRed) ? Constants.TOP_STATION_ZONE_BOUNDARY : Constants.BOTTOM_STATION_ZONE_BOUNDARY;
+    leftZoneBoundary = (isRed) ? Constants.BOTTOM_ZONE_BOUNDARY : Constants.TOP_ZONE_BOUNDARY;
     leftStationZoneBoundary =
-        (isRed) ? Constants.bottomStationZoneBoundary : Constants.topStationZoneBoundary;
+        (isRed) ? Constants.BOTTOM_STATION_ZONE_BOUNDARY : Constants.TOP_STATION_ZONE_BOUNDARY;
 
-    singleSubstation = relativeToAbsolute(Constants.singleSubstation);
-    doubleSubstation = relativeToAbsolute(Constants.doubleSubstation);
+    singleSubstation = relativeToAbsolute(Constants.SINGLE_SUBSTATION);
+    doubleSubstation = relativeToAbsolute(Constants.DOUBLE_SUBSTATION);
 
-    rightFarInflectionPoint = relativeToAbsolute(Constants.bottomFarInflectionPoint);
-    rightCloseInflectionPoint = relativeToAbsolute(Constants.bottomCloseInflectionPoint);
+    rightFarInflectionPoint = relativeToAbsolute(Constants.BOTTOM_FAR_INFLECTION_POINT);
+    rightCloseInflectionPoint = relativeToAbsolute(Constants.BOTTOM_CLOSE_INFLECTION_POINT);
 
-    rightStationFarInflectionPoint = relativeToAbsolute(Constants.bottomStationFarInflectionPoint);
+    rightStationFarInflectionPoint =
+        relativeToAbsolute(Constants.BOTTOM_STATION_FAR_INFLECTION_POINT);
     rightStationCloseInflectionPoint =
-        relativeToAbsolute(Constants.bottomStationCloseInflectionPoint);
+        relativeToAbsolute(Constants.BOTTOM_STATION_CLOSE_INFLECTION_POINT);
 
-    leftFarInflectionPoint = relativeToAbsolute(Constants.topFarInflectionPoint);
-    leftCloseInflectionPoint = relativeToAbsolute(Constants.topCloseInflectionPoint);
+    leftFarInflectionPoint = relativeToAbsolute(Constants.TOP_FAR_INFLECTION_POINT);
+    leftCloseInflectionPoint = relativeToAbsolute(Constants.TOP_CLOSE_INFLECTION_POINT);
 
-    leftStationFarInflectionPoint = relativeToAbsolute(Constants.topStationFarInflectionPoint);
-    leftStationCloseInflectionPoint = relativeToAbsolute(Constants.topStationCloseInflectionPoint);
+    leftStationFarInflectionPoint = relativeToAbsolute(Constants.TOP_STATION_FAR_INFLECTION_POINT);
+    leftStationCloseInflectionPoint =
+        relativeToAbsolute(Constants.TOP_STATION_CLOSE_INFLECTION_POINT);
 
-    closeProximityBoundary = relativeToAbsolute(Constants.closeProximityBoundary);
-    midProximityBoundary = relativeToAbsolute(Constants.midProximityBoundary);
-    farProximityBoundary = relativeToAbsolute(Constants.farProximityBoundary);
+    closeProximityBoundary = relativeToAbsolute(Constants.CLOSE_PROXIMITY_BOUNDARY);
+    midProximityBoundary = relativeToAbsolute(Constants.MID_PROXIMITY_BOUNDARY);
   }
 
   /*
@@ -195,7 +193,7 @@ public class FieldPoses {
   private Translation2d relativeToAbsolute(Translation2d translation) {
 
     if (isRed) {
-      translation = new Translation2d(Constants.fieldX - translation.getX(), translation.getY());
+      translation = new Translation2d(Constants.FIELD_X - translation.getX(), translation.getY());
     }
 
     return translation;
@@ -204,7 +202,7 @@ public class FieldPoses {
   // mirrors a distance from the alliance wall
   private double relativeToAbsolute(double x) {
     if (isRed) {
-      x = Constants.fieldX - x;
+      x = Constants.FIELD_X - x;
     }
 
     return x;
