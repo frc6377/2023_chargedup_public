@@ -33,7 +33,7 @@ public class RobotContainer {
   private final ArmSubsystem arm = new ArmSubsystem();
   // TODO: Fix to make EndAffector Subsystem only use 1 motor because there will only BE 1 motor.
   private final EndAffectorSubsystem endAffector =
-      new EndAffectorSubsystem(Constants.END_AFFECTOR_ID_1, Constants.END_AFFECTOR_ID_2);
+      new EndAffectorSubsystem(Constants.END_AFFECTOR_ID);
 
   private final ColorSubsystem colorStrip = new ColorSubsystem(2);
   private final FieldPositioningSystem fieldPositioningSystem = new FieldPositioningSystem();
