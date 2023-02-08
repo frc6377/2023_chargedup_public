@@ -26,8 +26,7 @@ public final class Constants {
   public static final int GUNNER_CONTROLLER_ID = 2;
   public static final int STEAM_DECK_ID = 1;
   // TODO: add real value for the motor ID
-  public static final int END_AFFECTOR_ID_1 = 9;
-  public static final int END_AFFECTOR_ID_2 = 10;
+  public static final int END_AFFECTOR_ID = 9;
 
   public static final int TEAM_NUMBER = 6377;
 

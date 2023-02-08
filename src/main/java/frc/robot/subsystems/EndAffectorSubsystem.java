@@ -7,46 +7,32 @@ import frc.robot.Constants;
 
 public class EndAffectorSubsystem extends SubsystemBase {
 
-  CANSparkMax leftMotor;
+  CANSparkMax motor;
 
-  CANSparkMax rightMotor;
+  public EndAffectorSubsystem(int ID) {
 
-  public EndAffectorSubsystem(int leftID, int rightID) {
+    motor = new CANSparkMax(ID, MotorType.kBrushless);
 
-    leftMotor = new CANSparkMax(leftID, MotorType.kBrushless);
-    rightMotor = new CANSparkMax(rightID, MotorType.kBrushless);
-
-    leftMotor.setSmartCurrentLimit(40);
-    rightMotor.setSmartCurrentLimit(20);
+    motor.setSmartCurrentLimit(40);
   }
 
   public void intake() {
-
-    rightMotor.set(-Constants.END_AFFECTOR_INTAKE_SPEED);
-    leftMotor.set(Constants.END_AFFECTOR_INTAKE_SPEED);
+    motor.set(Constants.END_AFFECTOR_INTAKE_SPEED);
   }
 
   public void fastOutake() {
-
-    rightMotor.set(Constants.END_AFFECTOR_OUTTAKE_SPEED);
-    leftMotor.set(-Constants.END_AFFECTOR_OUTTAKE_SPEED);
+    motor.set(-Constants.END_AFFECTOR_OUTTAKE_SPEED);
   }
 
   public void slowOutake() {
-
-    rightMotor.set(Constants.END_AFFECTOR_SLOW_OUTTAKE_SPEED);
-    leftMotor.set(-Constants.END_AFFECTOR_SLOW_OUTTAKE_SPEED);
+    motor.set(-Constants.END_AFFECTOR_SLOW_OUTTAKE_SPEED);
   }
 
   public void halt() {
-
-    rightMotor.set(0);
-    leftMotor.set(0);
+    motor.set(0);
   }
 
   public void idle() {
-
-    rightMotor.set(-Constants.END_AFFECTOR_IDLE_SPEED);
-    leftMotor.set(Constants.END_AFFECTOR_IDLE_SPEED);
+    motor.set(Constants.END_AFFECTOR_IDLE_SPEED);
   }
 }
