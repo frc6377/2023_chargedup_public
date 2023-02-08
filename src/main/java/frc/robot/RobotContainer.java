@@ -22,20 +22,19 @@ import frc.robot.subsystems.fieldPositioningSystem.FieldPositioningSystem;
 
 public class RobotContainer {
   // Input controllers
-  private final XboxController driveController =
-      new XboxController(DeviceConstants.driveControllerID);
+  private final XboxController driveController = new XboxController(Constants.DRIVER_CONTROLLER_ID);
   private final StreamDeck streamDeck = new StreamDeck(2, 36);
   // Subsystems
   private final DeploySubsystem deploySubsystem = new DeploySubsystem();
   private final CommandXboxController driver =
-      new CommandXboxController(DeviceConstants.driveControllerID);
+      new CommandXboxController(Constants.DRIVER_CONTROLLER_ID);
   private final CommandXboxController gunner =
-      new CommandXboxController(DeviceConstants.gunnerControllerID);
-  private final ArmSubsystem arm =
-      new ArmSubsystem(DeviceConstants.armRotateID, DeviceConstants.armExtendID);
+      new CommandXboxController(Constants.GUNNER_CONTROLLER_ID);
+  private final ArmSubsystem arm = new ArmSubsystem();
+  // TODO: Fix to make EndAffector Subsystem only use 1 motor because there will only BE 1 motor.
   private final EndAffectorSubsystem endAffector =
-      new EndAffectorSubsystem(
-          DeviceConstants.endAffectorLeftID, DeviceConstants.endAffectorRightID);
+      new EndAffectorSubsystem(Constants.END_AFFECTOR_ID);
+
   private final ColorSubsystem colorStrip = new ColorSubsystem(2);
   private final FieldPositioningSystem fieldPositioningSystem = new FieldPositioningSystem();
   private final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem(null);
@@ -68,8 +67,10 @@ public class RobotContainer {
     Trigger shootButton = driver.rightTrigger(0.3);
     Trigger gunnerHighButton = gunner.a();
     Trigger gunnerMidButton = gunner.x();
+    Trigger gunnerLowButton = gunner.y();
     Trigger driverHighButton = driver.a();
     Trigger driverMidButton = driver.x();
+    Trigger driverLowButton = driver.y();
     Trigger driverGoButton = driver.b();
 
     intakeButton.whileTrue(
@@ -106,15 +107,11 @@ public class RobotContainer {
         .debounce(0.05)
         .toggleOnTrue(Commands.runOnce(() -> colorStrip.pieceColoring.toggleHeight(), colorStrip));
 
-    gunnerHighButton
-        .or(driverHighButton)
-        .whileTrue(Commands.startEnd(() -> arm.setHigh(), () -> arm.setLow(), arm));
-    gunnerMidButton
-        .or(driverMidButton)
-        .whileTrue(Commands.startEnd(() -> arm.setMid(), () -> arm.setLow(), arm));
     driverGoButton.whileTrue(
         Commands.runOnce(
-            () -> CommandScheduler.getInstance().schedule(autoCommand.generateCommand(getBay()).until(this::isDriving))));
+            () ->
+                CommandScheduler.getInstance()
+                    .schedule(autoCommand.generateCommand(getBay()).until(this::isDriving))));
   }
 
   public Command getAutonomousCommand() {
@@ -129,7 +126,7 @@ public class RobotContainer {
     return 8 - (grid + (selected % 9 % 3)); // if we are in the "1, 2, or 3" bays per grid
   }
 
-  private boolean isDriving(){
+  private boolean isDriving() {
     return 0.5 < Math.hypot(driveController.getLeftX(), driveController.getLeftY());
   }
 }

@@ -15,105 +15,131 @@ import frc.robot.subsystems.drivetrain.config.PodName;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static final int Degrees0 = 0;
-  public static final int Degrees45 = 45;
-  public static final int Degrees90 = 90;
-  public static final int Degrees180 = 180;
-  public static final int Degrees270 = 270;
+  public static final int DEGREES_0 = 0;
+  public static final int DEGREES_45 = 45;
+  public static final int DEGREES_90 = 90;
+  public static final int DEGREES_180 = 180;
+  public static final int DEGREES_270 = 270;
 
-  public static final int TeamNumber = 6377;
+  public static final int DRIVER_CONTROLLER_ID = 0;
+  // This is -1 to disable it as it is not currently going to be used.
+  public static final int GUNNER_CONTROLLER_ID = 2;
+  public static final int STEAM_DECK_ID = 1;
+  // TODO: add real value for the motor ID
+  public static final int END_AFFECTOR_ID = 9;
 
-  public static final double MetersToInches = 39.3701;
+  public static final int TEAM_NUMBER = 6377;
+
+  public static final double METERS_TO_INCHES = 39.3701;
+
   /**
    * TalonFX number of ticks per 1 motor revolution
    *
    * @link https://github.com/CrossTheRoadElec/Phoenix-Documentation#what-are-the-units-of-my-sensor
    */
-  public static final int TalonFXTicksPerRevolution = 2048;
+  public static final int TALON_FX_TICKS_PER_REVOLUTION = 2048;
 
-  public static final int TalonFullPowerInternal = 1023;
+  public static final int TALON_FULL_POWER_INTERVAL = 1023;
 
   /**
    * Pigeon number of units per 1 full 360 degree yaw rotation
    *
    * @link https://github.com/CrossTheRoadElec/Phoenix-Documentation#what-are-the-units-of-my-sensor
    */
-  public static final int PigeonUnitsPerRotation = 8192;
+  public static final int PIGEON_UNITS_PER_ROTATION = 8192;
 
   /** Default timeout to use when sending messages over the can bus */
-  public static final int CANTimeout = 50;
+  public static final int CAN_TIMEOUT = 50;
 
   /**
    * You can have up to 2 devices assigned remotely to a talon/victor HowdyBot conventions: -
    * Drivetrains: - use 0 for a remote left encoder - use 1 for a remote pigeon
    */
-  public static final int RemoteEncoder = 0;
+  public static final int REMOTE_ENCODER = 0;
 
-  public static final int RemotePigeon = 1;
+  public static final int REMOTE_PIGEON = 1;
 
   /**
    * The talon runs 2 pid loops, a primary and an aux pid loop. HowdyBot conventions: - Drivetrains:
    * - use primary for closed loop velocity or closed loop position - use aux for turning
    */
-  public static final int PIDLoopPrimary = 0;
+  public static final int PID_LOOP_PRIMARY = 0;
 
-  public static final int PIDLoopTurn = 1;
+  public static final int PID_LOOP_TURN = 1;
 
   /** HowydBot convention: the aux pid is expressed in units of 1/10 of a degree */
-  public static final int TurnPIDRange = 3600;
+  public static final int TURN_PID_RANGE = 3600;
 
   /**
    * The talon can have up to 4 pid loops configured. HowdyBot conventions: - Drivetrains: - Slot0:
    * velocity (primary pid loop) - Slot1: turninig (on aux pid loop) - Slot2: position (primary pid
    * loop) - Slot3: motion profile mode (primary pid loop)
    */
-  public static final int PIDSlotVelocity = 0;
+  public static final int PID_SLOT_VELOCITY = 0;
 
-  public static final int PIDSlotTurning = 1;
-  public static final int PIDSlotPosition = 2;
-  public static final int PIDSlotMotionProfile = 3;
+  public static final int PID_SLOT_TURNING = 1;
+  public static final int PID_SLOT_POSITION = 2;
+  public static final int PID_SLOT_MOTION_PROFILE = 3;
 
-  public static final double doubleEpsilon = 0.001;
+  public static final double DOUBLE_EPSILON = 0.001;
 
-  public static final double armKp = 5e-5 * 10;
-  public static final double armKf = 0.000156 * 10;
-  public static final int armMaxvelo = 2;
-  public static final int armMaxAccel = 1;
+  public static final double ARM_KP = 5e-5 * 10;
+  public static final double ARM_KF = 0.000156 * 10;
+  public static final int ARM_MAX_VELO = 2;
+  public static final int ARM_MAX_ACCEL = 1;
+  // TODO: rename to be in all caps+full names(also the extender and wrist)
   // added new functions from line 83-98 for rotational motor and extension motor.
   // TODO: convert arm rotation values to radians
-  public static final double armRotationStowed = -5;
-  public static final double armRotationLow = -3;
-  public static final double armRotationMid = -10.428622245788574 - 3;
-  public static final double armRotationHigh = -10.428622245788574 - 7;
-  public static final double armRotationalTicksToRadians = Math.PI / 50;
-  // TODO: decide on actual values for this
-  public static final double armLengthStowed = -5;
-  public static final double armLengthLow = -3;
-  public static final double armLengthMid = -10.428622245788574 - 3;
-  public static final double armLengthHigh = -10.428622245788574 - 7;
-  // TODO: Calculate actual value.
-  public static final double armLengthTicksToMeters = 0;
-  // TODO: Measure the arm and put that value in here
-  public static final double armLengthAtZeroTicks = 0.7;
+  // TODO: decide on actual values for arm length, rotation, and wrist rotation values and IDs
+  public static final int ARM_ROTATION_CURRENT_LIMIT = 40;
+
+  public static final int ARM_ROTATION_ID_1 = 11;
+  public static final int ARM_ROTATION_ID2 = 12;
+
+  public static final double ARM_ROTATION_TICKS_TO_RADIANS = Math.PI / 50;
+
+  public static final int ARM_EXTENSION_CURRENT_LIMIT = 40;
+
+  public static final int ARM_EXTENDER_ID = 13;
+
+  public static final double ARM_EXTENSIONS_TICKS_TO_METERS = 0;
+  public static final double ARM_LENGTH_AT_ZERO_TICKS = 0.7;
+
+  public static final int WRIST_CURRENT_LIMIT = 30;
+  public static final int WRIST_STATOR_LIMIT = 40;
+
+  public static final double WRIST_TICKS_TO_RADIANS =
+      Math.PI / 50; // TODO: Calculate the actual value
+
+  public static final int WRIST_ID = 14;
   // TODO: Get actual value(is the weight of the arm multiplied by the number needed to convert
-  public static final double rotationArmGearRatio = 100;
-  public static final double stalledTorque = 2.6;
-  public static final double armWeight = 4.3;
-  public static final double armAngleAtRest = Math.toRadians(9.3);
+  public static final double ROTATION_ARM_GEAR_RATIO = 100;
+  public static final double STALLED_TORQUE = 2.6;
+  public static final double ARM_WEIGHT = 0;
+  public static final double ARM_ANGLE_AT_REST = Math.toRadians(9.3);
 
-  public static final double endAffectorIntakespeed = 0.4;
-  public static final double endAffectorOutakespeed = 0.3;
-  public static final double endAffectorSlowOutakespeed = 0.075;
-  public static final double endAffectorIdleSpeed = 0.1;
+  public static final double END_AFFECTOR_INTAKE_SPEED = 0.4;
+  public static final double END_AFFECTOR_OUTTAKE_SPEED = 0.3;
+  public static final double END_AFFECTOR_SLOW_OUTTAKE_SPEED = 0.075;
+  public static final double END_AFFECTOR_IDLE_SPEED = 0.1;
 
-  //Wrist 
-  public static final double wristKp = 0;
-  public static final double wristMaxVelo = 0;
-  public static final double wristMaxAccel = 0;
-  public static final double wristMomentOfInertia = 0;
-  public static final double wristGearRatio = 0;
+  // Arm Rotation
+  public static final double ARM_ROTATION_KP = 0.99902;
+  public static final double ARM_ROTATION_MAX_VELOCITY = 15;
+  public static final double ARM_ROTATION_MAX_ACCELLERATION = 17.64705882;
 
-  
+  // Arm Extension
+  public static final double ARM_EXTENSION_KP = 0.99902;
+  public static final double ARM_EXTENSION_MAX_VELOCITY = 15;
+  public static final double ARM_EXTENSION_MAX_ACCELLERATION = 17.64705882;
+
+  // Wrist
+  public static final double WRIST_KP = 0.1;
+  public static final double WRIST_MAX_VELOCITY = 5000;
+  public static final double WRIST_MAX_ACCELLERATION = 5000;
+  public static final double WRIST_MOMENT_OF_INERTIA = 0;
+  public static final double WRIST_GEAR_RATIO = 0;
+  public static final double WRIST_ROTATION_STOWED = 0;
 
   /**
    * The left-to-right distance between the drivetrain wheels
@@ -138,7 +164,7 @@ public final class Constants {
 
   public static final PodName BACK_RIGHT_POD_NAME = PodName.G;
 
-  public static final double autoMaxVelocity = 4.5;
+  public static final double AUTO_MAX_VELOCITY = 4.5;
 
-  public static final double autoMaxAcceleration = 2.5;
+  public static final double AUTO_MAX_ACCELERATION = 2.5;
 }

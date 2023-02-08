@@ -29,8 +29,8 @@ public class SwerveAutoFactory {
   private final Pose2DSubscriber sub = Topics.PoseTopic().subscribe(new Pose2d());
   private FieldPoses fieldPoses =
       null; // bad values if built on startup, so instead the generate command method populates this
-  public final double maxVelocity = Constants.autoMaxVelocity;
-  public final double maxAcceleration = Constants.autoMaxAcceleration;
+  public final double maxVelocity = Constants.AUTO_MAX_VELOCITY;
+  public final double maxAcceleration = Constants.AUTO_MAX_ACCELERATION;
   private Consumer<Pose2d> poseReseter = null;
   private DrivetrainSubsystem drivetrainSubsystem;
 
@@ -126,9 +126,10 @@ public class SwerveAutoFactory {
         targetPose.getX() + " " + targetPose.getY() + " " + targetPose.getRotation().getDegrees());
     points.add(
         new PathPoint(
-            targetPose.getTranslation(), 
-            new Rotation2d(Math.PI), //TODO these from target
-            new Rotation2d(Math.PI)).withPrevControlLength(0.1));
+                targetPose.getTranslation(),
+                new Rotation2d(Math.PI), // TODO these from target
+                new Rotation2d(Math.PI))
+            .withPrevControlLength(0.1));
 
     var constraints = new PathConstraints(maxVelocity, maxAcceleration);
     var trajectory = PathPlanner.generatePath(constraints, points);
