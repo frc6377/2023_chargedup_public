@@ -27,11 +27,13 @@ public final class Constants {
   public static final int DEGREES_270 = 270;
 
   public static final int DRIVER_CONTROLLER_ID = 0;
-  // This is -1 to disable it as it is not currently going to be used.
   public static final int GUNNER_CONTROLLER_ID = 2;
   public static final int STEAM_DECK_ID = 1;
   // TODO: add real value for the motor ID
   public static final int END_AFFECTOR_ID = 9;
+
+  public static final int GAME_PIECE_CANDLE = 2;
+  public static final int GRID_SELECT_CANDLE = 3;
 
   public static final int TEAM_NUMBER = 6377;
 

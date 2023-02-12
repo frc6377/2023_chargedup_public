@@ -5,6 +5,8 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.networktables.BooleanTopic;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -31,11 +33,9 @@ public class RobotContainer {
   private final CommandXboxController gunner =
       new CommandXboxController(Constants.GUNNER_CONTROLLER_ID);
   private final ArmSubsystem arm = new ArmSubsystem();
-  // TODO: Fix to make EndAffector Subsystem only use 1 motor because there will only BE 1 motor.
-  private final EndAffectorSubsystem endAffector =
-      new EndAffectorSubsystem(Constants.END_AFFECTOR_ID);
-
-  private final ColorSubsystem colorStrip = new ColorSubsystem(2);
+  private final BooleanTopic isCubeTopic;
+  private final EndAffectorSubsystem endAffector;
+  private final ColorSubsystem colorStrip;
   private final FieldPositioningSystem fieldPositioningSystem = new FieldPositioningSystem();
   private final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem(null);
   private final SwerveAutoFactory autoCommand =
@@ -43,6 +43,12 @@ public class RobotContainer {
 
   public RobotContainer() {
     deploySubsystem.Log();
+
+    isCubeTopic = NetworkTableInstance.getDefault().getBooleanTopic("isCube");
+    endAffector = new EndAffectorSubsystem(Constants.END_AFFECTOR_ID, isCubeTopic);
+    colorStrip =
+        new ColorSubsystem(Constants.GAME_PIECE_CANDLE, Constants.GRID_SELECT_CANDLE, isCubeTopic);
+
     fieldPositioningSystem.setDriveTrainSupplier(
         () -> drivetrainSubsystem.getOdometry(), drivetrainSubsystem.getKinematics());
 
@@ -72,12 +78,16 @@ public class RobotContainer {
     Trigger driverMidButton = driver.x();
     Trigger driverLowButton = driver.y();
     Trigger driverGoButton = driver.b();
+    Trigger driverToggleGamePieceButton = driver.leftBumper();
 
     intakeButton.whileTrue(
         Commands.startEnd(() -> endAffector.intake(), () -> endAffector.idle(), endAffector));
 
     // This watches for the buttons to be pressed then released,
     // thereby making the arm extend quickly.
+    driverToggleGamePieceButton.toggleOnTrue(
+        Commands.runOnce(() -> endAffector.toggleGamePiece(), endAffector));
+
     shootButton
         .and(gunnerMidButton.or(driverMidButton).negate())
         .whileTrue(
@@ -98,14 +108,6 @@ public class RobotContainer {
         .povRight()
         .debounce(0.05)
         .toggleOnTrue(Commands.runOnce(() -> colorStrip.positionColoring.Decrement(), colorStrip));
-    driver
-        .povUp()
-        .debounce(0.05)
-        .toggleOnTrue(Commands.runOnce(() -> colorStrip.pieceColoring.toggleColor(), colorStrip));
-    driver
-        .povDown()
-        .debounce(0.05)
-        .toggleOnTrue(Commands.runOnce(() -> colorStrip.pieceColoring.toggleHeight(), colorStrip));
 
     driverGoButton.whileTrue(
         Commands.runOnce(

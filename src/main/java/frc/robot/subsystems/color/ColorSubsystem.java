@@ -5,33 +5,40 @@ import com.ctre.phoenix.led.CANdle;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
 import com.ctre.phoenix.led.CANdle.VBatOutputMode;
 import com.ctre.phoenix.led.CANdleConfiguration;
+import edu.wpi.first.networktables.BooleanSubscriber;
+import edu.wpi.first.networktables.BooleanTopic;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ColorSubsystem extends SubsystemBase {
-  private final int maxLights = 68;
-  private final CANdle candle;
+  private final CANdle gamePieceCandle;
+  private final CANdle gridPositionCandle;
 
   public final PieceColoring pieceColoring = new PieceColoring();
   public final PositionColoring positionColoring = new PositionColoring();
   public final MorseCodeAnimation morseCodeAnimation = new MorseCodeAnimation();
   private int periodicCount = 0;
   private boolean runningAnimation = true;
+  private final BooleanSubscriber isCubeSubscriber;
+  private boolean lastColor = true;
 
-  public ColorSubsystem(int id) {
-    candle = new CANdle(id);
+  public ColorSubsystem(int gamePieceID, int gridSelectID, BooleanTopic isCubeTopic) {
 
+    gamePieceCandle = new CANdle(gamePieceID);
+    gridPositionCandle = new CANdle(gridSelectID);
+    this.isCubeSubscriber = isCubeTopic.subscribe(true);
     CANdleConfiguration configAll = new CANdleConfiguration();
     configAll.statusLedOffWhenActive = false;
     configAll.disableWhenLOS = false;
     configAll.stripType = LEDStripType.RGB;
     configAll.brightnessScalar = 0.1;
     configAll.vBatOutputMode = VBatOutputMode.Modulated;
-    var errorcode = candle.configAllSettings(configAll, 100);
+    var errorcode = gamePieceCandle.configAllSettings(configAll, 100);
     if (errorcode != ErrorCode.OK) {
       System.out.println("Error initializing CANdle");
     }
 
-    clearLEDs();
+    clearLEDsGamePiece();
+    clearLEDsGridPosition();
   }
 
   public void periodic() {
@@ -39,71 +46,44 @@ public class ColorSubsystem extends SubsystemBase {
     if (runningAnimation && periodicCount % 10 == 0 && periodicCount < 2000) {
       this.morseCodeAnimation.AdvanceAnimation();
     }
+
+    if (lastColor != isCubeSubscriber.get()) {
+      this.pieceColoring.update();
+      lastColor = isCubeSubscriber.get();
+    }
   }
 
-  private void clearLEDs() {
-    writeLED(RGB.BLACK);
+  private void clearLEDsGamePiece() {
+    writeLEDsGamePiece(RGB.BLACK);
   }
 
-  private void writeLED(RGB rgb) {
-    candle.setLEDs(rgb.red, rgb.green, rgb.blue);
+  private void writeLEDsGamePiece(RGB rgb) {
+    gamePieceCandle.setLEDs(rgb.red, rgb.green, rgb.blue);
   }
 
-  private void writeLED(RGB rgb, int startIdx, int count) {
-    candle.setLEDs(rgb.red, rgb.green, rgb.blue, rgb.white, startIdx, count);
+  private void writeLEDsGamePiece(RGB rgb, int startIdx, int count) {
+    gamePieceCandle.setLEDs(rgb.red, rgb.green, rgb.blue, rgb.white, startIdx, count);
+  }
+
+  private void clearLEDsGridPosition() {
+    writeLEDsGamePiece(RGB.BLACK);
+  }
+
+  private void writeLEDsGridPosition(RGB rgb) {
+    gridPositionCandle.setLEDs(rgb.red, rgb.green, rgb.blue);
+  }
+
+  private void writeLEDsGridPosition(RGB rgb, int startIdx, int count) {
+    gridPositionCandle.setLEDs(rgb.red, rgb.green, rgb.blue, rgb.white, startIdx, count);
   }
 
   public class PieceColoring {
-    private boolean flashing = true;
-    private int colorSelect = 0;
-    private int lightsOn = 0;
-
-    public void toggleHeight() {
-      this.lightsOn++;
-      this.lightsOn %= 3;
-      update();
-    }
-
-    public void toggleColor() {
-      this.colorSelect = (this.colorSelect + 1) % 3;
-      update();
-    }
-
-    public void startFlashing() {
-      flashing = true;
-      update();
-    }
-
-    public void stopFlashing() {
-      flashing = false;
-      update();
-    }
-
     private void update() {
       runningAnimation = false;
-      final int LightBlock = 5;
-      final int FirstSpacer = 3;
-      final int SecondSpacer = 4;
 
-      RGB color = RGB.BLACK;
-      if (colorSelect > 0) {
-        color = colorSelect == 1 ? RGB.YELLOW : RGB.PURPLE;
-      }
+      RGB color = isCubeSubscriber.get() ? RGB.PURPLE : RGB.YELLOW;
 
-      for (int i = 0; i < maxLights; i++) {
-        int pos = i % LightBlock;
-
-        // This code is a little tricky so how it how it works
-        // We want lights to be in groups of 5,
-        // for low, we want 1 lights and four dark
-        // for mid, we want 2 lights and three dark
-        // for high, we want 3 lights and two dark
-        if (pos == FirstSpacer || pos == SecondSpacer || pos > lightsOn) {
-          writeLED(RGB.BLACK, i, 1);
-        } else {
-          writeLED(color, i, 1);
-        }
-      }
+      writeLEDsGamePiece(color);
     }
   }
 
@@ -118,8 +98,8 @@ public class ColorSubsystem extends SubsystemBase {
 
     public void AdvanceAnimation() {
       if (periodicCount / 10 >= animation.length) periodicCount = 0;
-      if (animation[periodicCount / 10] == 1) writeLED(RGB.HOWDY_BLUE);
-      else writeLED(RGB.BLACK);
+      if (animation[periodicCount / 10] == 1) writeLEDsGamePiece(RGB.HOWDY_BLUE);
+      else clearLEDsGamePiece();
     }
   }
 
@@ -128,15 +108,21 @@ public class ColorSubsystem extends SubsystemBase {
 
     private int cursor = 0; // 0 to 8
 
+    public void SetPosition(int position) {
+      cursor = position % MaxPosition;
+      clearLEDsGridPosition();
+      update();
+    }
+
     public void Increment() {
       cursor = (cursor + 1) % MaxPosition;
-      clearLEDs();
+      clearLEDsGridPosition();
       update();
     }
 
     public void Decrement() {
       cursor = (cursor + (MaxPosition - 1)) % MaxPosition;
-      clearLEDs();
+      clearLEDsGridPosition();
       update();
     }
 
@@ -148,20 +134,20 @@ public class ColorSubsystem extends SubsystemBase {
 
       // 8 9 10 [11] 12 13 14 [15] 16 17 18
 
-      clearLEDs();
-      writeLED(RGB.WHITE, Spacer1, 1);
-      writeLED(RGB.WHITE, Spacer2, 1);
+      clearLEDsGridPosition();
+      writeLEDsGridPosition(RGB.WHITE, Spacer1, 1);
+      writeLEDsGridPosition(RGB.WHITE, Spacer2, 1);
 
       int cursorLocation = cursor + StartIndex + (int) (cursor / 3);
 
       if (cursor % 3 == 0) {
-        writeLED(RGB.RED, cursorLocation, 1);
+        writeLEDsGridPosition(RGB.RED, cursorLocation, 1);
       }
       if (cursor % 3 == 1) {
-        writeLED(RGB.YELLOW, cursorLocation, 1);
+        writeLEDsGridPosition(RGB.YELLOW, cursorLocation, 1);
       }
       if (cursor % 3 == 2) {
-        writeLED(RGB.GREEN, cursorLocation, 1);
+        writeLEDsGridPosition(RGB.GREEN, cursorLocation, 1);
       }
     }
   }
