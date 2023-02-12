@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import frc.robot.subsystems.arm.ArmPosition;
 import frc.robot.subsystems.drivetrain.config.PodName;
 import java.util.Arrays;
 import java.util.List;
@@ -100,14 +101,16 @@ public final class Constants {
   public static final int ARM_ROTATION_ID_1 = 11;
   public static final int ARM_ROTATION_ID2 = 12;
 
-  public static final double ARM_ROTATION_TICKS_TO_RADIANS = Math.PI / 50;
+  public static final double ARM_ROTATION_TICKS_TO_RADIANS =
+      Math.PI * 2 / 90; // The arm is geared 90:1
 
   public static final int ARM_EXTENSION_CURRENT_LIMIT = 40;
 
   public static final int ARM_EXTENDER_ID = 13;
 
-  public static final double ARM_EXTENSIONS_TICKS_TO_METERS = 0;
-  public static final double ARM_LENGTH_AT_ZERO_TICKS = 0.7;
+  // This is the Circumference of the pully
+  public static final double ARM_EXTENSIONS_TICKS_TO_METERS = 0.0254 * Math.PI;
+  public static final double ARM_LENGTH_AT_ZERO_TICKS_METERS = 0.7;
 
   public static final int WRIST_CURRENT_LIMIT = 30;
   public static final int WRIST_STATOR_LIMIT = 40;
@@ -116,10 +119,36 @@ public final class Constants {
       Math.PI / 50; // TODO: Calculate the actual value
 
   public static final int WRIST_ID = 14;
+  // These are in degrees for arm and wrist rotation and meters for extension. The lengths for
+  // extension are relative to the minimum arm length.
+  public static final ArmPosition CUBE_PICKUP = new ArmPosition(-10, 0, 15, "CUBE PICKUP");
+
+  public static final ArmPosition CONE_PICKUP = new ArmPosition(-10, 0, 0, "CONE PICKUP");
+
+  public static final ArmPosition CUBE_MID =
+      new ArmPosition(35, 28 / METERS_TO_INCHES, 0, "CUBE MID");
+
+  public static final ArmPosition CONE_MID =
+      new ArmPosition(15, 14 / METERS_TO_INCHES, -15, "CONE MID");
+
+  public static final ArmPosition CUBE_HIGH =
+      new ArmPosition(35, 40 / METERS_TO_INCHES, 0, "CUBE HIGH");
+
+  public static final ArmPosition CONE_HIGH =
+      new ArmPosition(25, 36 / METERS_TO_INCHES, -25, "CONE HIGH");
+
+  public static final ArmPosition CUBE_DOUBLE_SUBSTATION =
+      new ArmPosition(60, 10 / METERS_TO_INCHES, -50, "CUBE DOUBLESUB");
+
+  public static final ArmPosition CONE_DOUBLE_SUBSTATION =
+      new ArmPosition(60, 10 / METERS_TO_INCHES, -70, "CONE DOUBLESUB");
+
+  public static final ArmPosition STOWED = new ArmPosition(90, 0, -45, "STOWED");
+
   // TODO: Get actual value(is the weight of the arm multiplied by the number needed to convert
   public static final double ROTATION_ARM_GEAR_RATIO = 100;
   public static final double STALLED_TORQUE = 2.6;
-  public static final double ARM_WEIGHT = 0;
+  public static final double ARM_WEIGHT_KG = 5.4;
   public static final double ARM_ANGLE_AT_REST = Math.toRadians(9.3);
 
   public static final double END_AFFECTOR_INTAKE_SPEED = 0.4;

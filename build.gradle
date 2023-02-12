@@ -74,6 +74,11 @@ dependencies {
 test {
     useJUnitPlatform()
     systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
+
+    testLogging {
+        events "failed"
+        exceptionFormat "full"
+    }
 }
 
 spotless {

@@ -15,9 +15,9 @@ import frc.robot.Constants;
 public class ArmSubsystem extends SubsystemBase {
 
   // Hardware
-  private final CANSparkMax armMotor1;
-  private final CANSparkMax armMotor2;
-  private final ProfiledPIDController armPPC1;
+  private final CANSparkMax rotationMotor1;
+  private final CANSparkMax rotationMotor2;
+  private final ProfiledPIDController rotationPPC;
 
   private final CANSparkMax extendMotor;
   private final ProfiledPIDController extendPPC;
@@ -27,24 +27,25 @@ public class ArmSubsystem extends SubsystemBase {
 
   public ArmSubsystem() {
     System.out.println("Starting Construct ArmSubsystem");
-    armPPC1 =
+    rotationPPC =
         new ProfiledPIDController(
             Constants.ARM_ROTATION_KP,
             0,
             0,
             new TrapezoidProfile.Constraints(
                 Constants.ARM_ROTATION_MAX_VELOCITY, Constants.ARM_ROTATION_MAX_ACCELLERATION));
-    armMotor1 = new CANSparkMax(Constants.ARM_ROTATION_ID_1, MotorType.kBrushless);
-    armMotor2 = new CANSparkMax(Constants.ARM_ROTATION_ID2, MotorType.kBrushless);
+    rotationMotor1 = new CANSparkMax(Constants.ARM_ROTATION_ID_1, MotorType.kBrushless);
+    rotationMotor2 = new CANSparkMax(Constants.ARM_ROTATION_ID2, MotorType.kBrushless);
 
-    armMotor1.restoreFactoryDefaults();
-    armMotor2.restoreFactoryDefaults();
+    rotationMotor1.restoreFactoryDefaults();
+    rotationMotor2.restoreFactoryDefaults();
 
-    armMotor1.setSmartCurrentLimit(Constants.ARM_ROTATION_CURRENT_LIMIT);
+    rotationMotor1.setSmartCurrentLimit(Constants.ARM_ROTATION_CURRENT_LIMIT);
 
-    // We haven't been able to gett following to work.
-    // armMotor2.follow(armMotor1);
-    armMotor2.setSmartCurrentLimit(Constants.ARM_ROTATION_CURRENT_LIMIT);
+    // We haven't been able to get following to work...
+    // rotationMotor2.follow(rotationMotor1);
+    // so instead we will just feed the same values to both motors.
+    rotationMotor2.setSmartCurrentLimit(Constants.ARM_ROTATION_CURRENT_LIMIT);
 
     extendPPC =
         new ProfiledPIDController(
@@ -75,10 +76,10 @@ public class ArmSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     double armMotorOutput =
-        armPPC1.calculate(armMotor1.getEncoder().getPosition())
+        rotationPPC.calculate(rotationMotor1.getEncoder().getPosition())
             + computeRotationArbitraryFeetForward();
-    armMotor1.set(armMotorOutput);
-    armMotor2.set(-armMotorOutput);
+    rotationMotor1.set(armMotorOutput);
+    rotationMotor2.set(-armMotorOutput);
     extendMotor.set(extendPPC.calculate(extendMotor.getEncoder().getPosition()));
     wristMotor.set(
         ControlMode.MotionMagic,
@@ -87,10 +88,12 @@ public class ArmSubsystem extends SubsystemBase {
         computeWristArbitraryFeetForward());
   }
 
-  public void setTarget(double armDegrees, double extendMeters, double wristDegrees) {
-    armPPC1.setGoal(Math.toRadians(armDegrees) / Constants.ARM_ROTATION_TICKS_TO_RADIANS);
-    extendPPC.setGoal(extendMeters / Constants.ARM_EXTENSIONS_TICKS_TO_METERS);
-    wristMotorGoal = Math.toRadians(wristDegrees) / Constants.WRIST_TICKS_TO_RADIANS;
+  public void setTarget(ArmPosition armPosition) {
+    System.out.println(armPosition);
+    rotationPPC.setGoal(
+        Math.toRadians(armPosition.armRotation) / Constants.ARM_ROTATION_TICKS_TO_RADIANS);
+    extendPPC.setGoal(armPosition.armExtension / Constants.ARM_EXTENSIONS_TICKS_TO_METERS);
+    wristMotorGoal = Math.toRadians(armPosition.wristRotation) / Constants.WRIST_TICKS_TO_RADIANS;
   }
 
   /**
@@ -101,20 +104,24 @@ public class ArmSubsystem extends SubsystemBase {
    */
   // TODO: move to I alpha instead of torque
   private double computeRotationArbitraryFeetForward() {
-    double theta = armMotor1.getEncoder().getPosition() * Constants.ARM_ROTATION_TICKS_TO_RADIANS;
+    return rotationArbitraryFeetForward(
+        rotationMotor1.getEncoder().getPosition(), extendMotor.getEncoder().getPosition());
+  }
+
+  public static double rotationArbitraryFeetForward(
+      double rotationPosition, double extendPosition) {
+    double theta = rotationPosition * Constants.ARM_ROTATION_TICKS_TO_RADIANS;
     double armLength =
-        extendMotor.getEncoder().getPosition() * Constants.ARM_EXTENSIONS_TICKS_TO_METERS
-            + Constants.ARM_LENGTH_AT_ZERO_TICKS;
-    return (Math.cos(theta - Math.toRadians(Constants.ARM_ANGLE_AT_REST))
-            * armLength
-            * Constants.ARM_WEIGHT)
+        extendPosition * Constants.ARM_EXTENSIONS_TICKS_TO_METERS
+            + Constants.ARM_LENGTH_AT_ZERO_TICKS_METERS;
+    return (Math.cos(theta) * armLength * Constants.ARM_WEIGHT_KG)
         / (Constants.STALLED_TORQUE * 2 * Constants.ROTATION_ARM_GEAR_RATIO);
   }
 
   private double computeWristArbitraryFeetForward() {
     double theta =
         wristMotor.getSelectedSensorPosition() * Constants.WRIST_TICKS_TO_RADIANS
-            + armMotor1.getEncoder().getPosition() * Constants.ARM_ROTATION_TICKS_TO_RADIANS;
+            + rotationMotor1.getEncoder().getPosition() * Constants.ARM_ROTATION_TICKS_TO_RADIANS;
 
     return (Math.cos(theta) * Constants.WRIST_MOMENT_OF_INERTIA * 9.8)
         / (Constants.STALLED_TORQUE * Constants.WRIST_GEAR_RATIO);

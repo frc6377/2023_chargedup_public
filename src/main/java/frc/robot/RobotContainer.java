@@ -49,11 +49,13 @@ public class RobotContainer {
     drivetrainSubsystem.setDefaultCommand(
         new DefaultDriveCommand(
             drivetrainSubsystem,
-            () -> Math.pow(MathUtil.applyDeadband(-driveController.getLeftY(), 0.05), 2) * Math.copySign(1, -driveController.getLeftY()),
-            () -> Math.pow(MathUtil.applyDeadband(-driveController.getLeftX(), 0.05), 2) * Math.copySign(1, -driveController.getLeftX()),
             () ->
-                Math.pow(MathUtil.applyDeadband(driveController.getRightX(), 0.05), 3)
-                    ,
+                Math.pow(MathUtil.applyDeadband(-driveController.getLeftY(), 0.05), 2)
+                    * Math.copySign(1, -driveController.getLeftY()),
+            () ->
+                Math.pow(MathUtil.applyDeadband(-driveController.getLeftX(), 0.05), 2)
+                    * Math.copySign(1, -driveController.getLeftX()),
+            () -> Math.pow(MathUtil.applyDeadband(driveController.getRightX(), 0.05), 3),
             () -> fieldPositioningSystem.getCurrentRobotRotationXY()));
 
     configureBindings();
