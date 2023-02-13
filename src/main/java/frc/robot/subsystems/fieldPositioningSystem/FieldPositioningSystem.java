@@ -14,6 +14,8 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.networktables.DoubleArrayPublisher;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
@@ -38,6 +40,8 @@ public class FieldPositioningSystem extends SubsystemBase {
   private SwerveDrivePoseEstimator swerveDriveOdometry;
   private CameraInterperter[] cameras;
   private final Pose2DPublisher pub = Topics.PoseTopic().publish();
+  private final DoubleArrayPublisher yprPub =
+      NetworkTableInstance.getDefault().getDoubleArrayTopic("pitch").publish();
 
   class FieldPositioningSystemError extends RuntimeException {
     public FieldPositioningSystemError(final String message, final Throwable throwable) {
@@ -132,6 +136,10 @@ public class FieldPositioningSystem extends SubsystemBase {
     currentRobotPose = swerveDriveOdometry.getEstimatedPosition();
     field.setRobotPose(currentRobotPose);
     pub.accept(currentRobotPose);
+    double[] ypr = new double[3];
+    inertialMeasurementUnit.getYawPitchRoll(ypr);
+    ypr[0] = getRobotXYPose().getRotation().getDegrees();
+    yprPub.accept(ypr);
     SmartDashboard.putString("pose", currentRobotPose.getX() + " " + currentRobotPose.getY());
   }
 

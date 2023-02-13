@@ -16,6 +16,7 @@ class FPSHardware {
     configCameras(FPS, config);
 
     Pigeon2 pig = new Pigeon2(0);
+    pig.setYaw(0);
     FPS.setPigeon2(pig);
   }
 

@@ -56,11 +56,11 @@ public class RobotContainer {
         new DefaultDriveCommand(
             drivetrainSubsystem,
             () ->
-                Math.pow(MathUtil.applyDeadband(-driveController.getLeftY(), 0.05), 2)
-                    * Math.copySign(1, -driveController.getLeftY()),
+                Math.pow(MathUtil.applyDeadband(driveController.getLeftY(), 0.05), 2)
+                    * Math.copySign(1, driveController.getLeftY()),
             () ->
-                Math.pow(MathUtil.applyDeadband(-driveController.getLeftX(), 0.05), 2)
-                    * Math.copySign(1, -driveController.getLeftX()),
+                Math.pow(MathUtil.applyDeadband(driveController.getLeftX(), 0.05), 2)
+                    * Math.copySign(1, driveController.getLeftX()),
             () -> Math.pow(MathUtil.applyDeadband(driveController.getRightX(), 0.05), 3),
             () -> fieldPositioningSystem.getCurrentRobotRotationXY()));
 
@@ -93,6 +93,7 @@ public class RobotContainer {
         .whileTrue(
             Commands.startEnd(
                 () -> endAffector.fastOutake(), () -> endAffector.halt(), endAffector));
+
     // This watches for the buttons to be pressed and held, thereby making the arm extend slowly.
     shootButton
         .and(gunnerMidButton.or(driverMidButton))

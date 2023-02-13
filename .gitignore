@@ -170,3 +170,4 @@ networktables.json.bck
 .idea
 local.properties
 *.iml
+.vscode/settings.json
