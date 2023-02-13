@@ -1,6 +1,7 @@
 package frc.robot.subsystems.drivetrain.config;
 
 public class DriverConfig {
+  public static final double rotDeadband = 0.75;
   public final double lowGearMaxSped = 0.6;
   public final double lowgearTurnPercent = 0.9;
 

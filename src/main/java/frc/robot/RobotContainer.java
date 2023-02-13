@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.BooleanTopic;
@@ -14,16 +13,20 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.DefaultDriveCommand;
+import frc.robot.commands.DriveCommand;
 import frc.robot.commands.SwerveAutoFactory;
 import frc.robot.subsystems.DeploySubsystem;
 import frc.robot.subsystems.EndAffectorSubsystem;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.color.ColorSubsystem;
+import frc.robot.subsystems.drivetrain.DriveInput;
 import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
+import frc.robot.subsystems.drivetrain.config.DriverConfig;
 import frc.robot.subsystems.fieldPositioningSystem.FieldPositioningSystem;
+import java.util.function.DoubleSupplier;
 
 public class RobotContainer {
   // Input controllers
@@ -47,6 +50,19 @@ public class RobotContainer {
   public RobotContainer() {
     deploySubsystem.Log();
 
+    DriverConfig driverConfig = new DriverConfig();
+    DoubleSupplier xSupplier =
+        new DriveInput(
+            driveController::getLeftY, DriveInput.InputType.TRANSLATION, driverConfig, false);
+    DoubleSupplier ySupplier =
+        new DriveInput(
+            driveController::getLeftX, DriveInput.InputType.TRANSLATION, driverConfig, false);
+    DoubleSupplier rotationSupplier =
+        new DriveInput(
+            driveController::getLeftX, DriveInput.InputType.TRANSLATION, driverConfig, false);
+    DoubleSupplier pointingDriveInput =
+        new DriveInput(driveController::getRightY, driveController::getRightX, driverConfig);
+
     isCubeTopic = NetworkTableInstance.getDefault().getBooleanTopic("isCube");
     endAffector = new EndAffectorSubsystem(Constants.END_AFFECTOR_ID, isCubeTopic);
     colorStrip =
@@ -56,16 +72,13 @@ public class RobotContainer {
         () -> drivetrainSubsystem.getOdometry(), drivetrainSubsystem.getKinematics());
 
     drivetrainSubsystem.setDefaultCommand(
-        new DefaultDriveCommand(
+        new DriveCommand(
             drivetrainSubsystem,
-            () ->
-                Math.pow(MathUtil.applyDeadband(driveController.getLeftY(), 0.05), 2)
-                    * Math.copySign(1, driveController.getLeftY()),
-            () ->
-                Math.pow(MathUtil.applyDeadband(driveController.getLeftX(), 0.05), 2)
-                    * Math.copySign(1, driveController.getLeftX()),
-            () -> Math.pow(MathUtil.applyDeadband(driveController.getRightX(), 0.05), 3),
-            () -> fieldPositioningSystem.getCurrentRobotRotationXY()));
+            fieldPositioningSystem,
+            xSupplier,
+            ySupplier,
+            rotationSupplier,
+            pointingDriveInput));
 
     configureBindings();
   }
@@ -74,12 +87,38 @@ public class RobotContainer {
 
     Trigger intakeButton = driver.leftTrigger(0.3);
     Trigger shootButton = driver.rightTrigger(0.3);
-    Trigger gunnerHighButton = gunner.a();
+    Trigger highGearButton = driver.rightBumper();
+    Trigger controlMethod = driver.start();
+
     Trigger gunnerMidButton = gunner.x();
-    Trigger gunnerLowButton = gunner.y();
-    Trigger driverHighButton = driver.a();
     Trigger driverMidButton = driver.x();
-    Trigger driverLowButton = driver.y();
+
+    DriverConfig driverConfig = new DriverConfig();
+    DoubleSupplier xSupplier =
+        new DriveInput(
+            driveController::getLeftY, DriveInput.InputType.TRANSLATION, driverConfig, false);
+    DoubleSupplier ySupplier =
+        new DriveInput(
+            driveController::getLeftX, DriveInput.InputType.TRANSLATION, driverConfig, false);
+    DoubleSupplier turnSupplier =
+        new DriveInput(
+            driveController::getRightX, DriveInput.InputType.ROTATION, driverConfig, false);
+    DoubleSupplier pointingDriveInput =
+        new DriveInput(driveController::getRightY, driveController::getRightX, driverConfig);
+
+    DriveCommand driveCommand =
+        new DriveCommand(
+            drivetrainSubsystem,
+            fieldPositioningSystem,
+            xSupplier,
+            ySupplier,
+            turnSupplier,
+            pointingDriveInput);
+
+    drivetrainSubsystem.setDefaultCommand(driveCommand);
+
+    controlMethod.onTrue(
+        Commands.startEnd(driveCommand::toggleDriveType, null, (Subsystem[]) null));
     Trigger driverGoButton = driver.b();
     Trigger driverResetFieldNorth = driver.start();
     Trigger driverToggleGamePieceButton = driver.leftBumper();
@@ -127,6 +166,10 @@ public class RobotContainer {
             () ->
                 CommandScheduler.getInstance()
                     .schedule(autoCommand.generateGridCommand(getBay()).until(this::isDriving))));
+
+    highGearButton.whileTrue(
+        Commands.startEnd(
+            () -> DriveInput.setToHighGear(true), () -> DriveInput.setToHighGear(false)));
   }
 
   public Command getAutonomousCommand() {
