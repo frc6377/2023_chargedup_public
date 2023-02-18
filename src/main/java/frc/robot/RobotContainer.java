@@ -20,6 +20,7 @@ import frc.robot.commands.DriveCommand;
 import frc.robot.commands.SwerveAutoFactory;
 import frc.robot.subsystems.DeploySubsystem;
 import frc.robot.subsystems.EndAffectorSubsystem;
+import frc.robot.subsystems.arm.ArmPosition;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.color.ColorSubsystem;
 import frc.robot.subsystems.drivetrain.DriveInput;
@@ -118,7 +119,7 @@ public class RobotContainer {
     drivetrainSubsystem.setDefaultCommand(driveCommand);
 
     controlMethod.onTrue(
-        Commands.startEnd(driveCommand::toggleDriveType, null, (Subsystem[]) null));
+        Commands.startEnd(driveCommand::toggleDriveType, () -> {}));
     Trigger driverGoButton = driver.b();
     Trigger driverResetFieldNorth = driver.start();
     Trigger driverToggleGamePieceButton = driver.leftBumper();
@@ -170,6 +171,14 @@ public class RobotContainer {
     highGearButton.whileTrue(
         Commands.startEnd(
             () -> DriveInput.setToHighGear(true), () -> DriveInput.setToHighGear(false)));
+    
+    Trigger retract = gunner.leftTrigger(0.3);
+    Trigger extend = gunner.a();
+
+    retract.whileTrue(Commands.runOnce(() ->arm.setTarget(new ArmPosition(0, 0.5, 0, "NAN")), arm));
+    extend.whileTrue(Commands.runOnce(() ->arm.setTarget(new ArmPosition(
+        0,11.4, 0, "NAN")), arm));
+
   }
 
   public Command getAutonomousCommand() {

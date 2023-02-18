@@ -1,14 +1,20 @@
 package frc.robot.subsystems.arm;
 
+import java.lang.annotation.Target;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -20,7 +26,10 @@ public class ArmSubsystem extends SubsystemBase {
   private final ProfiledPIDController rotationPPC;
 
   private final CANSparkMax extendMotor;
+  private final RelativeEncoder extendEncoder;
+  private final SparkMaxPIDController extendController;
   private final ProfiledPIDController extendPPC;
+  private double setpoint = 0;
 
   private final WPI_TalonFX wristMotor;
   private double wristMotorGoal;
@@ -58,6 +67,20 @@ public class ArmSubsystem extends SubsystemBase {
     extendMotor.restoreFactoryDefaults();
     extendMotor.setSmartCurrentLimit(Constants.ARM_EXTENSION_CURRENT_LIMIT);
 
+    extendEncoder = extendMotor.getEncoder();
+    extendController = extendMotor.getPIDController();
+
+    extendController.setP(0.009524*0.05, 0);
+    extendController.setI(0, 0);
+    extendController.setD(0.04*0.1, 0);
+    extendController.setFF(0, 0);
+    extendController.setIZone(0, 0);
+    extendController.setOutputRange(-1, 1);
+    extendController.setSmartMotionAllowedClosedLoopError(0.1, 0);
+    // extendController.setFeedbackDevice(extendEncoder);
+    extendController.setSmartMotionMaxAccel(16000, 0);
+    extendController.setSmartMotionMaxVelocity(16000, 0);
+
     wristMotor = new WPI_TalonFX(Constants.WRIST_ID);
     wristMotor.configStatorCurrentLimit(
         new StatorCurrentLimitConfiguration(
@@ -75,24 +98,30 @@ public class ArmSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    
+    System.out.println(extendMotor.getOutputCurrent());
     double armMotorOutput =
         rotationPPC.calculate(rotationMotor1.getEncoder().getPosition())
             + computeRotationArbitraryFeetForward();
     rotationMotor1.set(armMotorOutput);
     rotationMotor2.set(-armMotorOutput);
-    extendMotor.set(extendPPC.calculate(extendMotor.getEncoder().getPosition()));
+    double calc = extendPPC.calculate(extendMotor.getEncoder().getPosition());
+    SmartDashboard.putNumber("Extend ppc out", calc);
+    
     wristMotor.set(
-        ControlMode.MotionMagic,
-        wristMotorGoal,
-        DemandType.ArbitraryFeedForward,
-        computeWristArbitraryFeetForward());
+        ControlMode.Position,
+        wristMotorGoal
+        );
+    SmartDashboard.putNumber("ElevatorPosition", extendMotor.getEncoder().getPosition());
   }
 
   public void setTarget(ArmPosition armPosition) {
-    System.out.println(armPosition);
+    extendController.setReference(armPosition.armExtension, ControlType.kSmartMotion);
+    setpoint = armPosition.armExtension;
+    System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
     rotationPPC.setGoal(
         Math.toRadians(armPosition.armRotation) / Constants.ARM_ROTATION_TICKS_TO_RADIANS);
-    extendPPC.setGoal(armPosition.armExtension / Constants.ARM_EXTENSIONS_TICKS_TO_METERS);
+    extendPPC.setGoal(-1045);
     wristMotorGoal = Math.toRadians(armPosition.wristRotation) / Constants.WRIST_TICKS_TO_RADIANS;
   }
 

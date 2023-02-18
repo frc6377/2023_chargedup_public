@@ -35,6 +35,7 @@ public class DriveCommand extends CommandBase {
         new ProfiledPIDController(
             6, 0.1, 0.1, new TrapezoidProfile.Constraints(Math.PI * 8, Math.PI * 4));
     turnController.enableContinuousInput(-Math.PI, Math.PI);
+    driveType = DriveType.CLASSIC;
     addRequirements(drivetrainSubsystem);
   }
 
