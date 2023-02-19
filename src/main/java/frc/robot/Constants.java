@@ -106,7 +106,7 @@ public final class Constants {
   public static final double ARM_ROTATION_TICKS_TO_RADIANS =
       Math.PI * 2 / 90; // The arm is geared 90:1
 
-  public static final int ARM_EXTENSION_CURRENT_LIMIT = 20;
+  public static final int ARM_EXTENSION_CURRENT_LIMIT = 50;
 
   public static final int ARM_EXTENDER_ID = 12;
 
@@ -153,8 +153,8 @@ public final class Constants {
   public static final double ARM_WEIGHT_KG = 5.4;
   public static final double ARM_ANGLE_AT_REST = Math.toRadians(9.3);
 
-  public static final double END_AFFECTOR_INTAKE_SPEED = 0.4;
-  public static final double END_AFFECTOR_OUTTAKE_SPEED = 0.3;
+  public static final double END_AFFECTOR_INTAKE_SPEED = 0.7;
+  public static final double END_AFFECTOR_OUTTAKE_SPEED = 0.8;
   public static final double END_AFFECTOR_SLOW_OUTTAKE_SPEED = 0.075;
   public static final double END_AFFECTOR_IDLE_SPEED = 0.1;
 
