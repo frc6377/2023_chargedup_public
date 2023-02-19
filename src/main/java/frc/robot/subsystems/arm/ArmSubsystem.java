@@ -153,8 +153,7 @@ public class ArmSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("raw CANcoder", rawPos);
     double theta = Math.toRadians(rawPos*(6.0/16.0));
     SmartDashboard.putNumber("shoulder theta", theta);
-    System.out.println("theta " + theta
-    );
+    
     return theta;
   }
 

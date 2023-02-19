@@ -180,7 +180,7 @@ public class RobotContainer {
     Trigger extend = gunner.a();
 
 
-    retract.whileTrue(Commands.runOnce(() ->arm.setTarget(new ArmPosition(0, 1, -8475, "NAN")), arm));
+    retract.whileTrue(Commands.runOnce(() ->arm.setTarget(new ArmPosition(-0.04, 0.5, -19000, "NAN")), arm));
     extend.whileTrue(Commands.runOnce(() -> CommandScheduler.getInstance().schedule(Commands.runOnce(() ->arm.setTarget(new ArmPosition(
         0.65, 0.5, -8475, "NAN")), arm))));
 
