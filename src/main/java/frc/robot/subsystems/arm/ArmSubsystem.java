@@ -7,6 +7,7 @@ import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.sensors.CANCoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
@@ -27,7 +28,9 @@ public class ArmSubsystem extends SubsystemBase {
   private final CANSparkMax leftShoulder;
   private final RelativeEncoder leftShoulderEncoder;
   private final SparkMaxPIDController leftShoulderController;
+  private final ProfiledPIDController shoulderPPC;
   private final CANSparkMax rightShoulder;
+  private final CANCoder shoulderCANCoder;
 
   private final CANSparkMax extendMotor;
   private final RelativeEncoder extendEncoder;
@@ -42,7 +45,7 @@ public class ArmSubsystem extends SubsystemBase {
     leftShoulder = new CANSparkMax(Constants.LEFT_SHOULDER_ID, MotorType.kBrushless);
     rightShoulder = new CANSparkMax(Constants.RIGHT_SHOULDER_ID, MotorType.kBrushless);
 
-
+    shoulderCANCoder = new CANCoder(20);
 
     leftShoulder.restoreFactoryDefaults();
     rightShoulder.restoreFactoryDefaults();
@@ -57,15 +60,8 @@ public class ArmSubsystem extends SubsystemBase {
     leftShoulderEncoder = leftShoulder.getEncoder();
     leftShoulderController = leftShoulder.getPIDController();
 
-    leftShoulderController.setP(0.0005, 0);
-    leftShoulderController.setI(0.000, 0);
-    leftShoulderController.setD(0.003, 0);
-    leftShoulderController.setIZone(0.000, 0);
-    leftShoulderController.setFF(0, 0);
-    leftShoulderController.setOutputRange(-1, 1);
-    leftShoulderController.setSmartMotionAllowedClosedLoopError(1, 0);
-    leftShoulderController.setSmartMotionMaxVelocity(400, 0);
-    leftShoulderController.setSmartMotionMaxAccel(800, 0);
+    shoulderPPC = new ProfiledPIDController(2, 0, 0, new TrapezoidProfile.Constraints(4, 6
+    ));
 
     rightShoulder.follow(leftShoulder, true);
 
@@ -103,7 +99,9 @@ public class ArmSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    leftShoulderController.setReference(armPosition.armRotation, ControlType.kSmartMotion, 0, computeShoulderArbitraryFeetForward(), ArbFFUnits.kVoltage);
+
+
+    leftShoulder.set(computeShoulderOutput());
     SmartDashboard.putNumber("arb ffw", computeShoulderArbitraryFeetForward());  
     extendController.setReference(armPosition.armExtension, ControlType.kSmartMotion);
 
@@ -112,6 +110,7 @@ public class ArmSubsystem extends SubsystemBase {
 
   public void setTarget(ArmPosition armPosition) {
     this.armPosition = armPosition;
+    shoulderPPC.setGoal(armPosition.armRotation);
     wristMotor.set(ControlMode.MotionMagic, armPosition.wristRotation);
   }
 
@@ -123,13 +122,13 @@ public class ArmSubsystem extends SubsystemBase {
    */
   // TODO: move to I alpha instead of torque
   private double computeShoulderArbitraryFeetForward() {
-    double theta = Math.toRadians((360*leftShoulderEncoder.getPosition()/90) - 8);
+    double theta = thetaFromCANCoder();
     double centerOfMass = 0.4825;
     double mass = 6.01;
     double gearRatio = 90;
     double numMotors = 2;
     double torque = Math.cos(theta)*9.81*mass*centerOfMass;
-    double out = 12*torque/(Constants.STALLED_TORQUE*0.85*0.8*gearRatio*numMotors);
+    double out = torque/(Constants.STALLED_TORQUE*0.85*gearRatio*numMotors);
     SmartDashboard.putNumber("shoulder arb ffw", out);
     return out;
   }
@@ -144,6 +143,16 @@ public class ArmSubsystem extends SubsystemBase {
         / (Constants.STALLED_TORQUE * 2 * Constants.ROTATION_ARM_GEAR_RATIO);
   }
 
+  private double thetaFromCANCoder (){
+    double rawPos = shoulderCANCoder.getPosition();
+    SmartDashboard.putNumber("raw CANcoder", rawPos);
+    double theta = Math.toRadians(rawPos*(6.0/16.0));
+    SmartDashboard.putNumber("shoulder theta", theta);
+    System.out.println("theta " + theta
+    );
+    return theta;
+  }
+
   private double computeWristArbitraryFeetForward() {
     double theta =
         wristMotor.getSelectedSensorPosition() * Constants.WRIST_TICKS_TO_RADIANS
@@ -151,5 +160,11 @@ public class ArmSubsystem extends SubsystemBase {
 
     return (Math.cos(theta) * Constants.WRIST_MOMENT_OF_INERTIA * 9.8)
         / (Constants.STALLED_TORQUE * Constants.WRIST_GEAR_RATIO);
+  }
+
+  private double computeShoulderOutput (){
+    double output = shoulderPPC.calculate(thetaFromCANCoder()) + computeShoulderArbitraryFeetForward();
+    SmartDashboard.putNumber("shoulder output", output);
+    return output;
   }
 }
