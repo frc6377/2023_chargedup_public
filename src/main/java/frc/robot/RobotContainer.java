@@ -178,7 +178,7 @@ public class RobotContainer {
 
     // retract.whileTrue(Commands.runOnce(() ->arm.setTarget(new ArmPosition(0, 1, 7400, "NAN")), arm));
     extend.whileTrue(Commands.runOnce(() ->arm.setTarget(new ArmPosition(
-        6,2, 1016, "NAN")), arm));
+        6,0.5, -19459, "NAN")), arm));
 
   }
 
