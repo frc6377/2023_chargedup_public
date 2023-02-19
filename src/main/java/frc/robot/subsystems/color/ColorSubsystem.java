@@ -22,8 +22,8 @@ public class ColorSubsystem extends SubsystemBase {
   private boolean lastColor = true;
 
   public ColorSubsystem(int gamePieceID, int gridSelectID, BooleanTopic isCubeTopic) {
-
-    gamePieceCandle = new CANdle(gamePieceID);
+  
+  gamePieceCandle = new CANdle(gamePieceID);
     gridPositionCandle = new CANdle(gridSelectID);
     this.isCubeSubscriber = isCubeTopic.subscribe(true);
     CANdleConfiguration configAll = new CANdleConfiguration();
@@ -43,8 +43,8 @@ public class ColorSubsystem extends SubsystemBase {
 
   public void periodic() {
     periodicCount++;
-    if (runningAnimation && periodicCount % 10 == 0 && periodicCount < 2000) {
-      this.morseCodeAnimation.AdvanceAnimation();
+    if (runningAnimation && periodicCount % 10 == 0 ) {
+      this.morseCodeAnimation.AdvanceAnimation(periodicCount);
     }
 
     if (lastColor != isCubeSubscriber.get()) {
@@ -96,10 +96,17 @@ public class ColorSubsystem extends SubsystemBase {
       1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0
     };
 
-    public void AdvanceAnimation() {
-      if (periodicCount / 10 >= animation.length) periodicCount = 0;
-      if (animation[periodicCount / 10] == 1) writeLEDsGamePiece(RGB.HOWDY_BLUE);
-      else clearLEDsGamePiece();
+    public void AdvanceAnimation(int periodicCount) {
+      //if (periodicCount / 10 >= animation.length) periodicCount = 0;
+      //if (animation[periodicCount / 10] == 1){
+      //  writeLEDsGamePiece(RGB.HOWDY_BLUE);
+      //}
+      if (periodicCount % 100 == 0) {
+        clearLEDsGamePiece();
+      }
+      else {
+        writeLEDsGamePiece(RGB.RainbowThing[(periodicCount / 100) % 6]);
+      }
     }
   }
 
