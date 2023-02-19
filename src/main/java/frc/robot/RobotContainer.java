@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.BooleanTopic;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -50,6 +51,9 @@ public class RobotContainer {
 
   public RobotContainer() {
     deploySubsystem.Log();
+
+    SmartDashboard.putNumber("extension", 0.5);
+    SmartDashboard.putNumber("rotation", 0);
 
     DriverConfig driverConfig = new DriverConfig();
     DoubleSupplier xSupplier =
@@ -177,8 +181,8 @@ public class RobotContainer {
 
 
     retract.whileTrue(Commands.runOnce(() ->arm.setTarget(new ArmPosition(0, 1, -8475, "NAN")), arm));
-    extend.whileTrue(Commands.runOnce(() ->arm.setTarget(new ArmPosition(
-        1,6, -8475, "NAN")), arm));
+    extend.whileTrue(Commands.runOnce(() -> CommandScheduler.getInstance().schedule(Commands.runOnce(() ->arm.setTarget(new ArmPosition(
+        SmartDashboard.getNumber("rotation", 0),SmartDashboard.getNumber("extension", 0.5), -8475, "NAN")), arm))));
 
   }
 

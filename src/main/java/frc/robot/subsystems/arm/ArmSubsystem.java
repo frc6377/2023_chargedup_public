@@ -100,10 +100,10 @@ public class ArmSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
 
-
+    SmartDashboard.putNumber("elevator pos", extendEncoder.getPosition());
     leftShoulder.set(computeShoulderOutput());
     SmartDashboard.putNumber("arb ffw", computeShoulderArbitraryFeetForward());  
-    extendController.setReference(armPosition.armExtension, ControlType.kSmartMotion);
+    extendController.setReference(armPosition.armExtension, ControlType.kSmartMotion, 0, computeElevatorFeedForward(), ArbFFUnits.kVoltage);
 
 
   }
@@ -170,5 +170,12 @@ public class ArmSubsystem extends SubsystemBase {
     double output = shoulderPPC.calculate(thetaFromCANCoder()) + computeShoulderArbitraryFeetForward();
     SmartDashboard.putNumber("shoulder output", output);
     return output;
+  }
+
+  private double computeElevatorFeedForward(){
+    double theta = thetaFromCANCoder(); 
+    double mass = 4.08;
+    double stallLoad = 22.929;
+    return 12*mass*Math.cos(theta)/stallLoad;
   }
 }
