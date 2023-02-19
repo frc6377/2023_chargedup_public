@@ -1,9 +1,6 @@
 package frc.robot.subsystems.arm;
 
-import java.lang.annotation.Target;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
@@ -13,9 +10,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -147,7 +142,7 @@ public class ArmSubsystem extends SubsystemBase {
         / (Constants.STALLED_TORQUE * 2 * Constants.ROTATION_ARM_GEAR_RATIO);
   }
 
-  private double thetaFromCANCoder (){
+  public double thetaFromCANCoder (){
     double rawPos = shoulderCANCoder.getPosition();
     SmartDashboard.putNumber("raw CANcoder", rawPos);
     double theta = Math.toRadians(rawPos*(6.0/16.0));
@@ -170,5 +165,9 @@ public class ArmSubsystem extends SubsystemBase {
     double output = shoulderPPC.calculate(thetaFromCANCoder()) + computeShoulderArbitraryFeetForward();
     SmartDashboard.putNumber("shoulder output", output);
     return output;
+  }
+
+  public double currentArmExtenstion(){
+    return extendEncoder.getPosition() * Math.PI * Constants.CAPSTAN_DIAMETER_METERS + Constants.ARM_LENGTH_AT_ZERO_TICKS_METERS;
   }
 }
