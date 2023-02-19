@@ -182,7 +182,7 @@ public class RobotContainer {
 
     retract.whileTrue(Commands.runOnce(() ->arm.setTarget(new ArmPosition(0, 1, -8475, "NAN")), arm));
     extend.whileTrue(Commands.runOnce(() -> CommandScheduler.getInstance().schedule(Commands.runOnce(() ->arm.setTarget(new ArmPosition(
-        SmartDashboard.getNumber("rotation", 0),SmartDashboard.getNumber("extension", 0.5), -8475, "NAN")), arm))));
+        0.65, 0.5, -8475, "NAN")), arm))));
 
   }
 

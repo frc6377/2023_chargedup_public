@@ -78,10 +78,11 @@ public class ArmSubsystem extends SubsystemBase {
     extendController.setFF(0, 0);
     extendController.setIZone(0, 0);
     extendController.setOutputRange(-1, 1);
-    extendController.setSmartMotionAllowedClosedLoopError(0.1, 0);
+    extendController.setSmartMotionAllowedClosedLoopError(0.2, 0);
     // extendController.setFeedbackDevice(extendEncoder);
     extendController.setSmartMotionMaxAccel(16000, 0);
     extendController.setSmartMotionMaxVelocity(16000, 0);
+    SmartDashboard.putNumber("mass offset", 0);
 
     wristMotor = new WPI_TalonFX(Constants.WRIST_ID);
     wristMotor.configStatorCurrentLimit(
@@ -103,7 +104,7 @@ public class ArmSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("elevator pos", extendEncoder.getPosition());
     leftShoulder.set(computeShoulderOutput());
     SmartDashboard.putNumber("arb ffw", computeShoulderArbitraryFeetForward());  
-    extendController.setReference(armPosition.armExtension, ControlType.kSmartMotion, 0, computeElevatorFeedForward(), ArbFFUnits.kVoltage);
+    extendController.setReference(armPosition.armExtension, ControlType.kSmartMotion, 0, computeElevatorFeedForward(), ArbFFUnits.kPercentOut);
 
 
   }
@@ -174,8 +175,9 @@ public class ArmSubsystem extends SubsystemBase {
 
   private double computeElevatorFeedForward(){
     double theta = thetaFromCANCoder(); 
-    double mass = 4.08;
+    double magicNumberThatMakesItWork = 0.5;
+    double mass = 4.08 - magicNumberThatMakesItWork;
     double stallLoad = 22.929;
-    return 12*mass*Math.cos(theta)/stallLoad;
+    return mass*Math.sin(theta)/stallLoad;
   }
 }
