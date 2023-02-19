@@ -89,7 +89,7 @@ public class RobotContainer {
     Trigger intakeButton = driver.leftTrigger(0.3);
     Trigger shootButton = driver.rightTrigger(0.3);
     Trigger highGearButton = driver.rightBumper();
-    Trigger controlMethod = driver.start();
+    Trigger controlMethod = driver.back();
 
     Trigger gunnerMidButton = gunner.x();
     Trigger driverMidButton = driver.x();
@@ -175,9 +175,10 @@ public class RobotContainer {
     Trigger retract = gunner.leftTrigger(0.3);
     Trigger extend = gunner.a();
 
-    retract.whileTrue(Commands.runOnce(() ->arm.setTarget(new ArmPosition(0, 1, -9099, "NAN")), arm));
+
+    // retract.whileTrue(Commands.runOnce(() ->arm.setTarget(new ArmPosition(0, 1, 7400, "NAN")), arm));
     extend.whileTrue(Commands.runOnce(() ->arm.setTarget(new ArmPosition(
-        6,1, -9099, "NAN")), arm));
+        6,2, 1016, "NAN")), arm));
 
   }
 
