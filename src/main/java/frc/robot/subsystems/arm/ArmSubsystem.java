@@ -12,6 +12,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -33,7 +34,7 @@ public class ArmSubsystem extends SubsystemBase {
   private final SparkMaxPIDController extendController;
 
   private final WPI_TalonFX wristMotor;
-  private ArmPosition armPosition = new ArmPosition(0, 1, -9099, "default");
+  private ArmPosition armPosition = new ArmPosition(0, 1, -8475, "default");
 
   public ArmSubsystem() {
     System.out.println("Starting Construct ArmSubsystem");
@@ -58,7 +59,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     leftShoulderController.setP(0.0005, 0);
     leftShoulderController.setI(0.000, 0);
-    leftShoulderController.setD(0.001, 0);
+    leftShoulderController.setD(0.003, 0);
     leftShoulderController.setIZone(0.000, 0);
     leftShoulderController.setFF(0, 0);
     leftShoulderController.setOutputRange(-1, 1);
@@ -102,7 +103,7 @@ public class ArmSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    leftShoulderController.setReference(armPosition.armRotation, ControlType.kSmartMotion, 0, computeShoulderArbitraryFeetForward());
+    leftShoulderController.setReference(armPosition.armRotation, ControlType.kSmartMotion, 0, computeShoulderArbitraryFeetForward(), ArbFFUnits.kVoltage);
     SmartDashboard.putNumber("arb ffw", computeShoulderArbitraryFeetForward());  
     extendController.setReference(armPosition.armExtension, ControlType.kSmartMotion);
 
@@ -122,13 +123,15 @@ public class ArmSubsystem extends SubsystemBase {
    */
   // TODO: move to I alpha instead of torque
   private double computeShoulderArbitraryFeetForward() {
-    double theta = (leftShoulderEncoder.getPosition()/90) - 8;
+    double theta = Math.toRadians((360*leftShoulderEncoder.getPosition()/90) - 8);
     double centerOfMass = 0.4825;
     double mass = 6.01;
     double gearRatio = 90;
     double numMotors = 2;
     double torque = Math.cos(theta)*9.81*mass*centerOfMass;
-    return 12*torque/(Constants.STALLED_TORQUE*0.85*0.8*gearRatio*numMotors);
+    double out = 12*torque/(Constants.STALLED_TORQUE*0.85*0.8*gearRatio*numMotors);
+    SmartDashboard.putNumber("shoulder arb ffw", out);
+    return out;
   }
 
   public static double rotationArbitraryFeetForward(
