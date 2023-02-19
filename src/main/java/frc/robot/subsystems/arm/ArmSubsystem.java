@@ -123,7 +123,7 @@ public class ArmSubsystem extends SubsystemBase {
   // TODO: move to I alpha instead of torque
   private double computeShoulderArbitraryFeetForward() {
     double theta = thetaFromCANCoder();
-    double centerOfMass = 0.4825;
+    double centerOfMass = computeCenterOfMass();
     double mass = 6.01;
     double gearRatio = 90;
     double numMotors = 2;
@@ -131,6 +131,10 @@ public class ArmSubsystem extends SubsystemBase {
     double out = torque/(Constants.STALLED_TORQUE*0.85*gearRatio*numMotors);
     SmartDashboard.putNumber("shoulder arb ffw", out);
     return out;
+  }
+
+  private double computeCenterOfMass (){
+      return (extendEncoder.getPosition()/12*1.1175) + 0.4825;
   }
 
   public static double rotationArbitraryFeetForward(
