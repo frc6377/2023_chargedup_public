@@ -67,7 +67,7 @@ public class ArmCommand extends CommandBase {
         // Using (R/cos(theta + thetaOffset)) - minimumArmLength
         double denominator = Math.cos(armAngle() + lineThetaOffset);
 
-        return (lineRadius / denominator) - Constants.ARM_LENGTH_AT_ZERO_TICKS_METERS;
+        return Math.max((lineRadius / denominator) - Constants.ARM_LENGTH_AT_ZERO_TICKS_METERS,0);
     }
 
     private double armAngle() {
