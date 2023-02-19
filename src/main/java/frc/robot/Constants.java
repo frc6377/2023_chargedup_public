@@ -27,8 +27,8 @@ public final class Constants {
   public static final int DEGREES_270 = 270;
 
   public static final int DRIVER_CONTROLLER_ID = 0;
-  public static final int GUNNER_CONTROLLER_ID = 2;
-  public static final int STEAM_DECK_ID = 1;
+  public static final int GUNNER_CONTROLLER_ID = 1;
+  public static final int STEAM_DECK_ID = 2;
   // TODO: add real value for the motor ID
   public static final int END_AFFECTOR_ID = 9;
 
@@ -98,17 +98,17 @@ public final class Constants {
   // added new functions from line 83-98 for rotational motor and extension motor.
   // TODO: convert arm rotation values to radians
   // TODO: decide on actual values for arm length, rotation, and wrist rotation values and IDs
-  public static final int ARM_ROTATION_CURRENT_LIMIT = 40;
+  public static final int ARM_ROTATION_CURRENT_LIMIT = 30;
 
-  public static final int ARM_ROTATION_ID_1 = 11;
-  public static final int ARM_ROTATION_ID2 = 12;
+  public static final int LEFT_SHOULDER_ID = 11;
+  public static final int RIGHT_SHOULDER_ID = 13;
 
   public static final double ARM_ROTATION_TICKS_TO_RADIANS =
       Math.PI * 2 / 90; // The arm is geared 90:1
 
-  public static final int ARM_EXTENSION_CURRENT_LIMIT = 40;
+  public static final int ARM_EXTENSION_CURRENT_LIMIT = 100;
 
-  public static final int ARM_EXTENDER_ID = 13;
+  public static final int ARM_EXTENDER_ID = 12;
 
   // This is the Circumference of the pully
   public static final double ARM_EXTENSIONS_TICKS_TO_METERS = 0.0254 * Math.PI;
@@ -164,9 +164,9 @@ public final class Constants {
   public static final double ARM_ROTATION_MAX_ACCELLERATION = 17.64705882;
 
   // Arm Extension
-  public static final double ARM_EXTENSION_KP = 0.99902;
-  public static final double ARM_EXTENSION_MAX_VELOCITY = 15;
-  public static final double ARM_EXTENSION_MAX_ACCELLERATION = 17.64705882;
+  public static final double ARM_EXTENSION_KP = 0.6;
+  public static final double ARM_EXTENSION_MAX_VELOCITY = 15 *0.25;
+  public static final double ARM_EXTENSION_MAX_ACCELLERATION = 17.64705882 *0.25;
 
   // Wrist
   public static final double WRIST_KP = 0.1;

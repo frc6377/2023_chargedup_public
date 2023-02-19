@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.networktables.BooleanPublisher;
@@ -8,14 +9,13 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class EndAffectorSubsystem extends SubsystemBase {
-  CANSparkMax motor;
+  private WPI_TalonFX motor;
   private boolean isCube = true;
   private final BooleanPublisher isCubePublisher;
 
   public EndAffectorSubsystem(int ID, BooleanTopic isCubeTopic) {
-    motor = new CANSparkMax(ID, MotorType.kBrushless);
+    motor = new WPI_TalonFX(ID);
 
-    motor.setSmartCurrentLimit(40);
     isCubePublisher = isCubeTopic.publish();
     isCubePublisher.set(isCube);
   }
