@@ -25,6 +25,7 @@ public class ArmCommand extends CommandBase {
     public ArmCommand(Translation2d targetPosition, double targetWristRotation, ArmSubsystem subsystem) {
         this.subsystem = subsystem;
         this.targetPosition = targetPosition;
+        this.targetWristRotation = targetWristRotation;
     }
 
     /**
