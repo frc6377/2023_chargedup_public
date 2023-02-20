@@ -256,4 +256,5 @@ public final class Constants {
   public static final double CAPSTAN_DIAMETER_METERS = 0.0254;
   public static final double ARM_ALLOWED_ANGLE_ERROR = 0.02;
 public static final double ARM_ALLOWED_EXTENSION_ERROR = 0.0254;
+public static final int BREAK_FALCON_ID = 0;
 }

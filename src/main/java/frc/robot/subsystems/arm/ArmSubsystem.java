@@ -1,8 +1,10 @@
 package frc.robot.subsystems.arm;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.revrobotics.CANSparkMax;
@@ -26,6 +28,7 @@ public class ArmSubsystem extends SubsystemBase {
   private final ProfiledPIDController shoulderPPC;
   private final CANSparkMax rightShoulder;
   private final CANCoder shoulderCANCoder;
+  private final WPI_TalonFX brakeFalcon;
 
   private final CANSparkMax extendMotor;
   private final RelativeEncoder extendEncoder;
@@ -36,6 +39,10 @@ public class ArmSubsystem extends SubsystemBase {
 
   public ArmSubsystem() {
     System.out.println("Starting Construct ArmSubsystem");
+
+    brakeFalcon = new WPI_TalonFX(Constants.BREAK_FALCON_ID);
+    brakeFalcon.setNeutralMode(NeutralMode.Coast);
+    brakeFalcon.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 10, 10, 0));
     
     leftShoulder = new CANSparkMax(Constants.LEFT_SHOULDER_ID, MotorType.kBrushless);
     rightShoulder = new CANSparkMax(Constants.RIGHT_SHOULDER_ID, MotorType.kBrushless);
@@ -57,6 +64,8 @@ public class ArmSubsystem extends SubsystemBase {
 
     shoulderPPC = new ProfiledPIDController(2, 0, 0, new TrapezoidProfile.Constraints(4, 6
     ));
+
+    shoulderPPC.setTolerance(0.02);
 
     rightShoulder.follow(leftShoulder, true);
 
@@ -95,8 +104,19 @@ public class ArmSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
 
+    double shoulderOutput;
 
-    leftShoulder.set(computeShoulderOutput());
+    if (shoulderPPC.atGoal()){
+      shoulderOutput = 0;
+      brakeFalcon.set(ControlMode.PercentOutput, 0.05);
+    }
+
+    else {
+      shoulderOutput = computeShoulderOutput();
+      brakeFalcon.set(ControlMode.PercentOutput, 0);
+    }
+    
+    leftShoulder.set(shoulderOutput);
     SmartDashboard.putNumber("arb ffw", computeShoulderArbitraryFeetForward());  
     extendController.setReference(armPosition.armExtension, ControlType.kSmartMotion);
 
