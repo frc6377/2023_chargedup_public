@@ -6,10 +6,10 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.BooleanTopic;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.ArmCommand;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.SwerveAutoFactory;
 import frc.robot.subsystems.DeploySubsystem;
@@ -51,9 +52,6 @@ public class RobotContainer {
 
   public RobotContainer() {
     deploySubsystem.Log();
-
-    SmartDashboard.putNumber("extension", 0.5);
-    SmartDashboard.putNumber("rotation", 0);
 
     DriverConfig driverConfig = new DriverConfig();
     DoubleSupplier xSupplier =
@@ -180,9 +178,8 @@ public class RobotContainer {
     Trigger extend = gunner.a();
 
 
-    retract.whileTrue(Commands.runOnce(() ->arm.setTarget(new ArmPosition(-0.04, 0.5, -19000, "NAN")), arm));
-    extend.whileTrue(Commands.runOnce(() -> CommandScheduler.getInstance().schedule(Commands.runOnce(() ->arm.setTarget(new ArmPosition(
-        0.65, 0.5, -8475, "NAN")), arm))));
+    retract.whileTrue(Commands.runOnce(() ->arm.setTarget(new ArmPosition(0, 1, -8475, "NAN")), arm));
+    extend.whileTrue(new ArmCommand(new Translation2d(.5,.5), -8475, arm));
 
   }
 
