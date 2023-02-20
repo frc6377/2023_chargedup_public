@@ -28,19 +28,19 @@ public class Pods {
     // Unconfigured, please test and add correct values
     Pods.addPod(
         PodName.F,
-        new PodConstantsBuilder().setEncoderID(11).setEncoderOffset(-Math.toRadians(279.58)));
+        new PodConstantsBuilder().setEncoderID(11).setEncoderOffset(-Math.toRadians(181.9)));
 
     Pods.addPod(
         PodName.G,
-        new PodConstantsBuilder().setEncoderID(13).setEncoderOffset(-Math.toRadians(336.445)));
+        new PodConstantsBuilder().setEncoderID(13).setEncoderOffset(-Math.toRadians(329.9)));
 
     Pods.addPod(
         PodName.H,
-        new PodConstantsBuilder().setEncoderID(15).setEncoderOffset(-Math.toRadians(210.762)));
+        new PodConstantsBuilder().setEncoderID(15).setEncoderOffset(-Math.toRadians(383.0)));
 
     Pods.addPod(
         PodName.E,
-        new PodConstantsBuilder().setEncoderID(9).setEncoderOffset(-Math.toRadians(291.182)));
+        new PodConstantsBuilder().setEncoderID(9).setEncoderOffset(-Math.toRadians(15.3)));
 
     Pods.addPod(
         PodName.J,
