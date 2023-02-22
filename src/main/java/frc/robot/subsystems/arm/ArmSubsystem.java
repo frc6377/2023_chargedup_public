@@ -113,7 +113,9 @@ public class ArmSubsystem extends SubsystemBase {
 
     leftShoulder.set(shoulderOutput);
     SmartDashboard.putNumber("arb ffw", computeShoulderArbitraryFeetForward());
-    extendController.setReference(armPosition.armExtension, ControlType.kPosition);
+    SmartDashboard.putNumber("Extension2 electric boogaloo (encoder pos)", extendEncoder.getPosition());
+
+    extendController.setReference(armPosition.armExtension, ControlType.kSmartMotion);
   }
 
   public void setTarget(ArmPosition armPosition) {

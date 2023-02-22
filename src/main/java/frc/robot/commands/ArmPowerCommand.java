@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.arm.ArmPosition;
@@ -12,10 +13,11 @@ public class ArmPowerCommand extends CommandBase {
   private final PolarPoint targetPose;
   private final ArmSubsystem armSubsystem;
   private final double pow;
+  
 
   public ArmPowerCommand(ArmPosition targetPosition, ArmSubsystem armSubsystem, double pow) {
     this.targetPose =
-        new PolarPoint(targetPosition.getArmRotation(), targetPosition.getArmExtension());
+        new PolarPoint(targetPosition.getArmRotation(), MathUtil.clamp(targetPosition.getArmExtension(), 0, 12));
     this.targetWristAngle = targetPosition.getWristRotation();
     this.armSubsystem = armSubsystem;
     this.pow = pow;
@@ -35,7 +37,7 @@ public class ArmPowerCommand extends CommandBase {
             ? computeExtension()
             : targetPose.r; // math breaks if theta doesnt change
     // System.out.println(armSubsystem.currentArmExtenstion()+ " inital extension "+ initalPose.r);
-    armSubsystem.setTarget(new ArmPosition(targetPose.theta, armExtension, targetWristAngle, ""));
+    armSubsystem.setTarget(new ArmPosition(targetPose.theta, MathUtil.clamp(armExtension, 0, 12), targetWristAngle, ""));
   }
 
   @Override

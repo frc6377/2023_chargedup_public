@@ -178,7 +178,7 @@ public class RobotContainer {
 
     retract.whileTrue(
         Commands.runOnce(() -> arm.setTarget(new ArmPosition(0, 1, -8475, "NAN")), arm));
-    extend.onTrue(new ArmPowerCommand(new ArmPosition(0.65, 2, -8475, "NAN"), arm, 5));
+    extend.onTrue(new ArmPowerCommand(new ArmPosition(0.25, 6., -8475, "NAN"), arm, 5));
   }
 
   public Command getAutonomousCommand() {
