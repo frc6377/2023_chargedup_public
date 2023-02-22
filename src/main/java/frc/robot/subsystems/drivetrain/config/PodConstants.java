@@ -37,7 +37,7 @@ public class PodConstants {
 
       if (error) return null;
 
-      encoderOffset += location.getOffSet();
+      // encoderOffset += location.getOffSet();
       driveMotorID = location.getDriveMotorID();
       steerMotorID = location.getSteerMotorID();
 

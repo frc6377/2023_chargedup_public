@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.BooleanTopic;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.XboxController;
@@ -13,9 +14,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.ArmCommand;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.SwerveAutoFactory;
 import frc.robot.subsystems.DeploySubsystem;
@@ -118,8 +119,7 @@ public class RobotContainer {
 
     drivetrainSubsystem.setDefaultCommand(driveCommand);
 
-    controlMethod.onTrue(
-        Commands.startEnd(driveCommand::toggleDriveType, () -> {}));
+    controlMethod.onTrue(Commands.startEnd(driveCommand::toggleDriveType, () -> {}));
     Trigger driverGoButton = driver.b();
     Trigger driverResetFieldNorth = driver.start();
     Trigger driverToggleGamePieceButton = driver.leftBumper();
@@ -171,15 +171,13 @@ public class RobotContainer {
     highGearButton.whileTrue(
         Commands.startEnd(
             () -> DriveInput.setToHighGear(true), () -> DriveInput.setToHighGear(false)));
-    
+
     Trigger retract = gunner.leftTrigger(0.3);
     Trigger extend = gunner.a();
 
-
-    retract.whileTrue(Commands.runOnce(() ->arm.setTarget(new ArmPosition(0, 1, -8475, "NAN")), arm));
-    extend.whileTrue(Commands.runOnce(() ->arm.setTarget(new ArmPosition(
-        1,6, -8475, "NAN")), arm));
-
+    retract.whileTrue(
+        Commands.runOnce(() -> arm.setTarget(new ArmPosition(0, 1, -8475, "NAN")), arm));
+    extend.whileTrue(new ArmCommand(new Translation2d(.5, .5), -8475, arm));
   }
 
   public Command getAutonomousCommand() {
