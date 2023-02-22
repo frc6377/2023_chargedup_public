@@ -4,19 +4,23 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.arm.ArmPosition;
 import frc.robot.subsystems.arm.ArmSubsystem;
+import java.util.function.Supplier;
 
 public class ArmPowerCommand extends CommandBase {
 
-  private PolarPoint initalPose;
-  private double targetWristAngle;
-  private final PolarPoint targetPose;
+  private final Supplier<ArmPosition> armPositionSupplier;
   private final ArmSubsystem armSubsystem;
   private final double pow;
 
-  public ArmPowerCommand(ArmPosition targetPosition, ArmSubsystem armSubsystem, double pow) {
-    this.targetPose =
-        new PolarPoint(targetPosition.getArmRotation(), targetPosition.getArmExtension());
-    this.targetWristAngle = targetPosition.getWristRotation();
+  private PolarPoint initalPose;
+  private PolarPoint targetPose;
+  private double targetWristAngle;
+
+  public ArmPowerCommand(
+      final Supplier<ArmPosition> armPositionSupplier,
+      final ArmSubsystem armSubsystem,
+      final double pow) {
+    this.armPositionSupplier = armPositionSupplier;
     this.armSubsystem = armSubsystem;
     this.pow = pow;
     addRequirements(armSubsystem);
@@ -26,6 +30,9 @@ public class ArmPowerCommand extends CommandBase {
   public void initialize() {
     initalPose =
         new PolarPoint(armSubsystem.thetaFromCANCoder(), armSubsystem.currentArmExtenstion());
+    final ArmPosition targetPosition = armPositionSupplier.get();
+    targetPose = new PolarPoint(targetPosition.getArmRotation(), targetPosition.getArmRotation());
+    targetWristAngle = targetPosition.getWristRotation();
   }
 
   @Override
