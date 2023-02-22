@@ -142,19 +142,19 @@ public class RobotContainer {
     driverToggleGamePieceButton.toggleOnTrue(
         Commands.runOnce(() -> endAffector.toggleGamePiece(), endAffector));
 
-    gunnerLowButton.toggleOnTrue(
+    gunnerLowButton.onTrue(
         new ArmPowerCommand(
             isCubeSubscriber.get() ? Constants.CUBE_LOW : Constants.CONE_LOW, arm, getBay()));
 
-    gunnerMidButton.toggleOnTrue(
+    gunnerMidButton.onTrue(
         new ArmPowerCommand(
             isCubeSubscriber.get() ? Constants.CUBE_MID : Constants.CONE_MID, arm, getBay()));
 
-    gunnerHighButton.toggleOnTrue(
+    gunnerHighButton.onTrue(
         new ArmPowerCommand(
             isCubeSubscriber.get() ? Constants.CUBE_HIGH : Constants.CONE_HIGH, arm, getBay()));
 
-    gunnerStowedButton.toggleOnTrue(new ArmPowerCommand(Constants.STOWED, arm, getBay()));
+    gunnerStowedButton.onTrue(new ArmPowerCommand(Constants.STOWED, arm, getBay()));
 
     driver
         .povLeft()
