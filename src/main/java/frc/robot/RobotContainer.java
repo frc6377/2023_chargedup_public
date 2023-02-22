@@ -6,7 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.networktables.BooleanTopic;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.XboxController;
@@ -16,12 +16,11 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.ArmCommand;
+import frc.robot.commands.ArmPowerCommand;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.SwerveAutoFactory;
 import frc.robot.subsystems.DeploySubsystem;
 import frc.robot.subsystems.EndAffectorSubsystem;
-import frc.robot.subsystems.arm.ArmPosition;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.color.ColorSubsystem;
 import frc.robot.subsystems.drivetrain.DriveInput;
@@ -42,6 +41,7 @@ public class RobotContainer {
       new CommandXboxController(Constants.GUNNER_CONTROLLER_ID);
   private final ArmSubsystem arm = new ArmSubsystem();
   private final BooleanTopic isCubeTopic;
+  private final BooleanSubscriber isCubeSubscriber;
   private final EndAffectorSubsystem endAffector;
   private final ColorSubsystem colorStrip;
   private final FieldPositioningSystem fieldPositioningSystem = new FieldPositioningSystem();
@@ -66,6 +66,7 @@ public class RobotContainer {
         new DriveInput(driveController::getRightY, driveController::getRightX, driverConfig);
 
     isCubeTopic = NetworkTableInstance.getDefault().getBooleanTopic("isCube");
+    isCubeSubscriber = isCubeTopic.subscribe(true);
     endAffector = new EndAffectorSubsystem(Constants.END_AFFECTOR_ID, isCubeTopic);
     colorStrip =
         new ColorSubsystem(Constants.GAME_PIECE_CANDLE, Constants.GRID_SELECT_CANDLE, isCubeTopic);
@@ -91,9 +92,12 @@ public class RobotContainer {
     Trigger shootButton = driver.rightTrigger(0.3);
     Trigger highGearButton = driver.rightBumper();
     Trigger controlMethod = driver.back();
-
-    Trigger gunnerMidButton = gunner.x();
     Trigger driverMidButton = driver.x();
+
+    Trigger gunnerHighButton = gunner.y();
+    Trigger gunnerMidButton = gunner.b();
+    Trigger gunnerLowButton = gunner.a();
+    Trigger gunnerStowedButton = gunner.x();
 
     DriverConfig driverConfig = new DriverConfig();
     DoubleSupplier xSupplier =
@@ -135,23 +139,22 @@ public class RobotContainer {
                         fieldPositioningSystem.getRobotXYPose().getTranslation(),
                         new Rotation2d(Math.PI)))));
 
-    // This watches for the buttons to be pressed then released,
-    // thereby making the arm extend quickly.
     driverToggleGamePieceButton.toggleOnTrue(
         Commands.runOnce(() -> endAffector.toggleGamePiece(), endAffector));
 
-    shootButton
-        .and(gunnerMidButton.or(driverMidButton).negate())
-        .whileTrue(
-            Commands.startEnd(
-                () -> endAffector.fastOutake(), () -> endAffector.halt(), endAffector));
+    gunnerLowButton.toggleOnTrue(
+        new ArmPowerCommand(
+            isCubeSubscriber.get() ? Constants.CUBE_LOW : Constants.CONE_LOW, arm, getBay()));
 
-    // This watches for the buttons to be pressed and held, thereby making the arm extend slowly.
-    shootButton
-        .and(gunnerMidButton.or(driverMidButton))
-        .whileTrue(
-            Commands.startEnd(
-                () -> endAffector.slowOutake(), () -> endAffector.halt(), endAffector));
+    gunnerMidButton.toggleOnTrue(
+        new ArmPowerCommand(
+            isCubeSubscriber.get() ? Constants.CUBE_MID : Constants.CONE_MID, arm, getBay()));
+
+    gunnerHighButton.toggleOnTrue(
+        new ArmPowerCommand(
+            isCubeSubscriber.get() ? Constants.CUBE_HIGH : Constants.CONE_HIGH, arm, getBay()));
+
+    gunnerStowedButton.toggleOnTrue(new ArmPowerCommand(Constants.STOWED, arm, getBay()));
 
     driver
         .povLeft()
@@ -171,13 +174,6 @@ public class RobotContainer {
     highGearButton.whileTrue(
         Commands.startEnd(
             () -> DriveInput.setToHighGear(true), () -> DriveInput.setToHighGear(false)));
-
-    Trigger retract = gunner.leftTrigger(0.3);
-    Trigger extend = gunner.a();
-
-    retract.whileTrue(
-        Commands.runOnce(() -> arm.setTarget(new ArmPosition(0, 1, -8475, "NAN")), arm));
-    extend.whileTrue(new ArmCommand(new Translation2d(.5, .5), -8475, arm));
   }
 
   public Command getAutonomousCommand() {

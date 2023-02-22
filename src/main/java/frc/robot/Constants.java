@@ -123,9 +123,9 @@ public final class Constants {
   public static final int WRIST_ID = 14;
   // These are in degrees for arm and wrist rotation and meters for extension. The lengths for
   // extension are relative to the minimum arm length.
-  public static final ArmPosition CUBE_PICKUP = new ArmPosition(-10, 0, 15, "CUBE PICKUP");
+  public static final ArmPosition CUBE_LOW = new ArmPosition(-10, 0, 15, "CUBE PICKUP");
 
-  public static final ArmPosition CONE_PICKUP = new ArmPosition(-10, 0, 0, "CONE PICKUP");
+  public static final ArmPosition CONE_LOW = new ArmPosition(-10, 0, 0, "CONE PICKUP");
 
   public static final ArmPosition CUBE_MID =
       new ArmPosition(35, 28 / METERS_TO_INCHES, 0, "CUBE MID");
