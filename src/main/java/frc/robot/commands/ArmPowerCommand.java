@@ -34,7 +34,7 @@ public class ArmPowerCommand extends CommandBase {
         (targetPose.theta != initalPose.theta)
             ? computeExtension()
             : targetPose.r; // math breaks if theta doesnt change
-
+    // System.out.println(armSubsystem.currentArmExtenstion()+ " inital extension "+ initalPose.r);
     armSubsystem.setTarget(new ArmPosition(targetPose.theta, armExtension, targetWristAngle, ""));
   }
 

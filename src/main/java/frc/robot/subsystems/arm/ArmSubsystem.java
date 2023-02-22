@@ -103,7 +103,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     double shoulderOutput;
 
-    if (shoulderPPC.atGoal()) {
+    if (false) {
       shoulderOutput = 0;
       brakeFalcon.set(ControlMode.PercentOutput, 0.05);
     } else {
@@ -113,6 +113,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     leftShoulder.set(shoulderOutput);
     SmartDashboard.putNumber("arb ffw", computeShoulderArbitraryFeetForward());
+    System.out.println("ARRG:"+extendMotor.getOutputCurrent());
     extendController.setReference(armPosition.armExtension, ControlType.kSmartMotion);
   }
 
@@ -160,7 +161,6 @@ public class ArmSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("raw CANcoder", rawPos);
     double theta = Math.toRadians(rawPos * (6.0 / 16.0));
     SmartDashboard.putNumber("shoulder theta", theta);
-    System.out.println("theta " + theta);
     return theta;
   }
 

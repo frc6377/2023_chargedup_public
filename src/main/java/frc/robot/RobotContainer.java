@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.ArmCommand;
+import frc.robot.commands.ArmPowerCommand;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.SwerveAutoFactory;
 import frc.robot.subsystems.DeploySubsystem;
@@ -177,7 +178,7 @@ public class RobotContainer {
 
     retract.whileTrue(
         Commands.runOnce(() -> arm.setTarget(new ArmPosition(0, 1, -8475, "NAN")), arm));
-    extend.whileTrue(new ArmCommand(new Translation2d(.5, .5), -8475, arm));
+    extend.onTrue(new ArmPowerCommand(new ArmPosition(0.65, 2, -8475, "NAN"), arm, 5));
   }
 
   public Command getAutonomousCommand() {
