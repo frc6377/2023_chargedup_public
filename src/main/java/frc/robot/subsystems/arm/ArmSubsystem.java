@@ -113,8 +113,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     leftShoulder.set(shoulderOutput);
     SmartDashboard.putNumber("arb ffw", computeShoulderArbitraryFeetForward());
-    System.out.println("ARRG:"+extendMotor.getOutputCurrent());
-    extendController.setReference(armPosition.armExtension, ControlType.kSmartMotion);
+    extendController.setReference(armPosition.armExtension, ControlType.kPosition);
   }
 
   public void setTarget(ArmPosition armPosition) {
