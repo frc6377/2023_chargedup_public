@@ -14,8 +14,8 @@ public class ArmPowerCommand extends CommandBase {
   private final double pow;
 
   public ArmPowerCommand(ArmPosition targetPosition, ArmSubsystem armSubsystem, double pow) {
-    this.targetPose = new PolarPoint(targetPosition.armRotation, targetPosition.armExtension);
-    this.targetWristAngle = targetPosition.wristRotation;
+    this.targetPose = new PolarPoint(targetPosition.getArmRotation(), targetPosition.getArmExtension());
+    this.targetWristAngle = targetPosition.getWristRotation();
     this.armSubsystem = armSubsystem;
     this.pow = pow;
     addRequirements(armSubsystem);

@@ -21,4 +21,24 @@ public class ArmPosition {
   public String toString() {
     return description;
   }
+
+  public double getArmRotation() {
+    return armRotation;
+  }
+
+  public double getArmExtension() {
+    return armExtension;
+  }
+
+  public double getWristRotation() {
+    return wristRotation;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getDescription() {
+    return description;
+  }
 }
