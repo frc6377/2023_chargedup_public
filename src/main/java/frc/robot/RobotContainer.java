@@ -144,17 +144,19 @@ public class RobotContainer {
 
     gunnerLowButton.onTrue(
         new ArmPowerCommand(
-            isCubeSubscriber.get() ? Constants.CUBE_LOW : Constants.CONE_LOW, arm, getBay()));
+            () -> isCubeSubscriber.get() ? Constants.CUBE_LOW : Constants.CONE_LOW, arm, getBay()));
 
     gunnerMidButton.onTrue(
         new ArmPowerCommand(
-            isCubeSubscriber.get() ? Constants.CUBE_MID : Constants.CONE_MID, arm, getBay()));
+            () -> isCubeSubscriber.get() ? Constants.CUBE_MID : Constants.CONE_MID, arm, getBay()));
 
     gunnerHighButton.onTrue(
         new ArmPowerCommand(
-            isCubeSubscriber.get() ? Constants.CUBE_HIGH : Constants.CONE_HIGH, arm, getBay()));
+            () -> isCubeSubscriber.get() ? Constants.CUBE_HIGH : Constants.CONE_HIGH,
+            arm,
+            getBay()));
 
-    gunnerStowedButton.onTrue(new ArmPowerCommand(Constants.STOWED, arm, getBay()));
+    gunnerStowedButton.onTrue(new ArmPowerCommand(() -> Constants.STOWED, arm, getBay()));
 
     driver
         .povLeft()
