@@ -26,7 +26,10 @@ public class ArmSubsystem extends SubsystemBase {
   private final SparkMaxPIDController leftShoulderController;
   private final ProfiledPIDController shoulderPPC;
   private final CANSparkMax rightShoulder;
+
+  //todo make these WPI_CANCoders. using CANCoder for now because it works and we dont have time for any more testing
   private final CANCoder shoulderCANCoder;
+  private final CANCoder wristCANCoder;
   private final WPI_TalonFX brakeFalcon;
 
   private final CANSparkMax extendMotor;
@@ -47,7 +50,9 @@ public class ArmSubsystem extends SubsystemBase {
     rightShoulder = new CANSparkMax(Constants.RIGHT_SHOULDER_ID, MotorType.kBrushless);
 
     shoulderCANCoder = new CANCoder(20);
-
+    shoulderCANCoder.configMagnetOffset(Constants.CANCODER_OFFSET);
+    shoulderCANCoder.setPositionToAbsolute();
+    
     leftShoulder.restoreFactoryDefaults();
     rightShoulder.restoreFactoryDefaults();
 
@@ -95,6 +100,10 @@ public class ArmSubsystem extends SubsystemBase {
     wristMotor.config_kP(0, Constants.WRIST_KP);
     wristMotor.configMotionAcceleration(Constants.WRIST_MAX_ACCELLERATION);
     wristMotor.configMotionCruiseVelocity(Constants.WRIST_MAX_VELOCITY);
+
+    wristCANCoder = new CANCoder(0);
+    wristCANCoder.configMagnetOffset(Constants.WRIST_CANCODER_OFFSET);
+    wristMotor.setSelectedSensorPosition(wristCANCoderToIntegratedSensor(wristCANCoder.getAbsolutePosition()));
 
     System.out.println("Complete Construct ArmSubsystem");
   }
@@ -197,5 +206,11 @@ public class ArmSubsystem extends SubsystemBase {
     double mass = 4.08 - magicNumberThatMakesItWork;
     double stallLoad = 22.929;
     return mass*Math.sin(theta)/stallLoad;
+  }
+
+  private double wristCANCoderToIntegratedSensor (double theta){
+    theta /= Constants.WRIST_GEAR_RATIO; //output shaft to input shaft
+    theta/=360; //degrees to revs
+    return theta*2048; //revs to ticks
   }
 }
