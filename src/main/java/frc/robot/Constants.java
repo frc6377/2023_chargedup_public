@@ -165,8 +165,8 @@ public final class Constants {
 
   // Arm Extension
   public static final double ARM_EXTENSION_KP = 0.6;
-  public static final double ARM_EXTENSION_MAX_VELOCITY = 15 *0.25;
-  public static final double ARM_EXTENSION_MAX_ACCELLERATION = 17.64705882 *0.25;
+  public static final double ARM_EXTENSION_MAX_VELOCITY = 15 * 0.25;
+  public static final double ARM_EXTENSION_MAX_ACCELLERATION = 17.64705882 * 0.25;
 
   // Wrist
   public static final double WRIST_KP = 0.1;
@@ -255,6 +255,6 @@ public final class Constants {
   public static final Rotation2d DOUBLE_SUB_ROTATION = new Rotation2d(0);
   public static final double CAPSTAN_DIAMETER_METERS = 0.0254;
   public static final double ARM_ALLOWED_ANGLE_ERROR = 0.02;
-public static final double ARM_ALLOWED_EXTENSION_ERROR = 0.0254;
-public static final int BREAK_FALCON_ID = 0;
+  public static final double ARM_ALLOWED_EXTENSION_ERROR = 0.0254;
+  public static final int BREAK_FALCON_ID = 0;
 }
