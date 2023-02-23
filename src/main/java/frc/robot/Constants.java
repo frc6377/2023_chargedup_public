@@ -173,7 +173,7 @@ public final class Constants {
   public static final double WRIST_MAX_VELOCITY = 5000;
   public static final double WRIST_MAX_ACCELLERATION = 5000;
   public static final double WRIST_MOMENT_OF_INERTIA = 0;
-  public static final double WRIST_GEAR_RATIO = 0;
+  public static final double WRIST_GEAR_RATIO = 1.0/41.67;
   public static final double WRIST_ROTATION_STOWED = 0;
 
   /**
@@ -255,8 +255,10 @@ public final class Constants {
   public static final Rotation2d DOUBLE_SUB_ROTATION = new Rotation2d(0);
   public static final double CAPSTAN_DIAMETER_METERS = 0.0254;
   public static final double ARM_ALLOWED_ANGLE_ERROR = 0.02;
-public static final double ARM_ALLOWED_EXTENSION_ERROR = 0.0254;
-public static final int BREAK_FALCON_ID = 0;
-public static final double CANCODER_OFFSET = 0;
-public static final double WRIST_CANCODER_OFFSET = 0;
+  public static final double ARM_ALLOWED_EXTENSION_ERROR = 0.0254;
+  public static final int BREAK_FALCON_ID = 0;
+  public static final double SHOULDER_CANCODER_OFFSET = -160.488;
+
+  public static final int WRIST_CANCODER_ID = 4;
+  public static final double WRIST_CANCODER_OFFSET = 111.709;
 }

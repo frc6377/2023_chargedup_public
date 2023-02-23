@@ -5,7 +5,9 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
+import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -50,8 +52,11 @@ public class ArmSubsystem extends SubsystemBase {
     rightShoulder = new CANSparkMax(Constants.RIGHT_SHOULDER_ID, MotorType.kBrushless);
 
     shoulderCANCoder = new CANCoder(20);
-    shoulderCANCoder.configMagnetOffset(Constants.CANCODER_OFFSET);
+    shoulderCANCoder.configMagnetOffset(Constants.SHOULDER_CANCODER_OFFSET);
+    shoulderCANCoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
+    shoulderCANCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
     shoulderCANCoder.setPositionToAbsolute();
+    shoulderCANCoder.configSensorDirection(false);
     
     leftShoulder.restoreFactoryDefaults();
     rightShoulder.restoreFactoryDefaults();
@@ -101,8 +106,10 @@ public class ArmSubsystem extends SubsystemBase {
     wristMotor.configMotionAcceleration(Constants.WRIST_MAX_ACCELLERATION);
     wristMotor.configMotionCruiseVelocity(Constants.WRIST_MAX_VELOCITY);
 
-    wristCANCoder = new CANCoder(0);
+    wristCANCoder = new CANCoder(Constants.WRIST_CANCODER_ID);
+    wristCANCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
     wristCANCoder.configMagnetOffset(Constants.WRIST_CANCODER_OFFSET);
+    wristCANCoder.configSensorDirection(true);
     wristMotor.setSelectedSensorPosition(wristCANCoderToIntegratedSensor(wristCANCoder.getAbsolutePosition()));
 
     System.out.println("Complete Construct ArmSubsystem");
@@ -126,6 +133,10 @@ public class ArmSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Extension2 electric boogaloo (encoder pos)", extendEncoder.getPosition());
 
     extendController.setReference(armPosition.armExtension, ControlType.kSmartMotion, 0, computeElevatorFeedForward(), ArbFFUnits.kPercentOut);
+
+
+    SmartDashboard.putNumber("Wrist Position (Ticks)", wristMotor.getSelectedSensorPosition());
+    SmartDashboard.putNumber("shoulder 2 electric", Math.toDegrees(thetaFromCANCoder()));
   }
 
   public void setTarget(ArmPosition armPosition) {
