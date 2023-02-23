@@ -9,6 +9,7 @@ import com.ctre.phoenix.sensors.CANCoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -115,7 +116,7 @@ public class ArmSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("arb ffw", computeShoulderArbitraryFeetForward());
     SmartDashboard.putNumber("Extension2 electric boogaloo (encoder pos)", extendEncoder.getPosition());
 
-    extendController.setReference(armPosition.armExtension, ControlType.kSmartMotion);
+    extendController.setReference(armPosition.armExtension, ControlType.kSmartMotion, 0, computeElevatorFeedForward(), ArbFFUnits.kPercentOut);
   }
 
   public void setTarget(ArmPosition armPosition) {
@@ -165,6 +166,10 @@ public class ArmSubsystem extends SubsystemBase {
     return theta;
   }
 
+  public double thetaFromPPC(){
+    return shoulderPPC.getSetpoint().position;
+  }
+
   private double computeWristArbitraryFeetForward() {
     double theta =
         wristMotor.getSelectedSensorPosition() * Constants.WRIST_TICKS_TO_RADIANS
@@ -184,5 +189,13 @@ public class ArmSubsystem extends SubsystemBase {
   public double currentArmExtenstion() {
     return extendEncoder.getPosition() * Math.PI * Constants.CAPSTAN_DIAMETER_METERS
         + Constants.ARM_LENGTH_AT_ZERO_TICKS_METERS;
+  }
+
+  private double computeElevatorFeedForward(){
+    double theta = thetaFromCANCoder(); 
+    double magicNumberThatMakesItWork = 0.5;
+    double mass = 4.08 - magicNumberThatMakesItWork;
+    double stallLoad = 22.929;
+    return mass*Math.sin(theta)/stallLoad;
   }
 }

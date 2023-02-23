@@ -37,12 +37,13 @@ public class ArmPowerCommand extends CommandBase {
             ? computeExtension()
             : targetPose.r; // math breaks if theta doesnt change
     // System.out.println(armSubsystem.currentArmExtenstion()+ " inital extension "+ initalPose.r);
-    armSubsystem.setTarget(new ArmPosition(targetPose.theta, MathUtil.clamp(armExtension, 0, 12), targetWristAngle, ""));
+    //TODO: fix wrist rotation
+    armSubsystem.setTarget(new ArmPosition(targetPose.theta, MathUtil.clamp(armExtension, 0, 12), 13217, ""));
   }
 
   @Override
   public boolean isFinished() {
-    return Math.abs(armSubsystem.thetaFromCANCoder() - targetPose.theta)
+    return Math.abs(armSubsystem.thetaFromPPC() - targetPose.theta)
             < Constants.ARM_ALLOWED_ANGLE_ERROR
         && Math.abs(armSubsystem.currentArmExtenstion() - targetPose.r)
             < Constants.ARM_ALLOWED_EXTENSION_ERROR;
@@ -51,7 +52,7 @@ public class ArmPowerCommand extends CommandBase {
   private double computeExtension() {
 
     // math from https://www.desmos.com/calculator/r6gnd4hvdc
-    double theta = armSubsystem.thetaFromCANCoder();
+    double theta = armSubsystem.thetaFromPPC();
     double thetaRatio = (theta - initalPose.theta) / (targetPose.theta - initalPose.theta);
     double extensionDelta = targetPose.r - initalPose.r;
     return Math.pow(thetaRatio, computePow(extensionDelta)) * extensionDelta + initalPose.r;

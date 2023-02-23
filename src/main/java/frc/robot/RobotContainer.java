@@ -177,9 +177,16 @@ public class RobotContainer {
     Trigger extend = gunner.a();
 
     retract.whileTrue(
-        Commands.runOnce(() -> arm.setTarget(new ArmPosition(0, 1, -8475, "NAN")), arm));
-    extend.onTrue(new ArmPowerCommand(new ArmPosition(0.25, 6., -8475, "NAN"), arm, 5));
-  }
+        Commands.runOnce(() -> arm.setTarget(new ArmPosition(0, 1, 13217, "NAN")), arm));
+
+    // extend.whileTrue(
+    //     Commands.runOnce(() -> arm.setTarget(new ArmPosition(0.25, 1, 13217, "NAN")), arm));
+    
+
+        extend.onTrue(new ArmPowerCommand(new ArmPosition(0.85, 12, -8475, "NAN"), arm, 3));
+
+
+}
 
   public Command getAutonomousCommand() {
     // AutoRoutines should be used to add more auto routines that we'll execute.
