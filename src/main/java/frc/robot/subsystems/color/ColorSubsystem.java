@@ -6,7 +6,6 @@ import com.ctre.phoenix.led.CANdle.LEDStripType;
 import com.ctre.phoenix.led.CANdle.VBatOutputMode;
 import com.ctre.phoenix.led.CANdleConfiguration;
 import com.ctre.phoenix.led.RainbowAnimation;
-
 import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.networktables.BooleanTopic;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -24,8 +23,8 @@ public class ColorSubsystem extends SubsystemBase {
   private final RainbowAnimation rainbowAnimation;
 
   public ColorSubsystem(int gamePieceID, int gridSelectID, BooleanTopic isCubeTopic) {
-  
-  gamePieceCandle = new CANdle(gamePieceID);
+
+    gamePieceCandle = new CANdle(gamePieceID);
     gridPositionCandle = new CANdle(gridSelectID);
     this.isCubeSubscriber = isCubeTopic.subscribe(true);
     CANdleConfiguration configAll = new CANdleConfiguration();
@@ -42,7 +41,7 @@ public class ColorSubsystem extends SubsystemBase {
     clearLEDsGamePiece();
     clearLEDsGridPosition();
 
-    rainbowAnimation = new RainbowAnimation(1, 0.5, 64);;
+    rainbowAnimation = new RainbowAnimation(1, 0.5, 64);
     startRainbowAnimation();
   }
 
