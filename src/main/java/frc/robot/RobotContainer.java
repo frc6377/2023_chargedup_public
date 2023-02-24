@@ -98,6 +98,8 @@ public class RobotContainer {
 
     Trigger gunnerMidButton = gunner.b();
     Trigger gunnerHighButton = gunner.y();
+    Trigger driverStowed = driver.x();
+    Trigger gunnerStowed = gunner.x();
     Trigger driverMidButton = driver.x();
 
     DriverConfig driverConfig = new DriverConfig();
@@ -186,13 +188,15 @@ public class RobotContainer {
     // extend.whileTrue(
     //     Commands.runOnce(() -> arm.setTarget(new ArmPosition(0.25, 1, 13217, "NAN")), arm));
     
-
-        extend.and(this::isCube).onTrue(new ArmPowerCommand(Constants.LOW_CUBE_ARM_POSITION, arm, 3));
-        extend.and(this::isntCube).onTrue(new ArmPowerCommand(Constants.LOW_CONE_ARM_POSITION, arm, 3));
-        gunnerMidButton.and(this::isCube).onTrue(new ArmPowerCommand(Constants.MID_CUBE_ARM_POSITION, arm, 3));
-        gunnerMidButton.and(this::isntCube).onTrue(new ArmPowerCommand(Constants.MID_CONE_ARM_POSITION, arm, 3));
-        gunnerHighButton.and(this::isCube).onTrue(new ArmPowerCommand(Constants.HIGH_CUBE_ARM_POSITION, arm, 3));
-        gunnerHighButton.and(this::isntCube).onTrue(new ArmPowerCommand(Constants.HIGH_CONE_ARM_POSITION, arm, 3));
+    gunnerStowed.onTrue(new ArmPowerCommand(Constants.STOWED_ARM_POSITION, arm, 3));
+    driverStowed.onTrue(new ArmPowerCommand(Constants.STOWED_ARM_POSITION, arm, 3));
+      
+    extend.and(this::isCube).onTrue(new ArmPowerCommand(Constants.LOW_CUBE_ARM_POSITION, arm, 3));
+    extend.and(this::isntCube).onTrue(new ArmPowerCommand(Constants.LOW_CONE_ARM_POSITION, arm, 3));
+    gunnerMidButton.and(this::isCube).onTrue(new ArmPowerCommand(Constants.MID_CUBE_ARM_POSITION, arm, 3));
+    gunnerMidButton.and(this::isntCube).onTrue(new ArmPowerCommand(Constants.MID_CONE_ARM_POSITION, arm, 3));
+    gunnerHighButton.and(this::isCube).onTrue(new ArmPowerCommand(Constants.HIGH_CUBE_ARM_POSITION, arm, 3));
+    gunnerHighButton.and(this::isntCube).onTrue(new ArmPowerCommand(Constants.HIGH_CONE_ARM_POSITION, arm, 3));
 
 
 

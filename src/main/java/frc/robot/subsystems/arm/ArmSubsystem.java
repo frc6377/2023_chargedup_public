@@ -129,7 +129,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     leftShoulder.set(shoulderOutput);
-    SmartDashboard.putNumber("arb ffw", computeShoulderArbitraryFeetForward());
+    SmartDashboard.putNumber("arb ffw", computeShoulderArbitraryFeedForward());
     SmartDashboard.putNumber("Extension2 electric boogaloo (encoder pos)", extendEncoder.getPosition());
 
     extendController.setReference(armPosition.armExtension, ControlType.kSmartMotion, 0, computeElevatorFeedForward(), ArbFFUnits.kPercentOut);
@@ -152,10 +152,10 @@ public class ArmSubsystem extends SubsystemBase {
    * @return The power needed to keep the arme stable, in ?electrical output units?.
    */
   // TODO: move to I alpha instead of torque
-  private double computeShoulderArbitraryFeetForward() {
+  private double computeShoulderArbitraryFeedForward() {
     double theta = thetaFromCANCoder();
     double centerOfMass = computeCenterOfMass();
-    double mass = 6.01;
+    double mass = 3.63;
     double gearRatio = 90;
     double numMotors = 2;
     double torque = Math.cos(theta) * 9.81 * mass * centerOfMass;
@@ -201,7 +201,7 @@ public class ArmSubsystem extends SubsystemBase {
 
   private double computeShoulderOutput() {
     double output =
-        shoulderPPC.calculate(thetaFromCANCoder()) + computeShoulderArbitraryFeetForward();
+        shoulderPPC.calculate(thetaFromCANCoder()) + computeShoulderArbitraryFeedForward();
     SmartDashboard.putNumber("shoulder output", output);
     return output;
   }

@@ -254,7 +254,7 @@ public final class Constants {
   public static final Rotation2d DELIVERY_ROTATION = new Rotation2d(Math.PI);
   public static final Rotation2d DOUBLE_SUB_ROTATION = new Rotation2d(0);
   public static final double CAPSTAN_DIAMETER_METERS = 0.0254;
-  public static final double ARM_ALLOWED_ANGLE_ERROR = 0.02;
+  public static final double ARM_ALLOWED_ANGLE_ERROR = 0.001;
   public static final double ARM_ALLOWED_EXTENSION_ERROR = 0.0254;
   public static final int BREAK_FALCON_ID = 0;
   public static final double SHOULDER_CANCODER_OFFSET = -160.488;
@@ -262,11 +262,12 @@ public final class Constants {
   public static final int WRIST_CANCODER_ID = 4;
   public static final double WRIST_CANCODER_OFFSET = 111.709;
 
-  public static final ArmPosition LOW_CUBE_ARM_POSITION = new ArmPosition(Math.toRadians(-6), 1, -1000, "");
-  public static final ArmPosition LOW_CONE_ARM_POSITION = new ArmPosition(Math.toRadians(-6), 1, -7000, "");
-  public static final ArmPosition MID_CUBE_ARM_POSITION = new ArmPosition(0.65, 6, 0, "");
-  public static final ArmPosition MID_CONE_ARM_POSITION = new ArmPosition(0.65, 6, -8000, "");
-  public static final ArmPosition HIGH_CUBE_ARM_POSITION = new ArmPosition(0.75, 9, 0, "");
-  public static final ArmPosition HIGH_CONE_ARM_POSITION = new ArmPosition(0.75, 9, -8000, "");
+  public static final ArmPosition STOWED_ARM_POSITION    = new ArmPosition(Math.toRadians(-6.3), 1, 5000, "");
+  public static final ArmPosition LOW_CUBE_ARM_POSITION  = new ArmPosition(Math.toRadians(-3), 1, -1000, "");
+  public static final ArmPosition LOW_CONE_ARM_POSITION  = new ArmPosition(Math.toRadians(-6.3), 1, -7500, "");
+  public static final ArmPosition MID_CUBE_ARM_POSITION  = new ArmPosition(0.65, 6, 0, "");
+  public static final ArmPosition MID_CONE_ARM_POSITION  = new ArmPosition(Math.toRadians(40.275879), 6.8, -13887, "");
+  public static final ArmPosition HIGH_CUBE_ARM_POSITION = new ArmPosition(0.75, 11, 0, "");
+  public static final ArmPosition HIGH_CONE_ARM_POSITION = new ArmPosition(Math.toRadians(38.957520), 12.3, -13880, "");
 
 }
