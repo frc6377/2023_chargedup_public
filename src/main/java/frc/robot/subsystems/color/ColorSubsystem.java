@@ -9,6 +9,7 @@ import com.ctre.phoenix.led.RainbowAnimation;
 import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.networktables.BooleanTopic;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class ColorSubsystem extends SubsystemBase {
   private final CANdle gamePieceCandle;
@@ -41,8 +42,7 @@ public class ColorSubsystem extends SubsystemBase {
     clearLEDsGamePiece();
     clearLEDsGridPosition();
 
-    rainbowAnimation = new RainbowAnimation(1, 0.5, 64);
-    startRainbowAnimation();
+    rainbowAnimation = new RainbowAnimation(1, Constants.RAINBOW_ANIMATION_SPEED, 64);
   }
 
   public void startRainbowAnimation() {
