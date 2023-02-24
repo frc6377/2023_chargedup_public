@@ -190,6 +190,14 @@ public class RobotContainer {
     return 8 - (grid + (selected % 9 % 3)); // if we are in the "1, 2, or 3" bays per grid
   }
 
+  public void onDisabled() {
+    colorStrip.startRainbowAnimation();
+  }
+
+  public void onExitDisabled() {
+    colorStrip.stopRainbowAnimation();
+  }
+
   private boolean isDriving() {
     return 0.5 < Math.hypot(driveController.getLeftX(), driveController.getLeftY());
   }

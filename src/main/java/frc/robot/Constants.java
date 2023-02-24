@@ -257,4 +257,7 @@ public final class Constants {
   public static final double ARM_ALLOWED_ANGLE_ERROR = 0.02;
   public static final double ARM_ALLOWED_EXTENSION_ERROR = 0.0254;
   public static final int BREAK_FALCON_ID = 0;
+
+  // A value between 0 and 1.
+  public static final double RAINBOW_ANIMATION_SPEED = 0.5;
 }
