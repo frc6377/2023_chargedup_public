@@ -187,9 +187,6 @@ public class RobotContainer {
     //     Commands.runOnce(() -> arm.setTarget(new ArmPosition(0.25, 1, 13217, "NAN")), arm));
     
 
-        extend.onTrue(new ArmPowerCommand(new ArmPosition(0.65, 6, 0, "NAN"), arm, 3));
-
-
         extend.and(this::isCube).onTrue(new ArmPowerCommand(Constants.LOW_CUBE_ARM_POSITION, arm, 3));
         extend.and(this::isntCube).onTrue(new ArmPowerCommand(Constants.LOW_CONE_ARM_POSITION, arm, 3));
         gunnerMidButton.and(this::isCube).onTrue(new ArmPowerCommand(Constants.MID_CUBE_ARM_POSITION, arm, 3));

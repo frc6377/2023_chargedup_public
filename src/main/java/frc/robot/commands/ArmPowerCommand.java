@@ -38,7 +38,7 @@ public class ArmPowerCommand extends CommandBase {
             : targetPose.r; // math breaks if theta doesnt change
     // System.out.println(armSubsystem.currentArmExtenstion()+ " inital extension "+ initalPose.r);
     //TODO: fix wrist rotation
-    armSubsystem.setTarget(new ArmPosition(targetPose.theta, MathUtil.clamp(armExtension, 0, 12), 0, ""));
+    armSubsystem.setTarget(new ArmPosition(targetPose.theta, MathUtil.clamp(armExtension, 0, 12), targetWristAngle, ""));
   }
 
   @Override
