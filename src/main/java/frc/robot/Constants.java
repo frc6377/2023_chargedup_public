@@ -261,4 +261,12 @@ public final class Constants {
 
   public static final int WRIST_CANCODER_ID = 4;
   public static final double WRIST_CANCODER_OFFSET = 111.709;
+
+  public static final ArmPosition LOW_CUBE_ARM_POSITION = new ArmPosition(Math.toRadians(-6), 1, -1000, "");
+  public static final ArmPosition LOW_CONE_ARM_POSITION = new ArmPosition(Math.toRadians(-6), 1, -7000, "");
+  public static final ArmPosition MID_CUBE_ARM_POSITION = new ArmPosition(0.65, 6, 0, "");
+  public static final ArmPosition MID_CONE_ARM_POSITION = new ArmPosition(0.65, 6, -8000, "");
+  public static final ArmPosition HIGH_CUBE_ARM_POSITION = new ArmPosition(0.75, 9, 0, "");
+  public static final ArmPosition HIGH_CONE_ARM_POSITION = new ArmPosition(0.75, 9, -8000, "");
+
 }

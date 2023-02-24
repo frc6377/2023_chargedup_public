@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.networktables.BooleanTopic;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.XboxController;
@@ -43,6 +44,7 @@ public class RobotContainer {
       new CommandXboxController(Constants.GUNNER_CONTROLLER_ID);
   private final ArmSubsystem arm = new ArmSubsystem();
   private final BooleanTopic isCubeTopic;
+  private final BooleanSubscriber cubeSub;
   private final EndAffectorSubsystem endAffector;
   private final ColorSubsystem colorStrip;
   private final FieldPositioningSystem fieldPositioningSystem = new FieldPositioningSystem();
@@ -67,6 +69,7 @@ public class RobotContainer {
         new DriveInput(driveController::getRightY, driveController::getRightX, driverConfig);
 
     isCubeTopic = NetworkTableInstance.getDefault().getBooleanTopic("isCube");
+    cubeSub = isCubeTopic.subscribe(false);
     endAffector = new EndAffectorSubsystem(Constants.END_AFFECTOR_ID, isCubeTopic);
     colorStrip =
         new ColorSubsystem(Constants.GAME_PIECE_CANDLE, Constants.GRID_SELECT_CANDLE, isCubeTopic);
@@ -93,7 +96,8 @@ public class RobotContainer {
     Trigger highGearButton = driver.rightBumper();
     Trigger controlMethod = driver.back();
 
-    Trigger gunnerMidButton = gunner.x();
+    Trigger gunnerMidButton = gunner.b();
+    Trigger gunnerHighButton = gunner.y();
     Trigger driverMidButton = driver.x();
 
     DriverConfig driverConfig = new DriverConfig();
@@ -186,6 +190,15 @@ public class RobotContainer {
         extend.onTrue(new ArmPowerCommand(new ArmPosition(0.65, 6, 0, "NAN"), arm, 3));
 
 
+        extend.and(this::isCube).onTrue(new ArmPowerCommand(Constants.LOW_CUBE_ARM_POSITION, arm, 3));
+        extend.and(this::isntCube).onTrue(new ArmPowerCommand(Constants.LOW_CONE_ARM_POSITION, arm, 3));
+        gunnerMidButton.and(this::isCube).onTrue(new ArmPowerCommand(Constants.MID_CUBE_ARM_POSITION, arm, 3));
+        gunnerMidButton.and(this::isntCube).onTrue(new ArmPowerCommand(Constants.MID_CONE_ARM_POSITION, arm, 3));
+        gunnerHighButton.and(this::isCube).onTrue(new ArmPowerCommand(Constants.HIGH_CUBE_ARM_POSITION, arm, 3));
+        gunnerHighButton.and(this::isntCube).onTrue(new ArmPowerCommand(Constants.HIGH_CONE_ARM_POSITION, arm, 3));
+
+
+
 }
 
   public Command getAutonomousCommand() {
@@ -202,5 +215,13 @@ public class RobotContainer {
 
   private boolean isDriving() {
     return 0.5 < Math.hypot(driveController.getLeftX(), driveController.getLeftY());
+  }
+
+  private boolean isCube(){
+    return cubeSub.get();
+  }
+
+  private boolean isntCube(){
+    return !cubeSub.get();
   }
 }
