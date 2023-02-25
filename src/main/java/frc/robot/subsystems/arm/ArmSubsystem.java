@@ -11,9 +11,9 @@ import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -29,7 +29,8 @@ public class ArmSubsystem extends SubsystemBase {
   private final ProfiledPIDController shoulderPPC;
   private final CANSparkMax rightShoulder;
 
-  //todo make these WPI_CANCoders. using CANCoder for now because it works and we dont have time for any more testing
+  // todo make these WPI_CANCoders. using CANCoder for now because it works and we dont have time
+  // for any more testing
   private final CANCoder shoulderCANCoder;
   private final CANCoder wristCANCoder;
   private final WPI_TalonFX brakeFalcon;
@@ -57,7 +58,7 @@ public class ArmSubsystem extends SubsystemBase {
     shoulderCANCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
     shoulderCANCoder.setPositionToAbsolute();
     shoulderCANCoder.configSensorDirection(false);
-    
+
     leftShoulder.restoreFactoryDefaults();
     rightShoulder.restoreFactoryDefaults();
 
@@ -110,7 +111,8 @@ public class ArmSubsystem extends SubsystemBase {
     wristCANCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
     wristCANCoder.configMagnetOffset(Constants.WRIST_CANCODER_OFFSET);
     wristCANCoder.configSensorDirection(true);
-    wristMotor.setSelectedSensorPosition(wristCANCoderToIntegratedSensor(wristCANCoder.getAbsolutePosition()));
+    wristMotor.setSelectedSensorPosition(
+        wristCANCoderToIntegratedSensor(wristCANCoder.getAbsolutePosition()));
 
     System.out.println("Complete Construct ArmSubsystem");
   }
@@ -130,10 +132,15 @@ public class ArmSubsystem extends SubsystemBase {
 
     leftShoulder.set(shoulderOutput);
     SmartDashboard.putNumber("arb ffw", computeShoulderArbitraryFeedForward());
-    SmartDashboard.putNumber("Extension2 electric boogaloo (encoder pos)", extendEncoder.getPosition());
+    SmartDashboard.putNumber(
+        "Extension2 electric boogaloo (encoder pos)", extendEncoder.getPosition());
 
-    extendController.setReference(armPosition.armExtension, ControlType.kSmartMotion, 0, computeElevatorFeedForward(), ArbFFUnits.kPercentOut);
-
+    extendController.setReference(
+        armPosition.armExtension,
+        ControlType.kSmartMotion,
+        0,
+        computeElevatorFeedForward(),
+        ArbFFUnits.kPercentOut);
 
     SmartDashboard.putNumber("Wrist Position (Ticks)", wristMotor.getSelectedSensorPosition());
     SmartDashboard.putNumber("shoulder 2 electric", Math.toDegrees(thetaFromCANCoder()));
@@ -186,7 +193,7 @@ public class ArmSubsystem extends SubsystemBase {
     return theta;
   }
 
-  public double thetaFromPPC(){
+  public double thetaFromPPC() {
     return shoulderPPC.getSetpoint().position;
   }
 
@@ -210,18 +217,18 @@ public class ArmSubsystem extends SubsystemBase {
     return extendEncoder.getPosition() * Math.PI * Constants.CAPSTAN_DIAMETER_METERS
         + Constants.ARM_LENGTH_AT_ZERO_TICKS_METERS;
   }
-  
-  private double computeElevatorFeedForward(){
-    double theta = thetaFromCANCoder(); 
+
+  private double computeElevatorFeedForward() {
+    double theta = thetaFromCANCoder();
     double magicNumberThatMakesItWork = 0.5;
     double mass = 4.08 - magicNumberThatMakesItWork;
     double stallLoad = 22.929;
-    return mass*Math.sin(theta)/stallLoad;
+    return mass * Math.sin(theta) / stallLoad;
   }
 
-  private double wristCANCoderToIntegratedSensor (double theta){
-    theta /= Constants.WRIST_GEAR_RATIO; //output shaft to input shaft
-    theta/=360; //degrees to revs
-    return theta*2048; //revs to ticks
+  private double wristCANCoderToIntegratedSensor(double theta) {
+    theta /= Constants.WRIST_GEAR_RATIO; // output shaft to input shaft
+    theta /= 360; // degrees to revs
+    return theta * 2048; // revs to ticks
   }
 }

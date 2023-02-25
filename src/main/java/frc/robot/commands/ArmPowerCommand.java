@@ -5,20 +5,27 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.arm.ArmPosition;
 import frc.robot.subsystems.arm.ArmSubsystem;
+import java.util.function.Supplier;
 
 public class ArmPowerCommand extends CommandBase {
 
-  private PolarPoint initalPose;
-  private double targetWristAngle;
-  private final PolarPoint targetPose;
+  private final Supplier<ArmPosition> armPositionSupplier;
   private final ArmSubsystem armSubsystem;
   private final double pow;
-  
 
-  public ArmPowerCommand(ArmPosition targetPosition, ArmSubsystem armSubsystem, double pow) {
-    this.targetPose =
-        new PolarPoint(targetPosition.getArmRotation(), MathUtil.clamp(targetPosition.getArmExtension(), 0, 12));
-    this.targetWristAngle = targetPosition.getWristRotation();
+  private PolarPoint initialPose;
+  private PolarPoint targetPose;
+  private double targetWristAngle;
+
+  public ArmPowerCommand(
+      final Supplier<ArmPosition> armPositionSupplier,
+      final ArmSubsystem armSubsystem,
+      final double pow) {
+    // this.targetPose =
+    //    new PolarPoint(targetPosition.getArmRotation(),
+    // MathUtil.clamp(targetPosition.getArmExtension(), 0, 12));
+    // this.targetWristAngle = targetPosition.getWristRotation();
+    this.armPositionSupplier = armPositionSupplier;
     this.armSubsystem = armSubsystem;
     this.pow = pow;
     addRequirements(armSubsystem);
@@ -26,19 +33,21 @@ public class ArmPowerCommand extends CommandBase {
 
   @Override
   public void initialize() {
-    initalPose =
+    initialPose =
         new PolarPoint(armSubsystem.thetaFromCANCoder(), armSubsystem.currentArmExtenstion());
   }
 
   @Override
   public void execute() {
     double armExtension =
-        (targetPose.theta != initalPose.theta)
+        (targetPose.theta != initialPose.theta)
             ? computeExtension()
             : targetPose.r; // math breaks if theta doesnt change
     // System.out.println(armSubsystem.currentArmExtenstion()+ " inital extension "+ initalPose.r);
-    //TODO: fix wrist rotation
-    armSubsystem.setTarget(new ArmPosition(targetPose.theta, MathUtil.clamp(armExtension, 0, 12), targetWristAngle, ""));
+    // TODO: fix wrist rotation
+    armSubsystem.setTarget(
+        new ArmPosition(
+            targetPose.theta, MathUtil.clamp(armExtension, 0, 12), targetWristAngle, ""));
   }
 
   @Override
@@ -53,9 +62,9 @@ public class ArmPowerCommand extends CommandBase {
 
     // math from https://www.desmos.com/calculator/r6gnd4hvdc
     double theta = armSubsystem.thetaFromPPC();
-    double thetaRatio = (theta - initalPose.theta) / (targetPose.theta - initalPose.theta);
-    double extensionDelta = targetPose.r - initalPose.r;
-    return Math.pow(thetaRatio, computePow(extensionDelta)) * extensionDelta + initalPose.r;
+    double thetaRatio = (theta - initialPose.theta) / (targetPose.theta - initialPose.theta);
+    double extensionDelta = targetPose.r - initialPose.r;
+    return Math.pow(thetaRatio, computePow(extensionDelta)) * extensionDelta + initialPose.r;
   }
 
   private double computePow(double extensionDelta) {

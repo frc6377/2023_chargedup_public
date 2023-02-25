@@ -6,7 +6,6 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.networktables.BooleanTopic;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -17,7 +16,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.ArmCommand;
 import frc.robot.commands.ArmPowerCommand;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.SwerveAutoFactory;
@@ -97,12 +95,6 @@ public class RobotContainer {
 
     Trigger gunnerMidButton = gunner.b();
     Trigger gunnerHighButton = gunner.y();
-    Trigger driverStowed = driver.x();
-    Trigger gunnerStowed = gunner.x();
-    Trigger driverMidButton = driver.x();
-
-    Trigger gunnerHighButton = gunner.y();
-    Trigger gunnerMidButton = gunner.b();
     Trigger gunnerLowButton = gunner.a();
     Trigger gunnerStowedButton = gunner.x();
 
@@ -138,6 +130,9 @@ public class RobotContainer {
     intakeButton.whileTrue(
         Commands.startEnd(() -> endAffector.intake(), () -> endAffector.idle(), endAffector));
 
+    shootButton.whileTrue(
+        Commands.startEnd(() -> endAffector.fastOutake(), () -> endAffector.idle(), endAffector));
+
     driverResetFieldNorth.whileTrue(
         new InstantCommand(
             () ->
@@ -151,17 +146,15 @@ public class RobotContainer {
 
     gunnerLowButton.onTrue(
         new ArmPowerCommand(
-            () -> isCubeSubscriber.get() ? Constants.CUBE_LOW : Constants.CONE_LOW, arm, getBay()));
+            () -> cubeSub.get() ? Constants.CUBE_LOW : Constants.CONE_LOW, arm, getBay()));
 
     gunnerMidButton.onTrue(
         new ArmPowerCommand(
-            () -> isCubeSubscriber.get() ? Constants.CUBE_MID : Constants.CONE_MID, arm, getBay()));
+            () -> cubeSub.get() ? Constants.CUBE_MID : Constants.CONE_MID, arm, getBay()));
 
     gunnerHighButton.onTrue(
         new ArmPowerCommand(
-            () -> isCubeSubscriber.get() ? Constants.CUBE_HIGH : Constants.CONE_HIGH,
-            arm,
-            getBay()));
+            () -> cubeSub.get() ? Constants.CUBE_HIGH : Constants.CONE_HIGH, arm, getBay()));
 
     gunnerStowedButton.onTrue(new ArmPowerCommand(() -> Constants.STOWED, arm, getBay()));
 
@@ -183,29 +176,7 @@ public class RobotContainer {
     highGearButton.whileTrue(
         Commands.startEnd(
             () -> DriveInput.setToHighGear(true), () -> DriveInput.setToHighGear(false)));
-
-    Trigger retract = gunner.leftTrigger(0.3);
-    Trigger extend = gunner.a();
-
-    retract.whileTrue(
-        Commands.runOnce(() -> arm.setTarget(new ArmPosition(0, 1, 0, "NAN")), arm));
-
-    // extend.whileTrue(
-    //     Commands.runOnce(() -> arm.setTarget(new ArmPosition(0.25, 1, 13217, "NAN")), arm));
-    
-    gunnerStowed.onTrue(new ArmPowerCommand(Constants.STOWED_ARM_POSITION, arm, 3));
-    driverStowed.onTrue(new ArmPowerCommand(Constants.STOWED_ARM_POSITION, arm, 3));
-      
-    extend.and(this::isCube).onTrue(new ArmPowerCommand(Constants.LOW_CUBE_ARM_POSITION, arm, 3));
-    extend.and(this::isntCube).onTrue(new ArmPowerCommand(Constants.LOW_CONE_ARM_POSITION, arm, 3));
-    gunnerMidButton.and(this::isCube).onTrue(new ArmPowerCommand(Constants.MID_CUBE_ARM_POSITION, arm, 3));
-    gunnerMidButton.and(this::isntCube).onTrue(new ArmPowerCommand(Constants.MID_CONE_ARM_POSITION, arm, 3));
-    gunnerHighButton.and(this::isCube).onTrue(new ArmPowerCommand(Constants.HIGH_CUBE_ARM_POSITION, arm, 3));
-    gunnerHighButton.and(this::isntCube).onTrue(new ArmPowerCommand(Constants.HIGH_CONE_ARM_POSITION, arm, 3));
-
-
-
-}
+  }
 
   public Command getAutonomousCommand() {
     // AutoRoutines should be used to add more auto routines that we'll execute.
@@ -229,13 +200,5 @@ public class RobotContainer {
 
   private boolean isDriving() {
     return 0.5 < Math.hypot(driveController.getLeftX(), driveController.getLeftY());
-  }
-
-  private boolean isCube(){
-    return cubeSub.get();
-  }
-
-  private boolean isntCube(){
-    return !cubeSub.get();
   }
 }

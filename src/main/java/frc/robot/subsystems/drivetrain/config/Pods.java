@@ -27,7 +27,6 @@ public class Pods {
 
     // Unconfigured, please test and add correct values
     Pods.addPod(
-
         PodName.F,
         new PodConstantsBuilder().setEncoderID(11).setEncoderOffset(-Math.toRadians(14.150)));
 

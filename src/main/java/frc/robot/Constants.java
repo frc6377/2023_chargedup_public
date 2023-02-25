@@ -173,7 +173,7 @@ public final class Constants {
   public static final double WRIST_MAX_VELOCITY = 5000;
   public static final double WRIST_MAX_ACCELLERATION = 5000;
   public static final double WRIST_MOMENT_OF_INERTIA = 0;
-  public static final double WRIST_GEAR_RATIO = 1.0/41.67;
+  public static final double WRIST_GEAR_RATIO = 1.0 / 41.67;
   public static final double WRIST_ROTATION_STOWED = 0;
 
   /**
@@ -262,12 +262,20 @@ public final class Constants {
   public static final int WRIST_CANCODER_ID = 4;
   public static final double WRIST_CANCODER_OFFSET = 111.709;
 
-  public static final ArmPosition STOWED_ARM_POSITION    = new ArmPosition(Math.toRadians(-6.3), 1, 8000, "");
-  public static final ArmPosition LOW_CUBE_ARM_POSITION  = new ArmPosition(Math.toRadians(-6.3), 1, 2000, "");
-  public static final ArmPosition LOW_CONE_ARM_POSITION  = new ArmPosition(Math.toRadians(-6.3), 1, -7500, "");
-  public static final ArmPosition MID_CUBE_ARM_POSITION  = new ArmPosition(0.65, 6, 0, "");
-  public static final ArmPosition MID_CONE_ARM_POSITION  = new ArmPosition(Math.toRadians(40.275879), 6.8, -13887, "");
+  public static final ArmPosition STOWED_ARM_POSITION =
+      new ArmPosition(Math.toRadians(-6.3), 1, 8000, "");
+  public static final ArmPosition LOW_CUBE_ARM_POSITION =
+      new ArmPosition(Math.toRadians(-6.3), 1, 2000, "");
+  public static final ArmPosition LOW_CONE_ARM_POSITION =
+      new ArmPosition(Math.toRadians(-6.3), 1, -7500, "");
+  public static final ArmPosition MID_CUBE_ARM_POSITION = new ArmPosition(0.65, 6, 0, "");
+  public static final ArmPosition MID_CONE_ARM_POSITION =
+      new ArmPosition(Math.toRadians(40.275879), 6.8, -13887, "");
   public static final ArmPosition HIGH_CUBE_ARM_POSITION = new ArmPosition(0.75, 11, 0, "");
-  public static final ArmPosition HIGH_CONE_ARM_POSITION = new ArmPosition(Math.toRadians(38.957520), 12.3, -13880, "");
+  public static final ArmPosition HIGH_CONE_ARM_POSITION =
+      new ArmPosition(Math.toRadians(38.957520), 12.3, -13880, "");
 
+  /** Lighting configuration */
+  // Animation speed is a value between 0 and 1.
+  public static final double RAINBOW_ANIMATION_SPEED = 0.5;
 }
