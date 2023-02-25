@@ -210,7 +210,7 @@ public class ArmSubsystem extends SubsystemBase {
     return extendEncoder.getPosition() * Math.PI * Constants.CAPSTAN_DIAMETER_METERS
         + Constants.ARM_LENGTH_AT_ZERO_TICKS_METERS;
   }
-
+  
   private double computeElevatorFeedForward(){
     double theta = thetaFromCANCoder(); 
     double magicNumberThatMakesItWork = 0.5;

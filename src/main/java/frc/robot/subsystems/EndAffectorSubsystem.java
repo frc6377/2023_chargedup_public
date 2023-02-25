@@ -18,6 +18,7 @@ public class EndAffectorSubsystem extends SubsystemBase {
     isCubePublisher.set(isCube);
   }
 
+  // Driver will only use toggleGamePiece; will not use set{Cone|Cube}
   public void toggleGamePiece() {
     isCube = !isCube;
     isCubePublisher.set(isCube);

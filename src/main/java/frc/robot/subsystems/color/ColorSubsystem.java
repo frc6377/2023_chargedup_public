@@ -5,9 +5,11 @@ import com.ctre.phoenix.led.CANdle;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
 import com.ctre.phoenix.led.CANdle.VBatOutputMode;
 import com.ctre.phoenix.led.CANdleConfiguration;
+import com.ctre.phoenix.led.RainbowAnimation;
 import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.networktables.BooleanTopic;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class ColorSubsystem extends SubsystemBase {
   private final CANdle gamePieceCandle;
@@ -16,10 +18,10 @@ public class ColorSubsystem extends SubsystemBase {
   public final PieceColoring pieceColoring = new PieceColoring();
   public final PositionColoring positionColoring = new PositionColoring();
   public final MorseCodeAnimation morseCodeAnimation = new MorseCodeAnimation();
-  private int periodicCount = 0;
-  private boolean runningAnimation = true;
   private final BooleanSubscriber isCubeSubscriber;
   private boolean lastColor = true;
+
+  private final RainbowAnimation rainbowAnimation;
 
   public ColorSubsystem(int gamePieceID, int gridSelectID, BooleanTopic isCubeTopic) {
 
@@ -39,14 +41,22 @@ public class ColorSubsystem extends SubsystemBase {
 
     clearLEDsGamePiece();
     clearLEDsGridPosition();
+
+    rainbowAnimation = new RainbowAnimation(1, Constants.RAINBOW_ANIMATION_SPEED, 64);
   }
 
-  public void periodic() {
-    periodicCount++;
-    if (runningAnimation && periodicCount % 10 == 0 && periodicCount < 2000) {
-      this.morseCodeAnimation.AdvanceAnimation();
-    }
+  public void startRainbowAnimation() {
+    gamePieceCandle.animate(rainbowAnimation);
+    gridPositionCandle.animate(rainbowAnimation);
+  }
 
+  public void stopRainbowAnimation() {
+    gamePieceCandle.clearAnimation(0);
+    gridPositionCandle.clearAnimation(0);
+  }
+
+  @Override
+  public void periodic() {
     if (lastColor != isCubeSubscriber.get()) {
       this.pieceColoring.update();
       lastColor = isCubeSubscriber.get();
@@ -79,7 +89,6 @@ public class ColorSubsystem extends SubsystemBase {
 
   public class PieceColoring {
     private void update() {
-      runningAnimation = false;
 
       RGB color = isCubeSubscriber.get() ? RGB.PURPLE : RGB.YELLOW;
 
@@ -95,12 +104,6 @@ public class ColorSubsystem extends SubsystemBase {
       0, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1,
       1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0
     };
-
-    public void AdvanceAnimation() {
-      if (periodicCount / 10 >= animation.length) periodicCount = 0;
-      if (animation[periodicCount / 10] == 1) writeLEDsGamePiece(RGB.HOWDY_BLUE);
-      else clearLEDsGamePiece();
-    }
   }
 
   public class PositionColoring {
@@ -127,7 +130,6 @@ public class ColorSubsystem extends SubsystemBase {
     }
 
     public void update() {
-      runningAnimation = false;
       final int StartIndex = 8;
       final int Spacer1 = StartIndex + 3;
       final int Spacer2 = StartIndex + 7;

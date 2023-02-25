@@ -8,11 +8,14 @@ public class RGB {
   public static final RGB WHITE = new RGB(MAX_RGB_VALUE, MAX_RGB_VALUE, MAX_RGB_VALUE);
 
   public static final RGB RED = new RGB(MAX_RGB_VALUE, 0, 0);
-  public static final RGB GREEN = new RGB(0, MAX_RGB_VALUE, 0);
+  public static final RGB ORANGE = new RGB(255, 130, 0);
   public static final RGB YELLOW = new RGB(MAX_RGB_VALUE, MAX_RGB_VALUE, 0);
-  public static final RGB PURPLE = new RGB(160, 32, 240);
-
+  public static final RGB GREEN = new RGB(0, MAX_RGB_VALUE, 0);
   public static final RGB HOWDY_BLUE = new RGB(0, 225, 225);
+  public static final RGB PURPLE = new RGB(127, 0, 255);
+  public static final RGB[] RainbowThing =
+      new RGB[] {RED, ORANGE, YELLOW, GREEN, HOWDY_BLUE, PURPLE};
+
   public static final RGB HOWDY_TAN = new RGB(229, 218, 91);
   public static final RGB HOWDY_BROWN_1 = new RGB(140, 101, 64);
   public static final RGB HOWDY_BROWN_2 = new RGB(97, 71, 5);

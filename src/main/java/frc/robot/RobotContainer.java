@@ -23,7 +23,6 @@ import frc.robot.commands.DriveCommand;
 import frc.robot.commands.SwerveAutoFactory;
 import frc.robot.subsystems.DeploySubsystem;
 import frc.robot.subsystems.EndAffectorSubsystem;
-import frc.robot.subsystems.arm.ArmPosition;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.color.ColorSubsystem;
 import frc.robot.subsystems.drivetrain.DriveInput;
@@ -102,6 +101,11 @@ public class RobotContainer {
     Trigger gunnerStowed = gunner.x();
     Trigger driverMidButton = driver.x();
 
+    Trigger gunnerHighButton = gunner.y();
+    Trigger gunnerMidButton = gunner.b();
+    Trigger gunnerLowButton = gunner.a();
+    Trigger gunnerStowedButton = gunner.x();
+
     DriverConfig driverConfig = new DriverConfig();
     DoubleSupplier xSupplier =
         new DriveInput(
@@ -142,23 +146,24 @@ public class RobotContainer {
                         fieldPositioningSystem.getRobotXYPose().getTranslation(),
                         new Rotation2d(Math.PI)))));
 
-    // This watches for the buttons to be pressed then released,
-    // thereby making the arm extend quickly.
     driverToggleGamePieceButton.toggleOnTrue(
         Commands.runOnce(() -> endAffector.toggleGamePiece(), endAffector));
 
-    shootButton
-        .and(gunnerMidButton.or(driverMidButton).negate())
-        .whileTrue(
-            Commands.startEnd(
-                () -> endAffector.fastOutake(), () -> endAffector.halt(), endAffector));
+    gunnerLowButton.onTrue(
+        new ArmPowerCommand(
+            () -> isCubeSubscriber.get() ? Constants.CUBE_LOW : Constants.CONE_LOW, arm, getBay()));
 
-    // This watches for the buttons to be pressed and held, thereby making the arm extend slowly.
-    shootButton
-        .and(gunnerMidButton.or(driverMidButton))
-        .whileTrue(
-            Commands.startEnd(
-                () -> endAffector.slowOutake(), () -> endAffector.halt(), endAffector));
+    gunnerMidButton.onTrue(
+        new ArmPowerCommand(
+            () -> isCubeSubscriber.get() ? Constants.CUBE_MID : Constants.CONE_MID, arm, getBay()));
+
+    gunnerHighButton.onTrue(
+        new ArmPowerCommand(
+            () -> isCubeSubscriber.get() ? Constants.CUBE_HIGH : Constants.CONE_HIGH,
+            arm,
+            getBay()));
+
+    gunnerStowedButton.onTrue(new ArmPowerCommand(() -> Constants.STOWED, arm, getBay()));
 
     driver
         .povLeft()
@@ -212,6 +217,14 @@ public class RobotContainer {
     int selected = streamDeck.getSelected() - 1;
     int grid = (selected / 9) * 3; // if we are in the left right or middle grid
     return 8 - (grid + (selected % 9 % 3)); // if we are in the "1, 2, or 3" bays per grid
+  }
+
+  public void onDisabled() {
+    colorStrip.startRainbowAnimation();
+  }
+
+  public void onExitDisabled() {
+    colorStrip.stopRainbowAnimation();
   }
 
   private boolean isDriving() {

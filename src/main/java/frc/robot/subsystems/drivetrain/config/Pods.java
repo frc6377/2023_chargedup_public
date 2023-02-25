@@ -37,7 +37,7 @@ public class Pods {
 
     Pods.addPod(
         PodName.H,
-        new PodConstantsBuilder().setEncoderID(15).setEncoderOffset(-Math.toRadians(210.762)));
+        new PodConstantsBuilder().setEncoderID(15).setEncoderOffset(-Math.toRadians(383.0)));
 
     Pods.addPod(
         PodName.E,
