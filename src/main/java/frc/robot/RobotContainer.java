@@ -41,7 +41,7 @@ public class RobotContainer {
       new CommandXboxController(Constants.GUNNER_CONTROLLER_ID);
   private final ArmSubsystem arm = new ArmSubsystem();
   private final BooleanTopic isCubeTopic;
-  private final BooleanSubscriber isCubeSubscriber;
+  private final BooleanSubscriber cubeSub;
   private final EndAffectorSubsystem endAffector;
   private final ColorSubsystem colorStrip;
   private final FieldPositioningSystem fieldPositioningSystem = new FieldPositioningSystem();
@@ -66,7 +66,7 @@ public class RobotContainer {
         new DriveInput(driveController::getRightY, driveController::getRightX, driverConfig);
 
     isCubeTopic = NetworkTableInstance.getDefault().getBooleanTopic("isCube");
-    isCubeSubscriber = isCubeTopic.subscribe(true);
+    cubeSub = isCubeTopic.subscribe(false);
     endAffector = new EndAffectorSubsystem(Constants.END_AFFECTOR_ID, isCubeTopic);
     colorStrip =
         new ColorSubsystem(Constants.GAME_PIECE_CANDLE, Constants.GRID_SELECT_CANDLE, isCubeTopic);
@@ -92,10 +92,9 @@ public class RobotContainer {
     Trigger shootButton = driver.rightTrigger(0.3);
     Trigger highGearButton = driver.rightBumper();
     Trigger controlMethod = driver.back();
-    Trigger driverMidButton = driver.x();
 
-    Trigger gunnerHighButton = gunner.y();
     Trigger gunnerMidButton = gunner.b();
+    Trigger gunnerHighButton = gunner.y();
     Trigger gunnerLowButton = gunner.a();
     Trigger gunnerStowedButton = gunner.x();
 
@@ -131,6 +130,9 @@ public class RobotContainer {
     intakeButton.whileTrue(
         Commands.startEnd(() -> endAffector.intake(), () -> endAffector.idle(), endAffector));
 
+    shootButton.whileTrue(
+        Commands.startEnd(() -> endAffector.fastOutake(), () -> endAffector.idle(), endAffector));
+
     driverResetFieldNorth.whileTrue(
         new InstantCommand(
             () ->
@@ -144,17 +146,15 @@ public class RobotContainer {
 
     gunnerLowButton.onTrue(
         new ArmPowerCommand(
-            () -> isCubeSubscriber.get() ? Constants.CUBE_LOW : Constants.CONE_LOW, arm, getBay()));
+            () -> cubeSub.get() ? Constants.CUBE_LOW : Constants.CONE_LOW, arm, getBay()));
 
     gunnerMidButton.onTrue(
         new ArmPowerCommand(
-            () -> isCubeSubscriber.get() ? Constants.CUBE_MID : Constants.CONE_MID, arm, getBay()));
+            () -> cubeSub.get() ? Constants.CUBE_MID : Constants.CONE_MID, arm, getBay()));
 
     gunnerHighButton.onTrue(
         new ArmPowerCommand(
-            () -> isCubeSubscriber.get() ? Constants.CUBE_HIGH : Constants.CONE_HIGH,
-            arm,
-            getBay()));
+            () -> cubeSub.get() ? Constants.CUBE_HIGH : Constants.CONE_HIGH, arm, getBay()));
 
     gunnerStowedButton.onTrue(new ArmPowerCommand(() -> Constants.STOWED, arm, getBay()));
 

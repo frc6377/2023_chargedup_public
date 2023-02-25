@@ -5,12 +5,15 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
+import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -25,7 +28,11 @@ public class ArmSubsystem extends SubsystemBase {
   private final SparkMaxPIDController leftShoulderController;
   private final ProfiledPIDController shoulderPPC;
   private final CANSparkMax rightShoulder;
+
+  // todo make these WPI_CANCoders. using CANCoder for now because it works and we dont have time
+  // for any more testing
   private final CANCoder shoulderCANCoder;
+  private final CANCoder wristCANCoder;
   private final WPI_TalonFX brakeFalcon;
 
   private final CANSparkMax extendMotor;
@@ -46,6 +53,11 @@ public class ArmSubsystem extends SubsystemBase {
     rightShoulder = new CANSparkMax(Constants.RIGHT_SHOULDER_ID, MotorType.kBrushless);
 
     shoulderCANCoder = new CANCoder(20);
+    shoulderCANCoder.configMagnetOffset(Constants.SHOULDER_CANCODER_OFFSET);
+    shoulderCANCoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
+    shoulderCANCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
+    shoulderCANCoder.setPositionToAbsolute();
+    shoulderCANCoder.configSensorDirection(false);
 
     leftShoulder.restoreFactoryDefaults();
     rightShoulder.restoreFactoryDefaults();
@@ -95,6 +107,13 @@ public class ArmSubsystem extends SubsystemBase {
     wristMotor.configMotionAcceleration(Constants.WRIST_MAX_ACCELLERATION);
     wristMotor.configMotionCruiseVelocity(Constants.WRIST_MAX_VELOCITY);
 
+    wristCANCoder = new CANCoder(Constants.WRIST_CANCODER_ID);
+    wristCANCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
+    wristCANCoder.configMagnetOffset(Constants.WRIST_CANCODER_OFFSET);
+    wristCANCoder.configSensorDirection(true);
+    wristMotor.setSelectedSensorPosition(
+        wristCANCoderToIntegratedSensor(wristCANCoder.getAbsolutePosition()));
+
     System.out.println("Complete Construct ArmSubsystem");
   }
 
@@ -103,7 +122,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     double shoulderOutput;
 
-    if (shoulderPPC.atGoal()) {
+    if (false) {
       shoulderOutput = 0;
       brakeFalcon.set(ControlMode.PercentOutput, 0.05);
     } else {
@@ -112,8 +131,19 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     leftShoulder.set(shoulderOutput);
-    SmartDashboard.putNumber("arb ffw", computeShoulderArbitraryFeetForward());
-    extendController.setReference(armPosition.armExtension, ControlType.kSmartMotion);
+    SmartDashboard.putNumber("arb ffw", computeShoulderArbitraryFeedForward());
+    SmartDashboard.putNumber(
+        "Extension2 electric boogaloo (encoder pos)", extendEncoder.getPosition());
+
+    extendController.setReference(
+        armPosition.armExtension,
+        ControlType.kSmartMotion,
+        0,
+        computeElevatorFeedForward(),
+        ArbFFUnits.kPercentOut);
+
+    SmartDashboard.putNumber("Wrist Position (Ticks)", wristMotor.getSelectedSensorPosition());
+    SmartDashboard.putNumber("shoulder 2 electric", Math.toDegrees(thetaFromCANCoder()));
   }
 
   public void setTarget(ArmPosition armPosition) {
@@ -129,10 +159,10 @@ public class ArmSubsystem extends SubsystemBase {
    * @return The power needed to keep the arme stable, in ?electrical output units?.
    */
   // TODO: move to I alpha instead of torque
-  private double computeShoulderArbitraryFeetForward() {
+  private double computeShoulderArbitraryFeedForward() {
     double theta = thetaFromCANCoder();
     double centerOfMass = computeCenterOfMass();
-    double mass = 6.01;
+    double mass = 3.63;
     double gearRatio = 90;
     double numMotors = 2;
     double torque = Math.cos(theta) * 9.81 * mass * centerOfMass;
@@ -160,8 +190,11 @@ public class ArmSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("raw CANcoder", rawPos);
     double theta = Math.toRadians(rawPos * (6.0 / 16.0));
     SmartDashboard.putNumber("shoulder theta", theta);
-    System.out.println("theta " + theta);
     return theta;
+  }
+
+  public double thetaFromPPC() {
+    return shoulderPPC.getSetpoint().position;
   }
 
   private double computeWristArbitraryFeetForward() {
@@ -175,7 +208,7 @@ public class ArmSubsystem extends SubsystemBase {
 
   private double computeShoulderOutput() {
     double output =
-        shoulderPPC.calculate(thetaFromCANCoder()) + computeShoulderArbitraryFeetForward();
+        shoulderPPC.calculate(thetaFromCANCoder()) + computeShoulderArbitraryFeedForward();
     SmartDashboard.putNumber("shoulder output", output);
     return output;
   }
@@ -183,5 +216,19 @@ public class ArmSubsystem extends SubsystemBase {
   public double currentArmExtenstion() {
     return extendEncoder.getPosition() * Math.PI * Constants.CAPSTAN_DIAMETER_METERS
         + Constants.ARM_LENGTH_AT_ZERO_TICKS_METERS;
+  }
+
+  private double computeElevatorFeedForward() {
+    double theta = thetaFromCANCoder();
+    double magicNumberThatMakesItWork = 0.5;
+    double mass = 4.08 - magicNumberThatMakesItWork;
+    double stallLoad = 22.929;
+    return mass * Math.sin(theta) / stallLoad;
+  }
+
+  private double wristCANCoderToIntegratedSensor(double theta) {
+    theta /= Constants.WRIST_GEAR_RATIO; // output shaft to input shaft
+    theta /= 360; // degrees to revs
+    return theta * 2048; // revs to ticks
   }
 }
