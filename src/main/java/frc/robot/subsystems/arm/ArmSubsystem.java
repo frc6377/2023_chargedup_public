@@ -1,9 +1,9 @@
 package frc.robot.subsystems.arm;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
@@ -29,25 +29,28 @@ public class ArmSubsystem extends SubsystemBase {
   private final ProfiledPIDController shoulderPPC;
   private final CANSparkMax rightShoulder;
 
-  // todo make these WPI_CANCoders. using CANCoder for now because it works and we dont have time
+  // todo make these WPI_CANCoders. using CANCoder for now because it works and we
+  // dont have time
   // for any more testing
   private final CANCoder shoulderCANCoder;
   private final CANCoder wristCANCoder;
-  private final WPI_TalonFX brakeFalcon;
+  private final VictorSPX brakeMotor;
 
   private final CANSparkMax extendMotor;
   private final RelativeEncoder extendEncoder;
   private final SparkMaxPIDController extendController;
 
   private final WPI_TalonFX wristMotor;
-  private ArmPosition armPosition = new ArmPosition(0, 1, -8475, "default");
+
+  // State Tracking
+  private ArmPosition armPosition = Constants.LOW_CUBE_ARM_POSITION;
+  private boolean elevatorInPercentControl = false;
+  private double elevatorPercentOutput = 0;
 
   public ArmSubsystem() {
     System.out.println("Starting Construct ArmSubsystem");
 
-    brakeFalcon = new WPI_TalonFX(Constants.BREAK_FALCON_ID);
-    brakeFalcon.setNeutralMode(NeutralMode.Coast);
-    brakeFalcon.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 10, 10, 0));
+    brakeMotor = new VictorSPX(Constants.BREAK_VICTOR_ID);
 
     leftShoulder = new CANSparkMax(Constants.LEFT_SHOULDER_ID, MotorType.kBrushless);
     rightShoulder = new CANSparkMax(Constants.RIGHT_SHOULDER_ID, MotorType.kBrushless);
@@ -57,6 +60,13 @@ public class ArmSubsystem extends SubsystemBase {
     shoulderCANCoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
     shoulderCANCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
     shoulderCANCoder.setPositionToAbsolute();
+
+    final double shoudlerPositionOnStartUp = shoulderCANCoder.getPosition();
+
+    if (shoudlerPositionOnStartUp < -20) {
+      shoulderCANCoder.setPosition(shoudlerPositionOnStartUp + 360);
+    }
+
     shoulderCANCoder.configSensorDirection(false);
 
     leftShoulder.restoreFactoryDefaults();
@@ -72,7 +82,7 @@ public class ArmSubsystem extends SubsystemBase {
     leftShoulderEncoder = leftShoulder.getEncoder();
     leftShoulderController = leftShoulder.getPIDController();
 
-    shoulderPPC = new ProfiledPIDController(2, 0, 0, new TrapezoidProfile.Constraints(4, 6));
+    shoulderPPC = new ProfiledPIDController(2, 0, 0, new TrapezoidProfile.Constraints(4, 4));
 
     shoulderPPC.setTolerance(0.02);
 
@@ -80,7 +90,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     extendMotor = new CANSparkMax(Constants.ARM_EXTENDER_ID, MotorType.kBrushless);
     extendMotor.restoreFactoryDefaults();
-    extendMotor.setSmartCurrentLimit(Constants.ARM_EXTENSION_CURRENT_LIMIT);
+    extendMotor.setSmartCurrentLimit(Constants.ARM_EXTENSION_CURRENT_LIMIT, 100, 4);
 
     extendEncoder = extendMotor.getEncoder();
     extendController = extendMotor.getPIDController();
@@ -119,50 +129,63 @@ public class ArmSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-
     double shoulderOutput;
-
-    if (false) {
-      shoulderOutput = 0;
-      brakeFalcon.set(ControlMode.PercentOutput, 0.05);
-    } else {
-      shoulderOutput = computeShoulderOutput();
-      brakeFalcon.set(ControlMode.PercentOutput, 0);
-    }
+    shoulderOutput = computeShoulderOutput();
 
     leftShoulder.set(shoulderOutput);
     SmartDashboard.putNumber("arb ffw", computeShoulderArbitraryFeedForward());
-    SmartDashboard.putNumber(
-        "Extension2 electric boogaloo (encoder pos)", extendEncoder.getPosition());
+    SmartDashboard.putNumber("Arm Extension (encoder pos)", extendEncoder.getPosition());
+    SmartDashboard.putNumber("Elevator ffw", computeElevatorFeedForward());
 
-    extendController.setReference(
-        armPosition.armExtension,
-        ControlType.kSmartMotion,
-        0,
-        computeElevatorFeedForward(),
-        ArbFFUnits.kPercentOut);
+    if (!elevatorInPercentControl) {
+      extendController.setReference(
+          armPosition.armExtension,
+          ControlType.kSmartMotion,
+          0,
+          computeElevatorFeedForward(),
+          ArbFFUnits.kPercentOut);
+    } else {
+      extendMotor.set(elevatorPercentOutput);
+    }
 
     SmartDashboard.putNumber("Wrist Position (Ticks)", wristMotor.getSelectedSensorPosition());
-    SmartDashboard.putNumber("shoulder 2 electric", Math.toDegrees(thetaFromCANCoder()));
+    SmartDashboard.putNumber(
+        "shoulder angle (degrees)", Math.toDegrees(shoulderThetaFromCANCoder()));
+    SmartDashboard.putNumber("Elevator Target (meters)", currentArmExtenstionMeters());
+
+    brakeMotor.set(ControlMode.PercentOutput, 1);
+  }
+
+  public void setElevatorPercent(double elevatorPercentOutput) {
+    this.elevatorPercentOutput = elevatorPercentOutput;
+
+    if (elevatorPercentOutput == 0) {
+      if (elevatorInPercentControl) {
+        stop();
+      }
+      elevatorInPercentControl = false;
+    } else {
+      elevatorInPercentControl = true;
+    }
   }
 
   public void setTarget(ArmPosition armPosition) {
-    this.armPosition = armPosition;
-    shoulderPPC.setGoal(armPosition.armRotation);
-    wristMotor.set(ControlMode.MotionMagic, armPosition.wristRotation);
+    this.armPosition = armPosition.min(Constants.MAX_POSITION).max(Constants.MIN_POSITION);
+    shoulderPPC.setGoal(this.armPosition.armRotation);
+    wristMotor.set(ControlMode.MotionMagic, this.armPosition.wristRotation);
   }
 
   /**
    * Calculates the amount of power needed to counteract the force of gravity to keep the arm at a
    * constant angle.
    *
-   * @return The power needed to keep the arme stable, in ?electrical output units?.
+   * @return The power needed to keep the arme stable, in percent output
    */
   // TODO: move to I alpha instead of torque
   private double computeShoulderArbitraryFeedForward() {
-    double theta = thetaFromCANCoder();
+    double theta = shoulderThetaFromCANCoder();
     double centerOfMass = computeCenterOfMass();
-    double mass = 3.63;
+    double mass = 4.03;
     double gearRatio = 90;
     double numMotors = 2;
     double torque = Math.cos(theta) * 9.81 * mass * centerOfMass;
@@ -185,7 +208,12 @@ public class ArmSubsystem extends SubsystemBase {
         / (Constants.STALLED_TORQUE * 2 * Constants.ROTATION_ARM_GEAR_RATIO);
   }
 
-  public double thetaFromCANCoder() {
+  /**
+   * Returns the angle of the shoulder in radians
+   *
+   * @return the angle of the shoulder in radians
+   */
+  public double shoulderThetaFromCANCoder() {
     double rawPos = shoulderCANCoder.getPosition();
     SmartDashboard.putNumber("raw CANcoder", rawPos);
     double theta = Math.toRadians(rawPos * (6.0 / 16.0));
@@ -208,27 +236,61 @@ public class ArmSubsystem extends SubsystemBase {
 
   private double computeShoulderOutput() {
     double output =
-        shoulderPPC.calculate(thetaFromCANCoder()) + computeShoulderArbitraryFeedForward();
+        shoulderPPC.calculate(shoulderThetaFromCANCoder()) + computeShoulderArbitraryFeedForward();
     SmartDashboard.putNumber("shoulder output", output);
     return output;
   }
 
-  public double currentArmExtenstion() {
+  public double currentArmExtenstionMeters() {
     return extendEncoder.getPosition() * Math.PI * Constants.CAPSTAN_DIAMETER_METERS
         + Constants.ARM_LENGTH_AT_ZERO_TICKS_METERS;
   }
 
+  public double currentArmExtenstionRevs() {
+    return extendEncoder.getPosition();
+  }
+
   private double computeElevatorFeedForward() {
-    double theta = thetaFromCANCoder();
+    double theta = shoulderThetaFromCANCoder();
     double magicNumberThatMakesItWork = 0.5;
-    double mass = 4.08 - magicNumberThatMakesItWork;
+    double mass = 4.15 - magicNumberThatMakesItWork;
     double stallLoad = 22.929;
-    return mass * Math.sin(theta) / stallLoad;
+    return (mass * Math.sin(theta)) / stallLoad;
   }
 
   private double wristCANCoderToIntegratedSensor(double theta) {
     theta /= Constants.WRIST_GEAR_RATIO; // output shaft to input shaft
     theta /= 360; // degrees to revs
     return theta * 2048; // revs to ticks
+  }
+
+  public ArmPosition getArmPosition() {
+    return new ArmPosition(
+        shoulderThetaFromCANCoder(),
+        extendEncoder.getPosition(),
+        wristMotor.getSelectedSensorPosition(),
+        ArmHeight.NOT_SPECIFIED);
+  }
+
+  public ArmPosition getArmGoalPosition() {
+    return armPosition;
+  }
+
+  public double getElevatorCurrentDraw() {
+    return extendMotor.getOutputCurrent();
+  }
+
+  public void setTheElevatorZero() {
+    extendEncoder.setPosition(0);
+  }
+
+  /** Has the arm hold it position. */
+  public void stop() {
+    setTarget(
+        new ArmPosition(
+            thetaFromPPC(),
+            currentArmExtenstionRevs(),
+            armPosition.wristRotation,
+            ArmHeight.NOT_SPECIFIED));
   }
 }

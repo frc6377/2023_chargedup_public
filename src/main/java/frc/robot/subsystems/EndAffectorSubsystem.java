@@ -13,12 +13,16 @@ public class EndAffectorSubsystem extends SubsystemBase {
 
   public EndAffectorSubsystem(int ID, BooleanTopic isCubeTopic) {
     motor = new WPI_TalonFX(ID);
+    motor.configOpenloopRamp(0.25);
 
     isCubePublisher = isCubeTopic.publish();
     isCubePublisher.set(isCube);
   }
 
-  // Driver will only use toggleGamePiece; will not use set{Cone|Cube}
+  public boolean isCube() {
+    return isCube;
+  }
+
   public void toggleGamePiece() {
     isCube = !isCube;
     isCubePublisher.set(isCube);
@@ -39,11 +43,11 @@ public class EndAffectorSubsystem extends SubsystemBase {
   }
 
   public void fastOutake() {
-    motor.set(-Constants.END_AFFECTOR_OUTTAKE_SPEED * (isCube ? -1 : 1));
+    motor.set(-Constants.END_AFFECTOR_OUTTAKE_SPEED * (isCube ? -1 : 1.25));
   }
 
   public void slowOutake() {
-    motor.set(-Constants.END_AFFECTOR_SLOW_OUTTAKE_SPEED * (isCube ? -1 : 1));
+    motor.set(-Constants.END_AFFECTOR_SLOW_OUTTAKE_SPEED * (isCube ? -1 : 1.25));
   }
 
   public void halt() {

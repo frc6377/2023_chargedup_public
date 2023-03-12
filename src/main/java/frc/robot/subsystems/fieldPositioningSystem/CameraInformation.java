@@ -3,7 +3,6 @@ package frc.robot.subsystems.fieldPositioningSystem;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
 
 class CameraInformation {
   private String name;
@@ -27,9 +26,7 @@ class CameraInformation {
       final double pitch,
       final double roll) {
     this.name = name;
-    cameraLocation =
-        new Transform3d(
-            new Translation3d(x, y, z), new Rotation3d(Units.degreesToRadians(roll), pitch, yaw));
+    cameraLocation = new Transform3d(new Translation3d(x, y, z), new Rotation3d(roll, pitch, yaw));
   }
 
   public String getName() {

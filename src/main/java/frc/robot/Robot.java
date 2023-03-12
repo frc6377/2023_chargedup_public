@@ -25,6 +25,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {
+    m_robotContainer.updateLEDs();
     m_robotContainer.onDisabled();
   }
 
@@ -38,6 +39,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    m_robotContainer.updateLEDs();
+    m_robotContainer.unbindShoulder();
 
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
@@ -54,10 +57,13 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    m_robotContainer.updateLEDs();
 
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
+    m_robotContainer.unbindShoulder();
   }
 
   @Override

@@ -23,9 +23,9 @@ public class AutoBalanceCommand extends CommandBase {
     this.drive = drive;
     pitchController =
         new ProfiledPIDController(
-            0.0533,
+            0.0333,
             0,
-            0,
+            0.01,
             new TrapezoidProfile.Constraints(
                 Constants.AUTO_MAX_VELOCITY, Constants.AUTO_MAX_ACCELERATION));
   }
@@ -40,7 +40,7 @@ public class AutoBalanceCommand extends CommandBase {
     double theta = computeTheta();
     drive.drive(
         ChassisSpeeds.fromFieldRelativeSpeeds(
-            new ChassisSpeeds(pitchController.calculate(theta), 0, 0),
+            new ChassisSpeeds(-pitchController.calculate(theta), 0, 0),
             new Rotation2d(Math.toRadians(sub.get()[0]))));
   }
 

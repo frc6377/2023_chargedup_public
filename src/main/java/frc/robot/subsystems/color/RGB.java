@@ -13,6 +13,7 @@ public class RGB {
   public static final RGB GREEN = new RGB(0, MAX_RGB_VALUE, 0);
   public static final RGB HOWDY_BLUE = new RGB(0, 225, 225);
   public static final RGB PURPLE = new RGB(127, 0, 255);
+  public static final RGB PINK = new RGB(174, 47, 132);
   public static final RGB[] RainbowThing =
       new RGB[] {RED, ORANGE, YELLOW, GREEN, HOWDY_BLUE, PURPLE};
 
@@ -20,6 +21,7 @@ public class RGB {
   public static final RGB HOWDY_BROWN_1 = new RGB(140, 101, 64);
   public static final RGB HOWDY_BROWN_2 = new RGB(97, 71, 5);
   public static final RGB HOWDY_BROWN_3 = new RGB(148, 88, 5);
+  public static final RGB BLUE = new RGB(50, 70, 168);
 
   public static RGB randomColor() {
     IntSupplier rndValue = () -> (int) Math.round(Math.random() * (MAX_RGB_VALUE + 1));

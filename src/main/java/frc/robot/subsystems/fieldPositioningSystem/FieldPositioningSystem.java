@@ -2,18 +2,14 @@ package frc.robot.subsystems.fieldPositioningSystem;
 
 import com.ctre.phoenix.sensors.Pigeon2;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -37,7 +33,7 @@ public class FieldPositioningSystem extends SubsystemBase {
   private Pose2d currentRobotPose;
   private Pigeon2 inertialMeasurementUnit;
   private Supplier<SwerveModuleState[]> swerveOdomSupplier;
-  private SwerveDrivePoseEstimator swerveDriveOdometry;
+  private SwerveDriveOdometry swerveDriveOdometry;
   private CameraInterperter[] cameras;
   private final Pose2DPublisher pub = Topics.PoseTopic().publish();
   private final DoubleArrayPublisher yprPub =
@@ -75,6 +71,7 @@ public class FieldPositioningSystem extends SubsystemBase {
   }
 
   private void enableCameraDebug(int targetCameraIndex) {
+    if (targetCameraIndex >= cameras.length) return;
     final FieldObject2d rawCameraPose = field.getObject("Camera Pose ID:" + targetCameraIndex);
 
     cameras[targetCameraIndex].setCameraFieldObject(rawCameraPose);
@@ -119,13 +116,13 @@ public class FieldPositioningSystem extends SubsystemBase {
     lastSwerveModuleUpdate = Timer.getFPGATimestamp();
 
     swerveDriveOdometry =
-        new SwerveDrivePoseEstimator(
+        new SwerveDriveOdometry(
             swerveKinematics,
             new Rotation2d(), // TODO: this and gyro angle should come from auto
             currentSwervePodPosition,
             new Pose2d());
-    Matrix<N3, N1> stdevMatrix = VecBuilder.fill(0.05, 0.05, 0.05);
-    swerveDriveOdometry.setVisionMeasurementStdDevs(stdevMatrix);
+    //  Matrix<N3, N1> stdevMatrix = VecBuilder.fill(0.05, 0.05, 0.05);
+    // swerveDriveOdometry.setVisionMeasurementStdDevs(stdevMatrix);
   }
 
   /** Called every 20ms to provide update the robots position */
@@ -133,7 +130,7 @@ public class FieldPositioningSystem extends SubsystemBase {
   public void periodic() {
     updateSwerveDriveOdometry();
     doVisionEstimation();
-    currentRobotPose = swerveDriveOdometry.getEstimatedPosition();
+    currentRobotPose = swerveDriveOdometry.getPoseMeters();
     field.setRobotPose(currentRobotPose);
     pub.accept(currentRobotPose);
     double[] ypr = new double[3];
@@ -196,17 +193,17 @@ public class FieldPositioningSystem extends SubsystemBase {
       Translation2d measuredLocation = measurement.measurement.getTranslation();
 
       final double correctionDistance =
-          measuredLocation.getDistance(swerveDriveOdometry.getEstimatedPosition().getTranslation());
+          measuredLocation.getDistance(swerveDriveOdometry.getPoseMeters().getTranslation());
 
       if (correctionDistance > FPSConfiguration.CAMER_OUTLIER_DISTANCE) {
         continue;
       }
 
-      swerveDriveOdometry.addVisionMeasurement(
-          new Pose2d(measuredLocation, getRotionFromIMU()), measurement.timeRecorded);
+      //   swerveDriveOdometry.addVisionMeasurement(
+      //     new Pose2d(measuredLocation, getRotionFromIMU()), measurement.timeRecorded);
     }
 
-    Pose2d robotPose = swerveDriveOdometry.getEstimatedPosition();
+    Pose2d robotPose = swerveDriveOdometry.getPoseMeters();
     Pose3d robotPose3d = new Pose3d(robotPose);
     for (CameraInterperter camera : cameras) {
       camera.setReferncePose(robotPose3d);

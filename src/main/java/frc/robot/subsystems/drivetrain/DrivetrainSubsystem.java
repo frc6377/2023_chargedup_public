@@ -22,10 +22,9 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.drivetrain.config.PodConstants;
-import frc.robot.subsystems.drivetrain.config.PodLocation;
-import frc.robot.subsystems.drivetrain.config.Pods;
-import java.util.function.DoubleSupplier;
+import frc.config.RobotVersion;
+import frc.robot.Constants;
+import frc.robot.subsystems.drivetrain.config.PodConfig;
 
 public class DrivetrainSubsystem extends SubsystemBase {
 
@@ -72,18 +71,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
       MAX_VELOCITY_METERS_PER_SECOND
           / Math.hypot(DRIVETRAIN_TRACKWIDTH_METERS / 2.0, DRIVETRAIN_WHEELBASE_METERS / 2.0);
 
-  private PodConstants frontLeftPodConstants =
-      Pods.getPod(FRONT_LEFT_POD_NAME, PodLocation.FRONT_LEFT);
-
-  private PodConstants frontRightPodConstants =
-      Pods.getPod(FRONT_RIGHT_POD_NAME, PodLocation.FRONT_RIGHT);
-
-  private PodConstants backLeftPodConstants =
-      Pods.getPod(BACK_LEFT_POD_NAME, PodLocation.BACK_LEFT);
-
-  private PodConstants backRightPodConstants =
-      Pods.getPod(BACK_RIGHT_POD_NAME, PodLocation.BACK_RIGHT);
-
   private final SwerveDriveKinematics m_kinematics =
       new SwerveDriveKinematics(
           // Front left
@@ -96,8 +83,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
           new Translation2d(
               -DRIVETRAIN_TRACKWIDTH_METERS / 2.0, -DRIVETRAIN_WHEELBASE_METERS / 2.0));
 
-  private final DoubleSupplier yawSupplier;
-
   // These are our modules. We initialize them in the constructor.
   private final SwerveModule m_frontLeftModule;
   private final SwerveModule m_frontRightModule;
@@ -107,8 +92,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
 
-  public DrivetrainSubsystem(DoubleSupplier yawSupplier) {
-    this.yawSupplier = yawSupplier;
+  public DrivetrainSubsystem(RobotVersion robotVersion) {
 
     SmartDashboard.putData("Field", m_field2d);
     ShuffleboardTab tab = Shuffleboard.getTab("Drivetrain");
@@ -134,7 +118,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
     Mk4ModuleConfiguration modCfg = new Mk4ModuleConfiguration();
     modCfg.setDriveCurrentLimit(45);
-
+    PodConfig frontLeftPodConfig =
+        robotVersion == RobotVersion.V1
+            ? Constants.FRONT_LEFT_V1_CONFIG
+            : Constants.FRONT_LEFT_V2_CONFIG;
     m_frontLeftModule =
         Mk4iSwerveModuleHelper.createNeo(
             // This parameter is optional, but will allow you to see the current state of the module
@@ -146,16 +133,20 @@ public class DrivetrainSubsystem extends SubsystemBase {
             // This can either be STANDARD or FAST depending on your gear configuration
             Mk4iSwerveModuleHelper.GearRatio.L3,
             // This is the ID of the drive motor
-            frontLeftPodConstants.DRIVE_MOTOR,
+            frontLeftPodConfig.getDriveID(),
             // This is the ID of the steer motor
-            frontLeftPodConstants.STEER_MOTOR,
+            frontLeftPodConfig.getTurnID(),
             // This is the ID of the steer encoder
-            frontLeftPodConstants.STEER_ENCODER,
+            frontLeftPodConfig.getCanCoderID(),
             // This is how much the steer encoder is offset from true zero (In our case, zero is
             // facing straight forward)
-            frontLeftPodConstants.STEER_OFFSET);
+            frontLeftPodConfig.getCanCoderOffset());
 
     // We will do the same for the other modules
+    PodConfig frontRightPodConfig =
+        robotVersion == RobotVersion.V1
+            ? Constants.FRONT_RIGHT_V1_CONFIG
+            : Constants.FRONT_RIGHT_V2_CONFIG;
     m_frontRightModule =
         Mk4iSwerveModuleHelper.createNeo(
             tab.getLayout("Front Right Module", BuiltInLayouts.kList)
@@ -163,11 +154,15 @@ public class DrivetrainSubsystem extends SubsystemBase {
                 .withPosition(2, 0),
             modCfg,
             Mk4iSwerveModuleHelper.GearRatio.L3,
-            frontRightPodConstants.DRIVE_MOTOR,
-            frontRightPodConstants.STEER_MOTOR,
-            frontRightPodConstants.STEER_ENCODER,
-            frontRightPodConstants.STEER_OFFSET);
+            frontRightPodConfig.getDriveID(),
+            frontRightPodConfig.getTurnID(),
+            frontRightPodConfig.getCanCoderID(),
+            frontRightPodConfig.getCanCoderOffset());
 
+    PodConfig backLeftPodConfig =
+        robotVersion == RobotVersion.V1
+            ? Constants.BACK_LEFT_V1_CONFIG
+            : Constants.BACK_LEFT_V2_CONFIG;
     m_backLeftModule =
         Mk4iSwerveModuleHelper.createNeo(
             tab.getLayout("Back Left Module", BuiltInLayouts.kList)
@@ -175,11 +170,15 @@ public class DrivetrainSubsystem extends SubsystemBase {
                 .withPosition(4, 0),
             modCfg,
             Mk4iSwerveModuleHelper.GearRatio.L3,
-            backLeftPodConstants.DRIVE_MOTOR,
-            backLeftPodConstants.STEER_MOTOR,
-            backLeftPodConstants.STEER_ENCODER,
-            backLeftPodConstants.STEER_OFFSET);
+            backLeftPodConfig.getDriveID(),
+            backLeftPodConfig.getTurnID(),
+            backLeftPodConfig.getCanCoderID(),
+            backLeftPodConfig.getCanCoderOffset());
 
+    PodConfig backRightPodConfig =
+        robotVersion == RobotVersion.V1
+            ? Constants.BACK_RIGHT_V1_CONFIG
+            : Constants.BACK_RIGHT_V2_CONFIG;
     m_backRightModule =
         Mk4iSwerveModuleHelper.createNeo(
             tab.getLayout("Back Right Module", BuiltInLayouts.kList)
@@ -187,14 +186,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
                 .withPosition(6, 0),
             modCfg,
             Mk4iSwerveModuleHelper.GearRatio.L3,
-            backRightPodConstants.DRIVE_MOTOR,
-            backRightPodConstants.STEER_MOTOR,
-            backRightPodConstants.STEER_ENCODER,
-            backRightPodConstants.STEER_OFFSET);
-  }
-
-  public Rotation2d getGyroscopeRotation() {
-    return Rotation2d.fromDegrees(0);
+            backRightPodConfig.getDriveID(),
+            backRightPodConfig.getTurnID(),
+            backRightPodConfig.getCanCoderID(),
+            backRightPodConfig.getCanCoderOffset());
   }
 
   public void drive(ChassisSpeeds chassisSpeeds) {

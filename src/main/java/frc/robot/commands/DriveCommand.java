@@ -64,7 +64,7 @@ public class DriveCommand extends CommandBase {
     return ChassisSpeeds.fromFieldRelativeSpeeds(
         translationXSupplier.getAsDouble() * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND,
         translationYSupplier.getAsDouble() * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND,
-        rotationSupplier.getAsDouble()
+        -rotationSupplier.getAsDouble()
             * drivetrainSubsystem.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND,
         fieldPositioningSystem.getCurrentRobotRotationXY());
   }

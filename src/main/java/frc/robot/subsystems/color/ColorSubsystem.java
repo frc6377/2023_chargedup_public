@@ -8,12 +8,25 @@ import com.ctre.phoenix.led.CANdleConfiguration;
 import com.ctre.phoenix.led.RainbowAnimation;
 import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.networktables.BooleanTopic;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.subsystems.color.patterns.BIFlag;
+import frc.robot.subsystems.color.patterns.FireFlyPattern;
+import frc.robot.subsystems.color.patterns.TransFlag;
 
 public class ColorSubsystem extends SubsystemBase {
+  private static final int patternUpdateFrequency = 10;
+
   private final CANdle gamePieceCandle;
   private final CANdle gridPositionCandle;
+
+  private static final int numberOfLEDS = 64;
+
+  private int tick;
+  private int patternTick = 0;
+  private DisablePattern disablePattern = DisablePattern.getRandom();
 
   public final PieceColoring pieceColoring = new PieceColoring();
   public final PositionColoring positionColoring = new PositionColoring();
@@ -42,10 +55,14 @@ public class ColorSubsystem extends SubsystemBase {
     clearLEDsGamePiece();
     clearLEDsGridPosition();
 
+    TransFlag.numberOfLEDS = numberOfLEDS;
+    FireFlyPattern.numberOfLEDS = numberOfLEDS;
+    BIFlag.numberOfLEDS = numberOfLEDS;
     rainbowAnimation = new RainbowAnimation(1, Constants.RAINBOW_ANIMATION_SPEED, 64);
   }
 
   public void startRainbowAnimation() {
+    if (disablePattern != DisablePattern.RAINBOW) return;
     gamePieceCandle.animate(rainbowAnimation);
     gridPositionCandle.animate(rainbowAnimation);
   }
@@ -61,6 +78,12 @@ public class ColorSubsystem extends SubsystemBase {
       this.pieceColoring.update();
       lastColor = isCubeSubscriber.get();
     }
+    if (DriverStation.isDisabled()) updatePattern();
+  }
+
+  public void forceUpdate() {
+    this.pieceColoring.update();
+    lastColor = isCubeSubscriber.get();
   }
 
   private void clearLEDsGamePiece() {
@@ -85,6 +108,47 @@ public class ColorSubsystem extends SubsystemBase {
 
   private void writeLEDsGridPosition(RGB rgb, int startIdx, int count) {
     gridPositionCandle.setLEDs(rgb.red, rgb.green, rgb.blue, rgb.white, startIdx, count);
+  }
+
+  private void updatePattern() {
+    RGB[] pattern;
+
+    tick++;
+    if (tick > patternUpdateFrequency) {
+      tick = 0;
+      patternTick++;
+    } else {
+      return;
+    }
+
+    SmartDashboard.putString("Disable Pattern", disablePattern.name());
+
+    switch (disablePattern) {
+        // case BI_FLAG:
+        //   pattern = BIFlag.getColors(patternTick);
+        //   break;
+      case FIRE_FLY:
+        pattern = FireFlyPattern.getColors(patternTick);
+        break;
+      case RAINBOW:
+        startRainbowAnimation();
+        return;
+      case TRANS_FLAG:
+        pattern = TransFlag.getColors(patternTick);
+        break;
+      default:
+        startRainbowAnimation();
+        return;
+    }
+    stopRainbowAnimation();
+    for (int i = 0; i < numberOfLEDS; i++) {
+      if (pattern.length <= i) break;
+      gamePieceCandle.setLEDs(pattern[i].red, pattern[i].green, pattern[i].blue, 125, i, i);
+    }
+  }
+
+  public void randomizePattern() {
+    disablePattern = DisablePattern.getRandom();
   }
 
   public class PieceColoring {
@@ -151,6 +215,17 @@ public class ColorSubsystem extends SubsystemBase {
       if (cursor % 3 == 2) {
         writeLEDsGridPosition(RGB.GREEN, cursorLocation, 1);
       }
+    }
+  }
+
+  private enum DisablePattern {
+    TRANS_FLAG,
+    RAINBOW,
+    FIRE_FLY;
+
+    public static DisablePattern getRandom() {
+      DisablePattern[] allPatterns = DisablePattern.values();
+      return allPatterns[(int) Math.floor(Math.random() * (allPatterns.length))];
     }
   }
 }

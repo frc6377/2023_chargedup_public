@@ -10,17 +10,29 @@ import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.networktables.BooleanTopic;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.config.IdentifyRoborio;
+import frc.config.RobotVersion;
+import frc.robot.commands.ArmManualCommand;
 import frc.robot.commands.ArmPowerCommand;
+import frc.robot.commands.AutoBalanceCommand;
 import frc.robot.commands.DriveCommand;
+import frc.robot.commands.RoutineFactory;
+import frc.robot.commands.RoutineFactory.Routines;
 import frc.robot.commands.SwerveAutoFactory;
+import frc.robot.commands.SwitchTargetObject;
+import frc.robot.commands.ZeroElevator;
 import frc.robot.subsystems.DeploySubsystem;
 import frc.robot.subsystems.EndAffectorSubsystem;
+import frc.robot.subsystems.arm.ArmHeight;
+import frc.robot.subsystems.arm.ArmPosition;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.color.ColorSubsystem;
 import frc.robot.subsystems.drivetrain.DriveInput;
@@ -30,8 +42,13 @@ import frc.robot.subsystems.fieldPositioningSystem.FieldPositioningSystem;
 import java.util.function.DoubleSupplier;
 
 public class RobotContainer {
+  // Find the configuration class to load for this robot
+  RobotVersion robotVersion = IdentifyRoborio.identifyRobot();
   // Input controllers
-  private final XboxController driveController = new XboxController(Constants.DRIVER_CONTROLLER_ID);
+  private final XboxController driverController =
+      new XboxController(Constants.DRIVER_CONTROLLER_ID);
+  private final XboxController gunnerController =
+      new XboxController(Constants.GUNNER_CONTROLLER_ID);
   private final StreamDeck streamDeck = new StreamDeck(2, 36);
   // Subsystems
   private final DeploySubsystem deploySubsystem = new DeploySubsystem();
@@ -45,9 +62,11 @@ public class RobotContainer {
   private final EndAffectorSubsystem endAffector;
   private final ColorSubsystem colorStrip;
   private final FieldPositioningSystem fieldPositioningSystem = new FieldPositioningSystem();
-  private final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem(null);
+  private final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem(robotVersion);
   private final SwerveAutoFactory autoCommand =
       new SwerveAutoFactory(fieldPositioningSystem::resetRobotPosition, drivetrainSubsystem);
+  private final SendableChooser<Routines> autoChooser;
+  private final RoutineFactory routineFactory;
 
   public RobotContainer() {
     deploySubsystem.Log();
@@ -55,15 +74,15 @@ public class RobotContainer {
     DriverConfig driverConfig = new DriverConfig();
     DoubleSupplier xSupplier =
         new DriveInput(
-            driveController::getLeftY, DriveInput.InputType.TRANSLATION, driverConfig, false);
+            driverController::getLeftY, DriveInput.InputType.TRANSLATION, driverConfig, false);
     DoubleSupplier ySupplier =
         new DriveInput(
-            driveController::getLeftX, DriveInput.InputType.TRANSLATION, driverConfig, false);
+            driverController::getLeftX, DriveInput.InputType.TRANSLATION, driverConfig, false);
     DoubleSupplier rotationSupplier =
         new DriveInput(
-            driveController::getLeftX, DriveInput.InputType.TRANSLATION, driverConfig, false);
+            driverController::getLeftX, DriveInput.InputType.TRANSLATION, driverConfig, false);
     DoubleSupplier pointingDriveInput =
-        new DriveInput(driveController::getRightY, driveController::getRightX, driverConfig);
+        new DriveInput(driverController::getRightY, driverController::getRightX, driverConfig);
 
     isCubeTopic = NetworkTableInstance.getDefault().getBooleanTopic("isCube");
     cubeSub = isCubeTopic.subscribe(false);
@@ -83,33 +102,30 @@ public class RobotContainer {
             rotationSupplier,
             pointingDriveInput));
 
+    autoChooser = new SendableChooser<>();
+    addChooserOptions();
+    routineFactory = new RoutineFactory(arm, endAffector, drivetrainSubsystem, autoCommand);
+
     configureBindings();
   }
 
   private void configureBindings() {
-
-    Trigger intakeButton = driver.leftTrigger(0.3);
-    Trigger shootButton = driver.rightTrigger(0.3);
     Trigger highGearButton = driver.rightBumper();
-    Trigger controlMethod = driver.back();
-
-    Trigger gunnerMidButton = gunner.b();
-    Trigger gunnerHighButton = gunner.y();
-    Trigger gunnerLowButton = gunner.a();
-    Trigger gunnerStowedButton = gunner.x();
 
     DriverConfig driverConfig = new DriverConfig();
     DoubleSupplier xSupplier =
         new DriveInput(
-            driveController::getLeftY, DriveInput.InputType.TRANSLATION, driverConfig, false);
+            driverController::getLeftY, DriveInput.InputType.TRANSLATION, driverConfig, false);
     DoubleSupplier ySupplier =
         new DriveInput(
-            driveController::getLeftX, DriveInput.InputType.TRANSLATION, driverConfig, false);
+            driverController::getLeftX, DriveInput.InputType.TRANSLATION, driverConfig, false);
     DoubleSupplier turnSupplier =
         new DriveInput(
-            driveController::getRightX, DriveInput.InputType.ROTATION, driverConfig, false);
+            driverController::getRightX, DriveInput.InputType.ROTATION, driverConfig, false);
     DoubleSupplier pointingDriveInput =
-        new DriveInput(driveController::getRightY, driveController::getRightX, driverConfig);
+        new DriveInput(driverController::getRightY, driverController::getRightX, driverConfig);
+    DoubleSupplier gunnerLeftYSupplier = gunnerController::getLeftY;
+    DoubleSupplier gunnerRightYSupplier = gunnerController::getRightY;
 
     DriveCommand driveCommand =
         new DriveCommand(
@@ -122,66 +138,114 @@ public class RobotContainer {
 
     drivetrainSubsystem.setDefaultCommand(driveCommand);
 
-    controlMethod.onTrue(Commands.startEnd(driveCommand::toggleDriveType, () -> {}));
-    Trigger driverGoButton = driver.b();
-    Trigger driverResetFieldNorth = driver.start();
-    Trigger driverToggleGamePieceButton = driver.leftBumper();
+    Trigger singleSubstation = driver.povUp();
+    singleSubstation.onTrue(new ArmPowerCommand(Constants.DOUBLE_SUBSTATION_ARM_POSITION, arm, 3));
+
+    Trigger intakeButton = driver.leftTrigger(0.3);
+    Trigger shootButton = driver.rightTrigger(0.3);
 
     intakeButton.whileTrue(
         Commands.startEnd(() -> endAffector.intake(), () -> endAffector.idle(), endAffector));
 
     shootButton.whileTrue(
-        Commands.startEnd(() -> endAffector.fastOutake(), () -> endAffector.idle(), endAffector));
+        Commands.startEnd(() -> endAffector.fastOutake(), () -> endAffector.halt(), endAffector));
 
-    driverResetFieldNorth.whileTrue(
+    Trigger driverGoButton = driver.a();
+    Trigger driverResetFieldNorth = driver.start();
+
+    driverResetFieldNorth.onTrue(
         new InstantCommand(
             () ->
                 fieldPositioningSystem.resetRobotPosition(
                     new Pose2d(
                         fieldPositioningSystem.getRobotXYPose().getTranslation(),
-                        new Rotation2d(Math.PI)))));
-
-    driverToggleGamePieceButton.toggleOnTrue(
-        Commands.runOnce(() -> endAffector.toggleGamePiece(), endAffector));
-
-    gunnerLowButton.onTrue(
-        new ArmPowerCommand(
-            () -> cubeSub.get() ? Constants.CUBE_LOW : Constants.CONE_LOW, arm, getBay()));
-
-    gunnerMidButton.onTrue(
-        new ArmPowerCommand(
-            () -> cubeSub.get() ? Constants.CUBE_MID : Constants.CONE_MID, arm, getBay()));
-
-    gunnerHighButton.onTrue(
-        new ArmPowerCommand(
-            () -> cubeSub.get() ? Constants.CUBE_HIGH : Constants.CONE_HIGH, arm, getBay()));
-
-    gunnerStowedButton.onTrue(new ArmPowerCommand(() -> Constants.STOWED, arm, getBay()));
-
-    driver
-        .povLeft()
-        .debounce(0.05)
-        .toggleOnTrue(Commands.runOnce(() -> colorStrip.positionColoring.Increment(), colorStrip));
-    driver
-        .povRight()
-        .debounce(0.05)
-        .toggleOnTrue(Commands.runOnce(() -> colorStrip.positionColoring.Decrement(), colorStrip));
-
-    driverGoButton.whileTrue(
-        Commands.runOnce(
-            () ->
-                CommandScheduler.getInstance()
-                    .schedule(autoCommand.generateGridCommand(getBay()).until(this::isDriving))));
+                        new Rotation2d(0)))));
 
     highGearButton.whileTrue(
         Commands.startEnd(
             () -> DriveInput.setToHighGear(true), () -> DriveInput.setToHighGear(false)));
+
+    // driverGoButton.onTrue(autoCommand.generateGridCommand(getBay()).until(this::isDriving));
+
+    Trigger driverToggleGamePieceButton = driver.leftBumper();
+    driverToggleGamePieceButton.onTrue(new SwitchTargetObject(endAffector, arm, isCubeTopic));
+
+    Trigger driverStowed = driver.x();
+    Trigger gunnerStowed = gunner.x();
+
+    gunnerStowed.onTrue(new ArmPowerCommand(Constants.STOWED_ARM_POSITION, arm, 3));
+    driverStowed.onTrue(
+        Commands.runOnce(() -> driverStowBehavior().schedule(), new Subsystem[] {}));
+
+    Trigger driverDefenseStowed = driver.b();
+    driverDefenseStowed.onTrue(new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3));
+
+    Trigger gunnerDefenseStowed = gunner.rightBumper();
+    gunnerDefenseStowed.onTrue(new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3));
+
+    Trigger zeroElevator = gunner.start();
+    zeroElevator.onTrue(new ZeroElevator(arm));
+
+    Trigger gunnerLowButton = gunner.a();
+    Trigger gunnerMidButton = gunner.b();
+    Trigger gunnerHighButton = gunner.y();
+    Trigger gunnerLeftY =
+        new Trigger(
+            () ->
+                gunner.getLeftY() > Constants.ARM_MANUAL_OVERRIDE_DEADZONE
+                    || gunner.getLeftY() < -Constants.ARM_MANUAL_OVERRIDE_DEADZONE);
+    Trigger gunnerRightY =
+        new Trigger(
+            () ->
+                gunner.getRightY() > Constants.ARM_MANUAL_OVERRIDE_DEADZONE
+                    || gunner.getRightY() < -Constants.ARM_MANUAL_OVERRIDE_DEADZONE);
+
+    gunnerLeftY
+        .or(gunnerRightY)
+        .onTrue(new ArmManualCommand(gunnerLeftYSupplier, gunnerRightYSupplier, arm));
+
+    gunnerLowButton
+        .and(() -> cubeSub.get())
+        .onTrue(new ArmPowerCommand(Constants.LOW_CUBE_ARM_POSITION, arm, 3));
+    gunnerLowButton
+        .and(() -> !cubeSub.get())
+        .onTrue(new ArmPowerCommand(Constants.LOW_CONE_ARM_POSITION, arm, 3));
+    gunnerMidButton
+        .and(() -> cubeSub.get())
+        .onTrue(new ArmPowerCommand(Constants.MID_CUBE_ARM_POSITION, arm, 3));
+    gunnerMidButton
+        .and(() -> !cubeSub.get())
+        .onTrue(new ArmPowerCommand(Constants.MID_CONE_ARM_POSITION, arm, 3));
+    gunnerHighButton
+        .and(() -> cubeSub.get())
+        .onTrue(new ArmPowerCommand(Constants.HIGH_CUBE_ARM_POSITION, arm, 3));
+    gunnerHighButton
+        .and(() -> !cubeSub.get())
+        .onTrue(new ArmPowerCommand(Constants.HIGH_CONE_ARM_POSITION, arm, 3));
+
+    Trigger gunnerLefTrigger = gunner.leftTrigger();
+    gunnerLefTrigger.onTrue(new AutoBalanceCommand(drivetrainSubsystem));
+  }
+
+  private Command driverStowBehavior() {
+    if (arm.getArmPosition().getHeight() == ArmHeight.STOWED
+        || arm.getArmPosition().getHeight() == ArmHeight.STOWED) {
+      ArmPosition targetPosition =
+          ArmPosition.getArmPositionFromHeightAndType(ArmHeight.LOW, cubeSub.get());
+      return new ArmPowerCommand(targetPosition, arm, 3);
+    } else {
+      return new ArmPowerCommand(Constants.STOWED_ARM_POSITION, arm, 3);
+    }
+  }
+
+  public void updateLEDs() {
+    colorStrip.forceUpdate();
   }
 
   public Command getAutonomousCommand() {
     // AutoRoutines should be used to add more auto routines that we'll execute.
 
-    return autoCommand.generateCommandFromFile("PickFirstElementRed", true);
+    return routineFactory.getAuto(autoChooser.getSelected());
   }
 
   public int getBay() {
@@ -191,7 +255,7 @@ public class RobotContainer {
   }
 
   public void onDisabled() {
-    colorStrip.startRainbowAnimation();
+    colorStrip.randomizePattern();
   }
 
   public void onExitDisabled() {
@@ -199,6 +263,28 @@ public class RobotContainer {
   }
 
   private boolean isDriving() {
-    return 0.5 < Math.hypot(driveController.getLeftX(), driveController.getLeftY());
+    return 0.5 < Math.hypot(driverController.getLeftX(), driverController.getLeftY());
+  }
+
+  public void unbindShoulder() {
+    ArmPosition currentPos = arm.getArmPosition();
+    ArmPosition unboundPos =
+        new ArmPosition(
+            currentPos.getArmRotation() + Math.toRadians(5),
+            currentPos.getArmExtension(),
+            currentPos.getWristRotation(),
+            ArmHeight.NOT_SPECIFIED);
+    new InstantCommand(() -> arm.setTarget(unboundPos)).schedule();
+  }
+
+  private void addChooserOptions() {
+    autoChooser.setDefaultOption("no op", Routines.NO_OP);
+    autoChooser.addOption("preload only", Routines.PRELOAD_ONLY);
+    autoChooser.addOption("mid climb", Routines.MIDDLE_CLIMB);
+    autoChooser.addOption("left 2 element climb", Routines.LEFT_2_ELEMENT_CLIMB);
+    autoChooser.addOption("right 2 element climb", Routines.RIGHT_2_ELEMENT_CLIMB);
+    autoChooser.addOption("left 2 element no climb", Routines.LEFT_2_ELEMENT_NOCLIMB);
+    autoChooser.addOption("right 2 element no climb", Routines.RIGHT_2_ELEMENT_NOCLIMB);
+    SmartDashboard.putData(autoChooser);
   }
 }

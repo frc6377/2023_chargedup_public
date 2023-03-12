@@ -13,6 +13,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
 import frc.robot.FieldPoses;
 import frc.robot.networktables.Pose2DSubscriber;
@@ -40,7 +41,7 @@ public class SwerveAutoFactory {
   }
 
   // loads a trajectory from file and hands it to the command generator
-  public Command generateCommandFromFile(String pathTofollow, boolean isFirstPath) {
+  public SequentialCommandGroup generateCommandFromFile(String pathTofollow, boolean isFirstPath) {
 
     createFieldPoses(); // create a field poses object if we dont have one already
 
@@ -205,9 +206,10 @@ public class SwerveAutoFactory {
         new Pose2d(fieldPoses.getDoubleSubstation(), fieldPoses.getDeliveryRotation()));
   }
 
-  public Command generateControllerCommand(boolean isFirstPath, PathPlannerTrajectory trajectory) {
+  public SequentialCommandGroup generateControllerCommand(
+      boolean isFirstPath, PathPlannerTrajectory trajectory) {
 
-    PIDController thetaController = new PIDController(2, 0.1, 0);
+    PIDController thetaController = new PIDController(2, 0, 0);
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
     PPSwerveControllerCommand command =
@@ -215,8 +217,8 @@ public class SwerveAutoFactory {
             trajectory,
             sub::get,
             drivetrainSubsystem.getKinematics(),
-            new PIDController(1, 0, 0),
-            new PIDController(1, 0, 0),
+            new PIDController(5, 0, 0),
+            new PIDController(5, 0, 0),
             thetaController,
             drivetrainSubsystem::updateAutoDemand,
             false,
@@ -226,6 +228,7 @@ public class SwerveAutoFactory {
         && isFirstPath) { // checks if we have a pose reseter and if we want to reset our pose. If
       // we
       // do we want to overwrite whatever the kalman filter has. Mostly for auton
+
       poseReseter.accept(trajectory.getInitialHolonomicPose());
     }
     drivetrainSubsystem.sendTrajectoryToNT(trajectory); // posts trajectory to dashboard
