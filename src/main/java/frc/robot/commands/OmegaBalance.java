@@ -46,7 +46,7 @@ public class OmegaBalance extends CommandBase {
       count = 0;
     }
 
-    return count > 3;
+    return count > 3 || isLevel();
   }
   
 
@@ -89,6 +89,6 @@ private double computeSign(){
     double pitch = (thetaSub.get()[1]);
     double roll = (thetaSub.get()[2]);
 
-    return Math.hypot(pitch, roll) < 1;
+    return Math.hypot(pitch, roll) < 2.5;
   }
 }
