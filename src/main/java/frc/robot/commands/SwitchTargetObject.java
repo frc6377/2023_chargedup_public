@@ -38,8 +38,7 @@ public class SwitchTargetObject extends CommandBase {
     endAffectorSubsystem.setGamePiece(isCube);
     colorSubsystem.updateLEDs(isCube);
     ArmHeight currentHeight = armSubsystem.getArmPosition().getHeight();
-    armSubsystem.setTarget(
-        ArmPosition.getArmPositionFromHeightAndType(currentHeight, isCube));
+    armSubsystem.setTarget(ArmPosition.getArmPositionFromHeightAndType(currentHeight, isCube));
   }
 
   public boolean isFinished() {

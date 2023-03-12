@@ -82,7 +82,8 @@ public class RobotContainer {
     isCubeSubscriber = isCubeTopic.subscribe(false);
     endAffector = new EndAffectorSubsystem(Constants.END_AFFECTOR_ID, isCubeSubscriber.get());
     colorStrip =
-        new ColorSubsystem(Constants.GAME_PIECE_CANDLE, Constants.GRID_SELECT_CANDLE, isCubeSubscriber.get());
+        new ColorSubsystem(
+            Constants.GAME_PIECE_CANDLE, Constants.GRID_SELECT_CANDLE, isCubeSubscriber.get());
 
     fieldPositioningSystem.setDriveTrainSupplier(
         () -> drivetrainSubsystem.getOdometry(), drivetrainSubsystem.getKinematics());
@@ -159,7 +160,8 @@ public class RobotContainer {
     // driverGoButton.onTrue(autoCommand.generateGridCommand(getBay()).until(this::isDriving));
 
     Trigger driverToggleGamePieceButton = driver.leftBumper();
-    driverToggleGamePieceButton.onTrue(new SwitchTargetObject(endAffector, arm, colorStrip, isCubeTopic));
+    driverToggleGamePieceButton.onTrue(
+        new SwitchTargetObject(endAffector, arm, colorStrip, isCubeTopic));
 
     Trigger driverStowed = driver.x();
     Trigger gunnerStowed = gunner.x();

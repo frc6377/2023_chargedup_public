@@ -37,7 +37,7 @@ public class ColorSubsystem extends SubsystemBase {
   public ColorSubsystem(int gamePieceID, int gridSelectID, final boolean isCube) {
 
     this.isCube = isCube;
-    this.lastColorIsCube  = isCube;
+    this.lastColorIsCube = isCube;
 
     gamePieceCandle = new CANdle(gamePieceID);
     gridPositionCandle = new CANdle(gridSelectID);
@@ -65,6 +65,7 @@ public class ColorSubsystem extends SubsystemBase {
   public void setCube() {
     updateLEDs(true);
   }
+
   public void setCone() {
     updateLEDs(false);
   }
