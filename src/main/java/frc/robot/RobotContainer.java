@@ -9,7 +9,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.networktables.BooleanTopic;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -45,17 +44,13 @@ public class RobotContainer {
   // Find the configuration class to load for this robot
   RobotVersion robotVersion = IdentifyRoborio.identifyRobot();
   // Input controllers
-  private final XboxController driverController =
-      new XboxController(Constants.DRIVER_CONTROLLER_ID);
-  private final XboxController gunnerController =
-      new XboxController(Constants.GUNNER_CONTROLLER_ID);
-  private final StreamDeck streamDeck = new StreamDeck(2, 36);
-  // Subsystems
-  private final DeploySubsystem deploySubsystem = new DeploySubsystem();
   private final CommandXboxController driver =
       new CommandXboxController(Constants.DRIVER_CONTROLLER_ID);
   private final CommandXboxController gunner =
       new CommandXboxController(Constants.GUNNER_CONTROLLER_ID);
+  private final StreamDeck streamDeck = new StreamDeck(2, 36);
+  // Subsystems
+  private final DeploySubsystem deploySubsystem = new DeploySubsystem();
   private final ArmSubsystem arm = new ArmSubsystem();
   private final BooleanTopic isCubeTopic;
   private final BooleanSubscriber cubeSub;
@@ -73,16 +68,13 @@ public class RobotContainer {
 
     DriverConfig driverConfig = new DriverConfig();
     DoubleSupplier xSupplier =
-        new DriveInput(
-            driverController::getLeftY, DriveInput.InputType.TRANSLATION, driverConfig, false);
+        new DriveInput(driver::getLeftY, DriveInput.InputType.TRANSLATION, driverConfig, false);
     DoubleSupplier ySupplier =
-        new DriveInput(
-            driverController::getLeftX, DriveInput.InputType.TRANSLATION, driverConfig, false);
+        new DriveInput(driver::getLeftX, DriveInput.InputType.TRANSLATION, driverConfig, false);
     DoubleSupplier rotationSupplier =
-        new DriveInput(
-            driverController::getLeftX, DriveInput.InputType.TRANSLATION, driverConfig, false);
+        new DriveInput(driver::getLeftX, DriveInput.InputType.TRANSLATION, driverConfig, false);
     DoubleSupplier pointingDriveInput =
-        new DriveInput(driverController::getRightY, driverController::getRightX, driverConfig);
+        new DriveInput(driver::getRightY, driver::getRightX, driverConfig);
 
     isCubeTopic = NetworkTableInstance.getDefault().getBooleanTopic("isCube");
     cubeSub = isCubeTopic.subscribe(false);
@@ -114,18 +106,15 @@ public class RobotContainer {
 
     DriverConfig driverConfig = new DriverConfig();
     DoubleSupplier xSupplier =
-        new DriveInput(
-            driverController::getLeftY, DriveInput.InputType.TRANSLATION, driverConfig, false);
+        new DriveInput(driver::getLeftY, DriveInput.InputType.TRANSLATION, driverConfig, false);
     DoubleSupplier ySupplier =
-        new DriveInput(
-            driverController::getLeftX, DriveInput.InputType.TRANSLATION, driverConfig, false);
+        new DriveInput(driver::getLeftX, DriveInput.InputType.TRANSLATION, driverConfig, false);
     DoubleSupplier turnSupplier =
-        new DriveInput(
-            driverController::getRightX, DriveInput.InputType.ROTATION, driverConfig, false);
+        new DriveInput(driver::getRightX, DriveInput.InputType.ROTATION, driverConfig, false);
     DoubleSupplier pointingDriveInput =
-        new DriveInput(driverController::getRightY, driverController::getRightX, driverConfig);
-    DoubleSupplier gunnerLeftYSupplier = gunnerController::getLeftY;
-    DoubleSupplier gunnerRightYSupplier = gunnerController::getRightY;
+        new DriveInput(driver::getRightY, driver::getRightX, driverConfig);
+    DoubleSupplier gunnerLeftYSupplier = gunner::getLeftY;
+    DoubleSupplier gunnerRightYSupplier = gunner::getRightY;
 
     DriveCommand driveCommand =
         new DriveCommand(
@@ -190,15 +179,9 @@ public class RobotContainer {
     Trigger gunnerMidButton = gunner.b();
     Trigger gunnerHighButton = gunner.y();
     Trigger gunnerLeftY =
-        new Trigger(
-            () ->
-                gunner.getLeftY() > Constants.ARM_MANUAL_OVERRIDE_DEADZONE
-                    || gunner.getLeftY() < -Constants.ARM_MANUAL_OVERRIDE_DEADZONE);
+        new Trigger(() -> Math.abs(gunner.getLeftY()) > Constants.ARM_MANUAL_OVERRIDE_DEADZONE);
     Trigger gunnerRightY =
-        new Trigger(
-            () ->
-                gunner.getRightY() > Constants.ARM_MANUAL_OVERRIDE_DEADZONE
-                    || gunner.getRightY() < -Constants.ARM_MANUAL_OVERRIDE_DEADZONE);
+        new Trigger(() -> Math.abs(gunner.getRightY()) > Constants.ARM_MANUAL_OVERRIDE_DEADZONE);
 
     gunnerLeftY
         .or(gunnerRightY)
@@ -263,7 +246,7 @@ public class RobotContainer {
   }
 
   private boolean isDriving() {
-    return 0.5 < Math.hypot(driverController.getLeftX(), driverController.getLeftY());
+    return 0.5 < Math.hypot(driver.getLeftX(), driver.getLeftY());
   }
 
   public void unbindShoulder() {

@@ -163,8 +163,8 @@ public final class Constants {
 
   // Wrist
   public static final double WRIST_KP = 0.1;
-  public static final double WRIST_MAX_VELOCITY = 17067;
-  public static final double WRIST_MAX_ACCELLERATION = 85333;
+  public static final double WRIST_MAX_VELOCITY = 5000;
+  public static final double WRIST_MAX_ACCELLERATION = 5000;
   public static final double WRIST_MOMENT_OF_INERTIA = 0;
   public static final double WRIST_GEAR_RATIO = 1.0 / 41.67;
   public static final double WRIST_ROTATION_STOWED = 0;
@@ -174,13 +174,13 @@ public final class Constants {
    *
    * <p>Should be measured from center to center.
    */
-  public static final double DRIVETRAIN_TRACKWIDTH_METERS = 0.4572;
+  public static final double DRIVETRAIN_TRACKWIDTH_METERS = 0.457;
   /**
    * The front-to-back distance between the drivetrain wheels.
    *
    * <p>Should be measured from center to center.
    */
-  public static final double DRIVETRAIN_WHEELBASE_METERS = 0.4572;
+  public static final double DRIVETRAIN_WHEELBASE_METERS = 0.457;
 
   public static final int DRIVETRAIN_PIGEON_ID = 1;
 
@@ -207,7 +207,7 @@ public final class Constants {
   public static final double FIELD_Y = 8.02;
 
   // otf pathing constants
-  public static final double AUTO_MAX_VELOCITY = 2.0;
+  public static final double AUTO_MAX_VELOCITY = 4.0;
   public static final double AUTO_MAX_ACCELERATION = 2.0;
 
   // relative distance from your alliance station wall or the left of the field depending on axis.
@@ -269,9 +269,9 @@ public final class Constants {
   public static final ArmPosition STOWED_ARM_POSITION =
       new ArmPosition(Math.toRadians(-6.3), 1, 8000, ArmHeight.STOWED);
   public static final ArmPosition LOW_CUBE_ARM_POSITION =
-      new ArmPosition(Math.toRadians(-6.3), 1, 4000, ArmHeight.LOW);
+      new ArmPosition(Math.toRadians(-6.3), 1, 4500, ArmHeight.LOW);
   public static final ArmPosition LOW_CONE_ARM_POSITION =
-      new ArmPosition(Math.toRadians(-6.3), 1, -7500, ArmHeight.LOW);
+      new ArmPosition(Math.toRadians(-6.3), 1, -6500, ArmHeight.LOW);
   public static final ArmPosition MID_CUBE_ARM_POSITION =
       new ArmPosition(Math.toRadians(35), 5.95, -2358, ArmHeight.MID);
   public static final ArmPosition MID_CONE_ARM_POSITION =
@@ -279,20 +279,20 @@ public final class Constants {
   public static final ArmPosition HIGH_CUBE_ARM_POSITION =
       new ArmPosition(Math.toRadians(34.94), 10.35, 3498, ArmHeight.HIGH);
   public static final ArmPosition HIGH_CONE_ARM_POSITION =
-      new ArmPosition(Math.toRadians(41.49), 11.3, -15000, ArmHeight.HIGH);
+      new ArmPosition(Math.toRadians(44.49), 12.6, -18000, ArmHeight.HIGH);
   public static final ArmPosition HIGH_STOWED_ARM_POSITION =
       new ArmPosition(Math.toRadians(70), 1, -16000, ArmHeight.HIGH_STOWED);
-  public static final ArmPosition MAX_POSITION =
-      new ArmPosition(Math.toRadians(75.0), 12, 20000, ArmHeight.NOT_SPECIFIED);
-  public static final ArmPosition MIN_POSITION =
-      new ArmPosition(Math.toRadians(-8), 1, -26000.0, ArmHeight.NOT_SPECIFIED);
+  public static final ArmPosition ARM_MAX_POSITION =
+      new ArmPosition(1000, 1000, 1000, ArmHeight.NOT_SPECIFIED);
+  public static final ArmPosition ARM_MIN_POSITION =
+      new ArmPosition(-1000, -1000, -1000, ArmHeight.NOT_SPECIFIED);
   public static final ArmPosition DOUBLE_SUBSTATION_ARM_POSITION =
       new ArmPosition(
-          Math.toRadians(60.743408), 4.204757, -19763.000000, ArmHeight.DOUBLE_SUBSTATION);
+          Math.toRadians(60.743408), 4.204757, -20363.000000, ArmHeight.DOUBLE_SUBSTATION);
 
   // A value between 0 and 1.
   public static final double RAINBOW_ANIMATION_SPEED = 0.5;
-  public static final double ELEVATOR_ZEROING_PERCENT = -0.1;
-  public static final int ELEVATOR_ZERO_AMPRAGE = 0;
+  public static final double ELEVATOR_ZEROING_PERCENT = -0.2;
+  public static final int ELEVATOR_ZERO_AMPRAGE = 20;
   public static final double ELEVATOR_ZEROING_TIME_SECONDS = 0.2;
 }

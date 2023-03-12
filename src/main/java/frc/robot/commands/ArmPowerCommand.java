@@ -51,7 +51,7 @@ public class ArmPowerCommand extends CommandBase {
                 Math.min(targetPose.r, initalPose.r),
                 Math.max(targetPose.r, initalPose.r)),
             targetWristAngle,
-            ArmHeight.NOT_SPECIFIED));
+            targetHeight));
   }
 
   @Override

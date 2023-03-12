@@ -135,6 +135,7 @@ public class ArmSubsystem extends SubsystemBase {
     leftShoulder.set(shoulderOutput);
     SmartDashboard.putNumber("arb ffw", computeShoulderArbitraryFeedForward());
     SmartDashboard.putNumber("Arm Extension (encoder pos)", extendEncoder.getPosition());
+    SmartDashboard.putNumber("elevator setpoint raw", armPosition.armExtension);
     SmartDashboard.putNumber("Elevator ffw", computeElevatorFeedForward());
 
     if (!elevatorInPercentControl) {
@@ -170,7 +171,7 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public void setTarget(ArmPosition armPosition) {
-    this.armPosition = armPosition.min(Constants.MAX_POSITION).max(Constants.MIN_POSITION);
+    this.armPosition = armPosition.clamp(Constants.ARM_MIN_POSITION, Constants.ARM_MAX_POSITION);
     shoulderPPC.setGoal(this.armPosition.armRotation);
     wristMotor.set(ControlMode.MotionMagic, this.armPosition.wristRotation);
   }

@@ -1,5 +1,6 @@
 package frc.robot.subsystems.arm;
 
+import edu.wpi.first.math.MathUtil;
 import frc.robot.Constants;
 
 public class ArmPosition {
@@ -19,22 +20,6 @@ public class ArmPosition {
         String.format(
             "%s - armRotation: %.3f, armExtension: %.3f, wristRotation: %.3f",
             armHeight.name(), armRotation, armExtension, wristRotation);
-  }
-
-  public ArmPosition max(ArmPosition armPos2) {
-    return new ArmPosition(
-        Math.max(armRotation, armPos2.getArmRotation()),
-        Math.max(armExtension, armPos2.getArmExtension()),
-        Math.max(wristRotation, armPos2.getWristRotation()),
-        ArmHeight.NOT_SPECIFIED);
-  }
-
-  public ArmPosition min(ArmPosition armPos2) {
-    return new ArmPosition(
-        Math.min(armRotation, armPos2.getArmRotation()),
-        Math.min(armExtension, armPos2.getArmExtension()),
-        Math.min(wristRotation, armPos2.getWristRotation()),
-        ArmHeight.NOT_SPECIFIED);
   }
 
   public ArmPosition add(ArmPosition armPos2) {
@@ -93,5 +78,18 @@ public class ArmPosition {
       default:
         return Constants.STOWED_ARM_POSITION;
     }
+  }
+
+  public ArmPosition clamp(ArmPosition armMinPosition, ArmPosition armMaxPosition) {
+    return new ArmPosition(
+        MathUtil.clamp(
+            this.armRotation, armMinPosition.getArmRotation(), armMaxPosition.getArmRotation()),
+        MathUtil.clamp(
+            this.armExtension, armMinPosition.getArmExtension(), armMaxPosition.getArmExtension()),
+        MathUtil.clamp(
+            this.wristRotation,
+            armMinPosition.getWristRotation(),
+            armMaxPosition.getWristRotation()),
+        ArmHeight.NOT_SPECIFIED);
   }
 }

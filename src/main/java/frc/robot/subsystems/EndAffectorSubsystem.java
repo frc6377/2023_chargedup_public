@@ -19,10 +19,6 @@ public class EndAffectorSubsystem extends SubsystemBase {
     isCubePublisher.set(isCube);
   }
 
-  public boolean isCube() {
-    return isCube;
-  }
-
   public void toggleGamePiece() {
     isCube = !isCube;
     isCubePublisher.set(isCube);
@@ -43,11 +39,11 @@ public class EndAffectorSubsystem extends SubsystemBase {
   }
 
   public void fastOutake() {
-    motor.set(-Constants.END_AFFECTOR_OUTTAKE_SPEED * (isCube ? -1 : 1.25));
+    motor.set(-Constants.END_AFFECTOR_OUTTAKE_SPEED * (isCube ? -1 : 3));
   }
 
   public void slowOutake() {
-    motor.set(-Constants.END_AFFECTOR_SLOW_OUTTAKE_SPEED * (isCube ? -1 : 1.25));
+    motor.set(-Constants.END_AFFECTOR_SLOW_OUTTAKE_SPEED * (isCube ? -1 : 3));
   }
 
   public void halt() {
