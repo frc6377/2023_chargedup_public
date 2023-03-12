@@ -11,10 +11,14 @@ import frc.robot.Constants;
 import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
 
 public class OmegaBalance extends CommandBase {
-  private final DoubleArraySubscriber sub =
+  private final DoubleArraySubscriber omegaSub =
       NetworkTableInstance.getDefault()
           .getDoubleArrayTopic("omegas")
           .subscribe(new double[] {0, 0, 0});
+          private final DoubleArraySubscriber thetaSub =
+          NetworkTableInstance.getDefault()
+              .getDoubleArrayTopic("pitch")
+              .subscribe(new double[] {0, 0, 0});
   private final DrivetrainSubsystem drive;
   private int count = 0;
   private final double driveVelocity;
@@ -31,13 +35,20 @@ public class OmegaBalance extends CommandBase {
     drive.drive(
         ChassisSpeeds.fromFieldRelativeSpeeds(
             new ChassisSpeeds(driveVelocity*computeSign(), 0, 0),
-            new Rotation2d(Math.toRadians(sub.get()[0]))));
+            new Rotation2d(Math.toRadians(omegaSub.get()[0]))));
   }
 
   @Override
   public boolean isFinished() {
-    return computeOmega() >= targetOmega;
+    if (computeOmega() > targetOmega) {
+      count++;
+    } else {
+      count = 0;
+    }
+
+    return count > 3;
   }
+  
 
   @Override
   public void end(boolean interupted) {
@@ -45,16 +56,17 @@ public class OmegaBalance extends CommandBase {
   }
 
   private double computeOmega() {
-    double pitch = (sub.get()[1]);
-    double roll = (sub.get()[2]);
+    double pitch = (omegaSub.get()[1]);
+    double roll = (omegaSub.get()[2]);
 
+    System.out.println("pitch " + pitch + " roll " + roll);
     return Math.hypot(roll, pitch);
   }
     // DONT TOUCH UNLESS U HAVE A FIX. I AM A BROKEN MAN
 private double computeSign(){
-    double yaw = (sub.get()[0]);
-    double pitch = (sub.get()[1]);
-    double roll = (sub.get()[2]);
+    double yaw = (thetaSub.get()[0]);
+    double pitch = (thetaSub.get()[1]);
+    double roll = (thetaSub.get()[2]);
 
     double sign = 0;
     if (yaw >= -45 && yaw < 45) {
@@ -71,5 +83,12 @@ private double computeSign(){
 
     return Math.copySign(1, sign);
     
+  }
+
+  private boolean isLevel(){
+    double pitch = (thetaSub.get()[1]);
+    double roll = (thetaSub.get()[2]);
+
+    return Math.hypot(pitch, roll) < 1;
   }
 }
