@@ -6,11 +6,12 @@ import frc.robot.Constants;
 
 public class EndAffectorSubsystem extends SubsystemBase {
   private WPI_TalonFX motor;
-  private boolean isCube = true;
+  private boolean isCube;
 
-  public EndAffectorSubsystem(int ID) {
+  public EndAffectorSubsystem(int ID, final boolean isCube) {
     motor = new WPI_TalonFX(ID);
     motor.configOpenloopRamp(0.25);
+    this.isCube = isCube;
   }
 
   public void toggleGamePiece() {

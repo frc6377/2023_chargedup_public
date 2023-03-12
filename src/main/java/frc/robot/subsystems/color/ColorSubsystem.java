@@ -29,12 +29,15 @@ public class ColorSubsystem extends SubsystemBase {
   public final PieceColoring pieceColoring = new PieceColoring();
   public final PositionColoring positionColoring = new PositionColoring();
   public final MorseCodeAnimation morseCodeAnimation = new MorseCodeAnimation();
-  private boolean lastColor = true;
-  private boolean isCube = true;
+  private boolean lastColorIsCube;
+  private boolean isCube;
 
   private final RainbowAnimation rainbowAnimation;
 
-  public ColorSubsystem(int gamePieceID, int gridSelectID) {
+  public ColorSubsystem(int gamePieceID, int gridSelectID, final boolean isCube) {
+
+    this.isCube = isCube;
+    this.lastColorIsCube  = isCube;
 
     gamePieceCandle = new CANdle(gamePieceID);
     gridPositionCandle = new CANdle(gridSelectID);
@@ -67,7 +70,7 @@ public class ColorSubsystem extends SubsystemBase {
   }
 
   public void updateLEDs(final boolean isCube) {
-    if (this.lastColor != isCube) {
+    if (this.lastColorIsCube != isCube) {
       forceUpdate();
     }
   }
@@ -90,7 +93,7 @@ public class ColorSubsystem extends SubsystemBase {
 
   public void forceUpdate() {
     this.pieceColoring.update();
-    lastColor = isCube;
+    lastColorIsCube = isCube;
   }
 
   private void clearLEDsGamePiece() {

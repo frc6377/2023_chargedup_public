@@ -53,7 +53,7 @@ public class RobotContainer {
   private final DeploySubsystem deploySubsystem = new DeploySubsystem();
   private final ArmSubsystem arm = new ArmSubsystem();
   private final BooleanTopic isCubeTopic;
-  private final BooleanSubscriber cubeSub;
+  private final BooleanSubscriber isCubeSubscriber;
   private final EndAffectorSubsystem endAffector;
   private final ColorSubsystem colorStrip;
   private final FieldPositioningSystem fieldPositioningSystem = new FieldPositioningSystem();
@@ -77,10 +77,12 @@ public class RobotContainer {
         new DriveInput(driver::getRightY, driver::getRightX, driverConfig);
 
     isCubeTopic = NetworkTableInstance.getDefault().getBooleanTopic("isCube");
-    cubeSub = isCubeTopic.subscribe(false);
-    endAffector = new EndAffectorSubsystem(Constants.END_AFFECTOR_ID, isCubeTopic);
+    // Default to Cube.
+    isCubeTopic.publish().set(true);
+    isCubeSubscriber = isCubeTopic.subscribe(false);
+    endAffector = new EndAffectorSubsystem(Constants.END_AFFECTOR_ID, isCubeSubscriber.get());
     colorStrip =
-        new ColorSubsystem(Constants.GAME_PIECE_CANDLE, Constants.GRID_SELECT_CANDLE);
+        new ColorSubsystem(Constants.GAME_PIECE_CANDLE, Constants.GRID_SELECT_CANDLE, isCubeSubscriber.get());
 
     fieldPositioningSystem.setDriveTrainSupplier(
         () -> drivetrainSubsystem.getOdometry(), drivetrainSubsystem.getKinematics());
@@ -188,22 +190,22 @@ public class RobotContainer {
         .onTrue(new ArmManualCommand(gunnerLeftYSupplier, gunnerRightYSupplier, arm));
 
     gunnerLowButton
-        .and(() -> cubeSub.get())
+        .and(() -> isCubeSubscriber.get())
         .onTrue(new ArmPowerCommand(Constants.LOW_CUBE_ARM_POSITION, arm, 3));
     gunnerLowButton
-        .and(() -> !cubeSub.get())
+        .and(() -> !isCubeSubscriber.get())
         .onTrue(new ArmPowerCommand(Constants.LOW_CONE_ARM_POSITION, arm, 3));
     gunnerMidButton
-        .and(() -> cubeSub.get())
+        .and(() -> isCubeSubscriber.get())
         .onTrue(new ArmPowerCommand(Constants.MID_CUBE_ARM_POSITION, arm, 3));
     gunnerMidButton
-        .and(() -> !cubeSub.get())
+        .and(() -> !isCubeSubscriber.get())
         .onTrue(new ArmPowerCommand(Constants.MID_CONE_ARM_POSITION, arm, 3));
     gunnerHighButton
-        .and(() -> cubeSub.get())
+        .and(() -> isCubeSubscriber.get())
         .onTrue(new ArmPowerCommand(Constants.HIGH_CUBE_ARM_POSITION, arm, 3));
     gunnerHighButton
-        .and(() -> !cubeSub.get())
+        .and(() -> !isCubeSubscriber.get())
         .onTrue(new ArmPowerCommand(Constants.HIGH_CONE_ARM_POSITION, arm, 3));
 
     Trigger gunnerLefTrigger = gunner.leftTrigger();
@@ -214,7 +216,7 @@ public class RobotContainer {
     if (arm.getArmPosition().getHeight() == ArmHeight.STOWED
         || arm.getArmPosition().getHeight() == ArmHeight.STOWED) {
       ArmPosition targetPosition =
-          ArmPosition.getArmPositionFromHeightAndType(ArmHeight.LOW, cubeSub.get());
+          ArmPosition.getArmPositionFromHeightAndType(ArmHeight.LOW, isCubeSubscriber.get());
       return new ArmPowerCommand(targetPosition, arm, 3);
     } else {
       return new ArmPowerCommand(Constants.STOWED_ARM_POSITION, arm, 3);
