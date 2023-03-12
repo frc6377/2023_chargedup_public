@@ -72,6 +72,7 @@ public class ArmPosition {
         if (isCube) {
           return Constants.MID_CUBE_ARM_POSITION;
         } else return Constants.MID_CONE_ARM_POSITION;
+
       case STOWED:
         return Constants.STOWED_ARM_POSITION;
 
