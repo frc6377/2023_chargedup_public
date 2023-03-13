@@ -34,6 +34,7 @@ public class ArmSubsystem extends SubsystemBase {
   // for any more testing
   private final CANCoder shoulderCANCoder;
   private final CANCoder wristCANCoder;
+  private final CANCoder elevatorCANCoder;
   private final VictorSPX brakeMotor;
 
   private final CANSparkMax extendMotor;
@@ -60,6 +61,11 @@ public class ArmSubsystem extends SubsystemBase {
     shoulderCANCoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
     shoulderCANCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
     shoulderCANCoder.setPositionToAbsolute();
+
+    elevatorCANCoder = new CANCoder(-1);
+    elevatorCANCoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
+    elevatorCANCoder.setPosition(0);
+    elevatorCANCoder.configSensorDirection(false);
 
     final double shoudlerPositionOnStartUp = shoulderCANCoder.getPosition();
 
@@ -121,8 +127,6 @@ public class ArmSubsystem extends SubsystemBase {
     wristCANCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
     wristCANCoder.configMagnetOffset(Constants.WRIST_CANCODER_OFFSET);
     wristCANCoder.configSensorDirection(true);
-    wristMotor.setSelectedSensorPosition(
-        wristCANCoderToIntegratedSensor(wristCANCoder.getAbsolutePosition()));
 
     System.out.println("Complete Construct ArmSubsystem");
   }
