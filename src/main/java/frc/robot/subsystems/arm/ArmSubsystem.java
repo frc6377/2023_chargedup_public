@@ -27,6 +27,7 @@ public class ArmSubsystem extends SubsystemBase {
   private final RelativeEncoder leftShoulderEncoder;
   private final SparkMaxPIDController leftShoulderController;
   private final ProfiledPIDController shoulderPPC;
+  private final ProfiledPIDController elevatorPPC;
   private final CANSparkMax rightShoulder;
 
   // todo make these WPI_CANCoders. using CANCoder for now because it works and we
@@ -89,8 +90,11 @@ public class ArmSubsystem extends SubsystemBase {
     leftShoulderController = leftShoulder.getPIDController();
 
     shoulderPPC = new ProfiledPIDController(2, 0, 0, new TrapezoidProfile.Constraints(4, 4));
+    elevatorPPC = new ProfiledPIDController(0.005, 0, 0, new TrapezoidProfile.Constraints(360, 360));
+
 
     shoulderPPC.setTolerance(0.02);
+    elevatorPPC.setTolerance(10);
 
     rightShoulder.follow(leftShoulder, true);
 
@@ -143,12 +147,7 @@ public class ArmSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Elevator ffw", computeElevatorFeedForward());
 
     if (!elevatorInPercentControl) {
-      extendController.setReference(
-          armPosition.armExtension,
-          ControlType.kSmartMotion,
-          0,
-          computeElevatorFeedForward(),
-          ArbFFUnits.kPercentOut);
+      extendMotor.set(computeElevatorOutput());
     } else {
       extendMotor.set(elevatorPercentOutput);
     }
@@ -177,6 +176,7 @@ public class ArmSubsystem extends SubsystemBase {
   public void setTarget(ArmPosition armPosition) {
     this.armPosition = armPosition.clamp(Constants.ARM_MIN_POSITION, Constants.ARM_MAX_POSITION);
     shoulderPPC.setGoal(this.armPosition.armRotation);
+    elevatorPPC.setGoal(this.armPosition.armExtension);
     wristMotor.set(ControlMode.MotionMagic, this.armPosition.wristRotation);
   }
 
@@ -243,6 +243,13 @@ public class ArmSubsystem extends SubsystemBase {
     double output =
         shoulderPPC.calculate(shoulderThetaFromCANCoder()) + computeShoulderArbitraryFeedForward();
     SmartDashboard.putNumber("shoulder output", output);
+    return output;
+  }
+
+  private double computeElevatorOutput() {
+    double output =
+        shoulderPPC.calculate(elevatorCANCoder.getPosition()) + computeElevatorFeedForward();
+    SmartDashboard.putNumber("elevator output", output);
     return output;
   }
 
