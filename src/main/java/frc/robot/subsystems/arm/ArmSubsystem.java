@@ -34,7 +34,6 @@ public class ArmSubsystem extends SubsystemBase {
   // for any more testing
   private final CANCoder shoulderCANCoder;
   private final CANCoder wristCANCoder;
-  private final VictorSPX brakeMotor;
 
   private final CANSparkMax extendMotor;
   private final RelativeEncoder extendEncoder;
@@ -49,8 +48,6 @@ public class ArmSubsystem extends SubsystemBase {
 
   public ArmSubsystem() {
     System.out.println("Starting Construct ArmSubsystem");
-
-    brakeMotor = new VictorSPX(Constants.BREAK_VICTOR_ID);
 
     leftShoulder = new CANSparkMax(Constants.LEFT_SHOULDER_ID, MotorType.kBrushless);
     rightShoulder = new CANSparkMax(Constants.RIGHT_SHOULDER_ID, MotorType.kBrushless);
@@ -154,7 +151,6 @@ public class ArmSubsystem extends SubsystemBase {
         "shoulder angle (degrees)", Math.toDegrees(shoulderThetaFromCANCoder()));
     SmartDashboard.putNumber("Elevator Target (meters)", currentArmExtenstionMeters());
 
-    brakeMotor.set(ControlMode.PercentOutput, 1);
   }
 
   public void setElevatorPercent(double elevatorPercentOutput) {

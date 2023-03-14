@@ -261,10 +261,10 @@ public final class Constants {
   public static final double ARM_ALLOWED_ANGLE_ERROR = 0.001;
   public static final double ARM_ALLOWED_EXTENSION_ERROR = 0.0254;
   public static final int BREAK_VICTOR_ID = 7;
-  public static final double SHOULDER_CANCODER_OFFSET = -160.488;
+  public static final double SHOULDER_CANCODER_OFFSET = 109.6;
 
   public static final int WRIST_CANCODER_ID = 14;
-  public static final double WRIST_CANCODER_OFFSET = 146.51;
+  public static final double WRIST_CANCODER_OFFSET = -75.322;
 
   public static final ArmPosition ARM_MAX_POSITION =
       new ArmPosition(1000, 1000, 1000, ArmHeight.NOT_SPECIFIED);
