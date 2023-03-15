@@ -94,6 +94,8 @@ public class RobotContainer {
             rotationSupplier,
             pointingDriveInput));
 
+    arm.setIsCubeSupplier(cubeSub);
+
     autoChooser = new SendableChooser<>();
     addChooserOptions();
     routineFactory = new RoutineFactory(arm, endAffector, drivetrainSubsystem, autoCommand);
@@ -269,5 +271,9 @@ public class RobotContainer {
     autoChooser.addOption("left 2 element no climb", Routines.LEFT_2_ELEMENT_NOCLIMB);
     autoChooser.addOption("right 2 element no climb", Routines.RIGHT_2_ELEMENT_NOCLIMB);
     SmartDashboard.putData(autoChooser);
+  }
+
+  public void setElevator() {
+    arm.setElevator();
   }
 }

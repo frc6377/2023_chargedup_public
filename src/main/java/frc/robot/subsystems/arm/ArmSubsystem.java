@@ -3,22 +3,21 @@ package frc.robot.subsystems.arm;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
+import com.ctre.phoenix.sensors.CANCoderStatusFrame;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import java.util.function.BooleanSupplier;
 
 public class ArmSubsystem extends SubsystemBase {
 
@@ -43,10 +42,17 @@ public class ArmSubsystem extends SubsystemBase {
 
   private final WPI_TalonFX wristMotor;
 
+  private BooleanSupplier isCubeSupplier;
+
   // State Tracking
   private ArmPosition armPosition = Constants.LOW_CUBE_ARM_POSITION;
   private boolean elevatorInPercentControl = false;
   private double elevatorPercentOutput = 0;
+
+  public ArmSubsystem(BooleanSupplier supplier) {
+    this();
+    this.isCubeSupplier = supplier;
+  }
 
   public ArmSubsystem() {
     System.out.println("Starting Construct ArmSubsystem");
@@ -63,6 +69,7 @@ public class ArmSubsystem extends SubsystemBase {
     elevatorCANCoder = new CANCoder(10);
     elevatorCANCoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
     elevatorCANCoder.configSensorDirection(true);
+    elevatorCANCoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 4);
 
     final double shoudlerPositionOnStartUp = shoulderCANCoder.getPosition();
 
@@ -86,8 +93,9 @@ public class ArmSubsystem extends SubsystemBase {
     leftShoulderController = leftShoulder.getPIDController();
 
     shoulderPPC = new ProfiledPIDController(2, 0, 0, new TrapezoidProfile.Constraints(4, 4));
-    elevatorPPC = new ProfiledPIDController(0.002, 0, 0.000000015, new TrapezoidProfile.Constraints(2*19200, 2*19200));
-
+    elevatorPPC =
+        new ProfiledPIDController(
+            0.002, 0, 0.000000015, new TrapezoidProfile.Constraints(2 * 19200, 2000));
 
     shoulderPPC.setTolerance(0.02);
     elevatorPPC.setTolerance(10);
@@ -128,8 +136,14 @@ public class ArmSubsystem extends SubsystemBase {
     wristCANCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
     wristCANCoder.configMagnetOffset(Constants.WRIST_CANCODER_OFFSET);
     wristCANCoder.configSensorDirection(true);
+    wristMotor.setSelectedSensorPosition(
+        wristCANCoderToIntegratedSensor(wristCANCoder.getAbsolutePosition()));
 
     System.out.println("Complete Construct ArmSubsystem");
+  }
+
+  public void setIsCubeSupplier(BooleanSupplier supplier) {
+    isCubeSupplier = supplier;
   }
 
   @Override
@@ -137,23 +151,19 @@ public class ArmSubsystem extends SubsystemBase {
     double shoulderOutput;
     shoulderOutput = computeShoulderOutput();
 
+    SmartDashboard.putNumber("Shoulder Output", shoulderOutput);
     leftShoulder.set(shoulderOutput);
+    SmartDashboard.putNumber("Reported Shoulder Output", rightShoulder.get());
+
     SmartDashboard.putNumber("arb ffw", computeShoulderArbitraryFeedForward());
     SmartDashboard.putNumber("Arm Extension (encoder pos)", elevatorCANCoder.getPosition());
     SmartDashboard.putNumber("elevator setpoint raw", armPosition.armExtension);
     SmartDashboard.putNumber("Elevator ffw", computeElevatorFeedForward());
 
-    if (!elevatorInPercentControl) {
-      extendMotor.set(computeElevatorOutput());
-    } else {
-      extendMotor.set(elevatorPercentOutput);
-    }
-
     SmartDashboard.putNumber("Wrist Position (Ticks)", wristMotor.getSelectedSensorPosition());
     SmartDashboard.putNumber(
         "shoulder angle (degrees)", Math.toDegrees(shoulderThetaFromCANCoder()));
     SmartDashboard.putNumber("Elevator Target (meters)", currentArmExtenstionMeters());
-
   }
 
   public void setElevatorPercent(double elevatorPercentOutput) {
@@ -185,9 +195,16 @@ public class ArmSubsystem extends SubsystemBase {
    */
   // TODO: move to I alpha instead of torque
   private double computeShoulderArbitraryFeedForward() {
+    double mass = 4.2;
+
+    if (isCubeSupplier != null) {
+      if (!isCubeSupplier.getAsBoolean() && armPosition.getHeight() == ArmHeight.HIGH) {
+        mass += 0.45;
+      }
+    }
+
     double theta = shoulderThetaFromCANCoder();
     double centerOfMass = computeCenterOfMass();
-    double mass = 4.03;
     double gearRatio = 90;
     double numMotors = 2;
     double torque = Math.cos(theta) * 9.81 * mass * centerOfMass;
@@ -197,7 +214,7 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   private double computeCenterOfMass() {
-    return (Math.abs(elevatorCANCoder.getAbsolutePosition()/360) / 12 * 1.1175) + 0.4825;
+    return (Math.abs(elevatorCANCoder.getAbsolutePosition() / 360) / 12 * 1.1175) + 0.4825;
   }
 
   public static double rotationArbitraryFeetForward(
@@ -239,7 +256,6 @@ public class ArmSubsystem extends SubsystemBase {
   private double computeShoulderOutput() {
     double output =
         shoulderPPC.calculate(shoulderThetaFromCANCoder()) + computeShoulderArbitraryFeedForward();
-    SmartDashboard.putNumber("shoulder output", output);
     return output;
   }
 
@@ -290,7 +306,7 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public void setTheElevatorZero() {
-    extendEncoder.setPosition(0);
+    elevatorCANCoder.setPosition(0);
   }
 
   /** Has the arm hold it position. */
@@ -301,5 +317,13 @@ public class ArmSubsystem extends SubsystemBase {
             currentArmExtenstionRevs(),
             armPosition.wristRotation,
             ArmHeight.NOT_SPECIFIED));
+  }
+
+  public void setElevator() {
+    if (!elevatorInPercentControl) {
+      extendMotor.set(computeElevatorOutput());
+    } else {
+      extendMotor.set(elevatorPercentOutput);
+    }
   }
 }

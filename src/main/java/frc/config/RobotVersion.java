@@ -9,7 +9,7 @@ public enum RobotVersion {
   private RobotVersion(final String rioMacAddress) {}
 
   public static RobotVersion getVersionForMacAddress(final String actualMacAddress) {
-    
+
     System.out.println(actualMacAddress);
     switch (actualMacAddress) {
       case Constants.V2_MAC_ADDRESS:

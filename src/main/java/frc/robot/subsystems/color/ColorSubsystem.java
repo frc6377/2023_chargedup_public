@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.color.patterns.BIFlag;
 import frc.robot.subsystems.color.patterns.FireFlyPattern;
+import frc.robot.subsystems.color.patterns.PatternNode;
 import frc.robot.subsystems.color.patterns.TransFlag;
 
 public class ColorSubsystem extends SubsystemBase {
@@ -111,7 +112,7 @@ public class ColorSubsystem extends SubsystemBase {
   }
 
   private void updatePattern() {
-    RGB[] pattern;
+    PatternNode[] pattern;
 
     tick++;
     if (tick > patternUpdateFrequency) {
@@ -141,9 +142,16 @@ public class ColorSubsystem extends SubsystemBase {
         return;
     }
     stopRainbowAnimation();
-    for (int i = 0; i < numberOfLEDS; i++) {
+    int patternIndex = 0;
+    for (int i = 0; i < numberOfLEDS; i += pattern[i].repeat) {
       if (pattern.length <= i) break;
-      gamePieceCandle.setLEDs(pattern[i].red, pattern[i].green, pattern[i].blue, 125, i, i);
+      gamePieceCandle.setLEDs(
+          pattern[patternIndex].color.red,
+          pattern[patternIndex].color.green,
+          pattern[patternIndex].color.blue,
+          125,
+          i,
+          pattern[patternIndex].repeat);
     }
   }
 
