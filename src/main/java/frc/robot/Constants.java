@@ -116,8 +116,8 @@ public final class Constants {
   // TODO: convert arm rotation values to radians
   public static final int ARM_ROTATION_CURRENT_LIMIT = 30;
 
-  public static final int LEFT_SHOULDER_ID = 11;
-  public static final int RIGHT_SHOULDER_ID = 13;
+  public static final int LEFT_SHOULDER_ID = 13;
+  public static final int RIGHT_SHOULDER_ID = 11;
 
   public static final double ARM_ROTATION_TICKS_TO_RADIANS =
       Math.PI * 2 / 90; // The arm is geared 90:1

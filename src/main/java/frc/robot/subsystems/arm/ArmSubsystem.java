@@ -170,6 +170,7 @@ public class ArmSubsystem extends SubsystemBase {
     this.armPosition = armPosition.clamp(Constants.ARM_MIN_POSITION, Constants.ARM_MAX_POSITION);
     shoulderPPC.setGoal(this.armPosition.armRotation);
     wristMotor.set(ControlMode.MotionMagic, this.armPosition.wristRotation);
+    SmartDashboard.putNumber("Shoulder Target", armPosition.armRotation);
   }
 
   /**
@@ -192,7 +193,7 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   private double computeCenterOfMass() {
-    return (extendEncoder.getPosition() / 12 * 1.1175) + 0.4825;
+    return (Math.abs(extendEncoder.getPosition()) / 12 * 1.1175) + 0.4825;
   }
 
   public static double rotationArbitraryFeetForward(
@@ -252,7 +253,7 @@ public class ArmSubsystem extends SubsystemBase {
     double magicNumberThatMakesItWork = 0.5;
     double mass = 4.15 - magicNumberThatMakesItWork;
     double stallLoad = 22.929;
-    return (mass * Math.sin(theta)) / stallLoad;
+    return -(mass * Math.sin(theta)) / stallLoad;
   }
 
   private double wristCANCoderToIntegratedSensor(double theta) {
