@@ -21,7 +21,7 @@ public class ArmPowerCommand extends CommandBase {
     this.targetPose =
         new PolarPoint(
             targetPosition.getArmRotation(),
-            MathUtil.clamp(targetPosition.getArmExtension(), 0, 13));
+            MathUtil.clamp(targetPosition.getArmExtension(), -13, -1));
     this.targetWristAngle = targetPosition.getWristRotation();
     this.armSubsystem = armSubsystem;
     targetHeight = targetPosition.getHeight();
@@ -74,7 +74,7 @@ public class ArmPowerCommand extends CommandBase {
 
   private double computePow(double extensionDelta) {
     // if we extend more we want to it last, if we retract we want to do it first.
-    return (extensionDelta < 0) ? 1 / pow : pow;
+    return (extensionDelta > 0) ? 1 / pow : pow;
   }
 
   private class PolarPoint {

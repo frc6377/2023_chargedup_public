@@ -36,7 +36,6 @@ public class ArmSubsystem extends SubsystemBase {
   private final CANCoder shoulderCANCoder;
   private final CANCoder wristCANCoder;
   private final CANCoder elevatorCANCoder;
-  private final VictorSPX brakeMotor;
 
   private final CANSparkMax extendMotor;
   private final RelativeEncoder extendEncoder;
@@ -51,8 +50,6 @@ public class ArmSubsystem extends SubsystemBase {
 
   public ArmSubsystem() {
     System.out.println("Starting Construct ArmSubsystem");
-
-    brakeMotor = new VictorSPX(Constants.BREAK_VICTOR_ID);
 
     leftShoulder = new CANSparkMax(Constants.LEFT_SHOULDER_ID, MotorType.kBrushless);
     rightShoulder = new CANSparkMax(Constants.RIGHT_SHOULDER_ID, MotorType.kBrushless);
@@ -157,7 +154,6 @@ public class ArmSubsystem extends SubsystemBase {
         "shoulder angle (degrees)", Math.toDegrees(shoulderThetaFromCANCoder()));
     SmartDashboard.putNumber("Elevator Target (meters)", currentArmExtenstionMeters());
 
-    brakeMotor.set(ControlMode.PercentOutput, 1);
   }
 
   public void setElevatorPercent(double elevatorPercentOutput) {
@@ -178,6 +174,7 @@ public class ArmSubsystem extends SubsystemBase {
     shoulderPPC.setGoal(this.armPosition.armRotation);
     elevatorPPC.setGoal(this.armPosition.armExtension);
     wristMotor.set(ControlMode.MotionMagic, this.armPosition.wristRotation);
+    SmartDashboard.putNumber("Shoulder Target", armPosition.armRotation);
   }
 
   /**
@@ -200,7 +197,7 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   private double computeCenterOfMass() {
-    return (extendEncoder.getPosition() / 12 * 1.1175) + 0.4825;
+    return (Math.abs(extendEncoder.getPosition()) / 12 * 1.1175) + 0.4825;
   }
 
   public static double rotationArbitraryFeetForward(
@@ -267,7 +264,7 @@ public class ArmSubsystem extends SubsystemBase {
     double magicNumberThatMakesItWork = 0.5;
     double mass = 4.15 - magicNumberThatMakesItWork;
     double stallLoad = 22.929;
-    return (mass * Math.sin(theta)) / stallLoad;
+    return -(mass * Math.sin(theta)) / stallLoad;
   }
 
   private double wristCANCoderToIntegratedSensor(double theta) {
