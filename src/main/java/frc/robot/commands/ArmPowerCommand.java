@@ -16,14 +16,12 @@ public class ArmPowerCommand extends CommandBase {
   private final ArmSubsystem armSubsystem;
   private final ArmHeight targetHeight;
   private final double pow;
-  private final double extendSign;
 
   public ArmPowerCommand(ArmPosition targetPosition, ArmSubsystem armSubsystem, double pow) {
-    extendSign = Math.copySign(1, targetPosition.getArmExtension());
     this.targetPose =
         new PolarPoint(
             targetPosition.getArmRotation(),
-            MathUtil.clamp(Math.abs(targetPosition.getArmExtension()), 0, 13));
+            MathUtil.clamp(targetPosition.getArmExtension(), 0, 13));
     this.targetWristAngle = targetPosition.getWristRotation();
     this.armSubsystem = armSubsystem;
     targetHeight = targetPosition.getHeight();
@@ -48,7 +46,7 @@ public class ArmPowerCommand extends CommandBase {
     armSubsystem.setTarget(
         new ArmPosition(
             targetPose.theta,
-            extendSign*MathUtil.clamp(
+            MathUtil.clamp(
                 armExtension,
                 Math.min(targetPose.r, initalPose.r),
                 Math.max(targetPose.r, initalPose.r)),
