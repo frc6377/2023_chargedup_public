@@ -60,10 +60,9 @@ public class ArmSubsystem extends SubsystemBase {
     shoulderCANCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
     shoulderCANCoder.setPositionToAbsolute();
 
-    elevatorCANCoder = new CANCoder(-1);
+    elevatorCANCoder = new CANCoder(10);
     elevatorCANCoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
-    elevatorCANCoder.setPosition(0);
-    elevatorCANCoder.configSensorDirection(false);
+    elevatorCANCoder.configSensorDirection(true);
 
     final double shoudlerPositionOnStartUp = shoulderCANCoder.getPosition();
 
@@ -87,7 +86,7 @@ public class ArmSubsystem extends SubsystemBase {
     leftShoulderController = leftShoulder.getPIDController();
 
     shoulderPPC = new ProfiledPIDController(2, 0, 0, new TrapezoidProfile.Constraints(4, 4));
-    elevatorPPC = new ProfiledPIDController(0.005, 0, 0, new TrapezoidProfile.Constraints(360, 360));
+    elevatorPPC = new ProfiledPIDController(0.002, 0, 0.000000015, new TrapezoidProfile.Constraints(2*19200, 2*19200));
 
 
     shoulderPPC.setTolerance(0.02);
@@ -98,6 +97,7 @@ public class ArmSubsystem extends SubsystemBase {
     extendMotor = new CANSparkMax(Constants.ARM_EXTENDER_ID, MotorType.kBrushless);
     extendMotor.restoreFactoryDefaults();
     extendMotor.setSmartCurrentLimit(Constants.ARM_EXTENSION_CURRENT_LIMIT, 100, 4);
+    extendMotor.setInverted(true);
 
     extendEncoder = extendMotor.getEncoder();
     extendController = extendMotor.getPIDController();
@@ -139,7 +139,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     leftShoulder.set(shoulderOutput);
     SmartDashboard.putNumber("arb ffw", computeShoulderArbitraryFeedForward());
-    SmartDashboard.putNumber("Arm Extension (encoder pos)", extendEncoder.getPosition());
+    SmartDashboard.putNumber("Arm Extension (encoder pos)", elevatorCANCoder.getPosition());
     SmartDashboard.putNumber("elevator setpoint raw", armPosition.armExtension);
     SmartDashboard.putNumber("Elevator ffw", computeElevatorFeedForward());
 
@@ -197,7 +197,7 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   private double computeCenterOfMass() {
-    return (Math.abs(extendEncoder.getPosition()) / 12 * 1.1175) + 0.4825;
+    return (Math.abs(elevatorCANCoder.getAbsolutePosition()/360) / 12 * 1.1175) + 0.4825;
   }
 
   public static double rotationArbitraryFeetForward(
@@ -245,7 +245,7 @@ public class ArmSubsystem extends SubsystemBase {
 
   private double computeElevatorOutput() {
     double output =
-        shoulderPPC.calculate(elevatorCANCoder.getPosition()) + computeElevatorFeedForward();
+        elevatorPPC.calculate(elevatorCANCoder.getPosition()) + computeElevatorFeedForward();
     SmartDashboard.putNumber("elevator output", output);
     return output;
   }
@@ -264,7 +264,7 @@ public class ArmSubsystem extends SubsystemBase {
     double magicNumberThatMakesItWork = 0.5;
     double mass = 4.15 - magicNumberThatMakesItWork;
     double stallLoad = 22.929;
-    return -(mass * Math.sin(theta)) / stallLoad;
+    return (mass * Math.sin(theta)) / stallLoad;
   }
 
   private double wristCANCoderToIntegratedSensor(double theta) {
