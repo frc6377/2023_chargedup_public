@@ -74,7 +74,7 @@ public class ArmPowerCommand extends CommandBase {
 
   private double computePow(double extensionDelta) {
     // if we extend more we want to it last, if we retract we want to do it first.
-    return (extensionDelta > 0) ? 1 / pow : pow;
+    return (extensionDelta < 0) ? 1 / pow : pow;
   }
 
   private class PolarPoint {
