@@ -284,12 +284,12 @@ public final class Constants {
   public static final ArmPosition MID_CUBE_ARM_POSITION =
       new ArmPosition(Math.toRadians(35), 360.0 * 5.95, -2358, ArmHeight.MID);
   public static final ArmPosition MID_CONE_ARM_POSITION =
-      new ArmPosition(Math.toRadians(40.75), 360.0 * 8.16, -29866, ArmHeight.MID);
+      new ArmPosition(Math.toRadians(43.75), 360.0 * 9.16, -29866, ArmHeight.MID);
 
   public static final ArmPosition HIGH_CUBE_ARM_POSITION =
       new ArmPosition(Math.toRadians(34.94), 360 * 10.35, 3498, ArmHeight.HIGH);
   public static final ArmPosition HIGH_CONE_ARM_POSITION =
-      new ArmPosition(Math.toRadians(44.49), 360 * 12.6, -18000, ArmHeight.HIGH);
+      new ArmPosition(Math.toRadians(47.5), 360 * 13.5, -19000, ArmHeight.HIGH);
 
   public static final ArmPosition SINGLE_SUBSTATION_CUBE_POSITION = null;
   public static final ArmPosition SINGLE_SUBSTATION_CONE_POSITION = 
