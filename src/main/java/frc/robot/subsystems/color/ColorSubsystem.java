@@ -23,7 +23,7 @@ public class ColorSubsystem extends SubsystemBase {
   private final CANdle gamePieceCandle;
   private final CANdle gridPositionCandle;
 
-  private static final int numberOfLEDS = 64;
+  private static final int numberOfLEDS = 70;
 
   private int tick;
   private int patternTick = 0;
@@ -113,6 +113,7 @@ public class ColorSubsystem extends SubsystemBase {
 
   private void updatePattern() {
     PatternNode[] pattern;
+    int patternLength;
 
     tick++;
     if (tick > patternUpdateFrequency) {
@@ -129,13 +130,15 @@ public class ColorSubsystem extends SubsystemBase {
         //   pattern = BIFlag.getColors(patternTick);
         //   break;
       case FIRE_FLY:
-        pattern = FireFlyPattern.getColors(patternTick);
+        pattern = FireFlyPattern.getPattern();
+        patternLength = FireFlyPattern.getPatternLength();
         break;
       case RAINBOW:
         startRainbowAnimation();
         return;
       case TRANS_FLAG:
-        pattern = TransFlag.getColors(patternTick);
+        pattern = TransFlag.getPattern();
+        patternLength = TransFlag.getPatternLength();
         break;
       default:
         startRainbowAnimation();
@@ -143,15 +146,17 @@ public class ColorSubsystem extends SubsystemBase {
     }
     stopRainbowAnimation();
     int patternIndex = 0;
-    for (int i = 0; i < numberOfLEDS; i += pattern[i].repeat) {
-      if (pattern.length <= i) break;
-      gamePieceCandle.setLEDs(
-          pattern[patternIndex].color.red,
-          pattern[patternIndex].color.green,
-          pattern[patternIndex].color.blue,
-          125,
-          i,
-          pattern[patternIndex].repeat);
+    patternTick %= patternLength;
+    int LEDIndex = -patternTick;
+    while(LEDIndex < numberOfLEDS){
+      patternIndex %= pattern.length;
+
+      PatternNode node = pattern[patternIndex];
+      RGB c = pattern[patternIndex].color;
+
+      gamePieceCandle.setLEDs(c.red, c.green, c.blue, 0, LEDIndex, node.repeat);
+      LEDIndex += node.repeat;
+      patternIndex += 1;
     }
   }
 

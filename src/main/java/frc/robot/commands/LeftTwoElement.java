@@ -16,6 +16,7 @@ public class LeftTwoElement extends SequentialCommandGroup {
       ArmSubsystem arm,
       EndAffectorSubsystem endAffector) {
     addCommands(
+        new InstantCommand(() -> endAffector.setCube()),
         new InstantCommand(() -> endAffector.intake()),
         new WaitCommand(0.75),
         new ScheduleCommand(
@@ -26,12 +27,12 @@ public class LeftTwoElement extends SequentialCommandGroup {
             new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3).withTimeout(0.5)),
         new InstantCommand(() -> endAffector.idle()),
         new ScheduleCommand(
-            new WaitCommand(1.25)
+            new WaitCommand(2)
                 .andThen(
                     new ArmPowerCommand(Constants.HIGH_CUBE_ARM_POSITION, arm, 3)
                         .withTimeout(1.5))),
         factory.generateCommandFromFile("ScoreFirstElementBlue", false),
-        new WaitCommand(0.5),
+        new WaitCommand(0.75),
         new InstantCommand(() -> endAffector.fastOutake()),
         new WaitCommand(0.5),
         new ScheduleCommand(

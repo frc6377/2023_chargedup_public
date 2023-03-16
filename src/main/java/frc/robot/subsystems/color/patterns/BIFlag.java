@@ -10,6 +10,16 @@ public class BIFlag {
     new PatternNode(RGB.PURPLE, 3),
     new PatternNode(RGB.BLUE, 3),
   };
+  private static int patternLength;
+
+  static {
+    for(PatternNode p : pattern)
+    {patternLength += p.repeat;}
+  }
+
+  public static int getPatternLength(){
+    return patternLength;
+  }
 
   public static PatternNode[] getColors(int step) {
     int initalStep = step % pattern.length;

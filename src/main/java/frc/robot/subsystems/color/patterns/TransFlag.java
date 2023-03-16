@@ -8,17 +8,22 @@ public class TransFlag {
     new PatternNode(RGB.BLACK, 1),
     new PatternNode(RGB.HOWDY_BLUE, 4),
     new PatternNode(RGB.PINK, 4),
-    new PatternNode(RGB.BLUE, 4),
+    new PatternNode(RGB.WHITE, 4),
     new PatternNode(RGB.PINK, 4),
     new PatternNode(RGB.HOWDY_BLUE, 4),
   };
+  private static int patternLength;
 
-  public static PatternNode[] getColors(int step) {
-    int initalStep = step % pattern.length;
-    PatternNode[] fullPattern = new PatternNode[numberOfLEDS];
-    for (int i = 0; i < numberOfLEDS; i++) {
-      fullPattern[i] = pattern[(i + initalStep) % pattern.length];
-    }
-    return fullPattern;
+  static {
+    for(PatternNode p : pattern)
+    {patternLength += p.repeat;}
+  }
+
+  public static int getPatternLength(){
+    return patternLength;
+  }
+
+  public static PatternNode[] getPattern() {
+    return pattern;
   }
 }

@@ -7,13 +7,18 @@ public class FireFlyPattern {
   private static final PatternNode[] pattern = {
     new PatternNode(RGB.GREEN, 5), new PatternNode(RGB.WHITE, 5)
   };
+  private static int patternLength;
 
-  public static PatternNode[] getColors(int step) {
-    int initalStep = step % pattern.length;
-    PatternNode[] fullPattern = new PatternNode[numberOfLEDS];
-    for (int i = 0; i < numberOfLEDS; i++) {
-      fullPattern[i] = pattern[(i + initalStep) % pattern.length];
-    }
-    return fullPattern;
+  static {
+    for(PatternNode p : pattern)
+    {patternLength += p.repeat;}
+  }
+
+  public static int getPatternLength(){
+    return patternLength;
+  }
+
+  public static PatternNode[] getPattern() {
+    return pattern;
   }
 }
