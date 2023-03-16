@@ -25,7 +25,6 @@ public class LeftTwoElement extends SequentialCommandGroup {
         factory.generateCommandFromFile("PickFirstElementBlue", true),
         new ScheduleCommand(
             new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3).withTimeout(0.5)),
-        new InstantCommand(() -> endAffector.idle()),
         new ScheduleCommand(
             new WaitCommand(2)
                 .andThen(

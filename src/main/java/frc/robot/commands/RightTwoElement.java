@@ -25,7 +25,6 @@ public class RightTwoElement extends SequentialCommandGroup {
         factory.generateCommandFromFile("PickFirstElementRight", true),
         new ScheduleCommand(
             new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3).withTimeout(0.5)),
-        new InstantCommand(() -> endAffector.idle()),
         new ScheduleCommand(
             new WaitCommand(2.0)
                 .andThen(
