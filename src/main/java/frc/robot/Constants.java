@@ -267,7 +267,7 @@ public final class Constants {
   public static final double WRIST_CANCODER_OFFSET = -13.711;
 
   public static final ArmPosition ARM_MAX_POSITION =
-      new ArmPosition(110, 360 * 12.6, 15000, ArmHeight.NOT_SPECIFIED);
+      new ArmPosition(110, 360 * 13.8, 15000, ArmHeight.NOT_SPECIFIED);
   public static final ArmPosition ARM_MIN_POSITION =
       new ArmPosition(-6, 360, -21788, ArmHeight.NOT_SPECIFIED);
 
@@ -289,7 +289,7 @@ public final class Constants {
   public static final ArmPosition HIGH_CUBE_ARM_POSITION =
       new ArmPosition(Math.toRadians(34.94), 360 * 10.35, 3498, ArmHeight.HIGH);
   public static final ArmPosition HIGH_CONE_ARM_POSITION =
-      new ArmPosition(Math.toRadians(47.5), 360 * 13.5, -19000, ArmHeight.HIGH);
+      new ArmPosition(Math.toRadians(47.5), 4800, -21000, ArmHeight.HIGH);
 
   public static final ArmPosition SINGLE_SUBSTATION_CUBE_POSITION = null;
   public static final ArmPosition SINGLE_SUBSTATION_CONE_POSITION = 
