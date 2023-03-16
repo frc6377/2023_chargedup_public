@@ -13,7 +13,7 @@ public class EndAffectorSubsystem extends SubsystemBase {
 
   public EndAffectorSubsystem(int ID, BooleanTopic isCubeTopic) {
     motor = new WPI_TalonFX(ID);
-    motor.configOpenloopRamp(0.25);
+    motor.configOpenloopRamp(0.0);
 
     isCubePublisher = isCubeTopic.publish();
     isCubePublisher.set(isCube);
@@ -39,11 +39,11 @@ public class EndAffectorSubsystem extends SubsystemBase {
   }
 
   public void fastOutake() {
-    motor.set(-Constants.END_AFFECTOR_OUTTAKE_SPEED * (isCube ? -1 : 3));
+    motor.set(-Constants.END_AFFECTOR_OUTTAKE_SPEED * (isCube ? -1 : 30));
   }
 
   public void slowOutake() {
-    motor.set(-Constants.END_AFFECTOR_SLOW_OUTTAKE_SPEED * (isCube ? -1 : 3));
+    motor.set(-Constants.END_AFFECTOR_SLOW_OUTTAKE_SPEED * (isCube ? -1 : 300));
   }
 
   public void halt() {

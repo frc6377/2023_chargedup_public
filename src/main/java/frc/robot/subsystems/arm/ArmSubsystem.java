@@ -180,6 +180,7 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public void setTarget(ArmPosition armPosition) {
+    elevatorInPercentControl = false;
     this.armPosition = armPosition.clamp(Constants.ARM_MIN_POSITION, Constants.ARM_MAX_POSITION);
     shoulderPPC.setGoal(this.armPosition.armRotation);
     elevatorPPC.setGoal(this.armPosition.armExtension);
@@ -311,6 +312,7 @@ public class ArmSubsystem extends SubsystemBase {
 
   /** Has the arm hold it position. */
   public void stop() {
+    elevatorInPercentControl = false;
     setTarget(
         new ArmPosition(
             thetaFromPPC(),

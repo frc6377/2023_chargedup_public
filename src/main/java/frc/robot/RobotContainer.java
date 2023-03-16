@@ -130,7 +130,7 @@ public class RobotContainer {
     drivetrainSubsystem.setDefaultCommand(driveCommand);
 
     Trigger singleSubstation = driver.povUp();
-    singleSubstation.onTrue(new ArmPowerCommand(Constants.DOUBLE_SUBSTATION_ARM_POSITION, arm, 3));
+    singleSubstation.onTrue(new ArmPowerCommand(Constants.SINGLE_SUBSTATION_CONE_POSITION, arm, 3));
 
     Trigger intakeButton = driver.leftTrigger(0.3);
     Trigger shootButton = driver.rightTrigger(0.3);
