@@ -29,6 +29,7 @@ public class RightTwoElement extends SequentialCommandGroup {
             new WaitCommand(2.0)
                 .andThen(
                     new ArmPowerCommand(Constants.HIGH_CUBE_ARM_POSITION, arm, 3).withTimeout(1.5))),
+        new InstantCommand(()-> endAffector.idle()),
         factory.generateCommandFromFile("ScoreFirstElementRight", false),
         new WaitCommand(0.75),
         new InstantCommand(() -> endAffector.fastOutake()),

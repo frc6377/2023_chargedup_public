@@ -30,6 +30,7 @@ public class LeftTwoElement extends SequentialCommandGroup {
                 .andThen(
                     new ArmPowerCommand(Constants.HIGH_CUBE_ARM_POSITION, arm, 3)
                         .withTimeout(1.5))),
+        new InstantCommand(()-> endAffector.idle()),
         factory.generateCommandFromFile("ScoreFirstElementBlue", false),
         new WaitCommand(0.75),
         new InstantCommand(() -> endAffector.fastOutake()),
