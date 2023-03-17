@@ -23,7 +23,7 @@ public class AutoBalanceCommand extends CommandBase {
     this.drive = drive;
     pitchController =
         new ProfiledPIDController(
-            0.0533,
+            0.0333,
             0,
             0.01,
             new TrapezoidProfile.Constraints(
