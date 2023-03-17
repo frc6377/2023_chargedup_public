@@ -43,7 +43,7 @@ public class LeftTwoElementNoClimb extends SequentialCommandGroup {
         new ScheduleCommand(
             new WaitCommand(0.5)
                 .andThen(
-                    new ArmPowerCommand(Constants.LOW_CUBE_ARM_POSITION, arm, 3).withTimeout(0.5))),
+                    new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3).withTimeout(0.5))),
         factory.generateCommandFromFile("PickSecondElementBlue", false));
   }
 }
