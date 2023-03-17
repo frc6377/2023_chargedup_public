@@ -39,7 +39,6 @@ public class LeftTwoElementNoClimb extends SequentialCommandGroup {
             new WaitCommand(0.5)
                 .andThen(
                     new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3).withTimeout(0.5))),
-        new InstantCommand(() -> endAffector.intake()),
         new ScheduleCommand(
             new WaitCommand(0.5)
                 .andThen(

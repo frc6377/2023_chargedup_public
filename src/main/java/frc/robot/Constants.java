@@ -264,7 +264,7 @@ public final class Constants {
   public static final double SHOULDER_CANCODER_OFFSET = 109.6;
 
   public static final int WRIST_CANCODER_ID = 14;
-  public static final double WRIST_CANCODER_OFFSET = -72.246;
+  public static final double WRIST_CANCODER_OFFSET = -150.996;
 
   public static final ArmPosition ARM_MAX_POSITION =
       new ArmPosition(110, 360 * 13.8, 15000, ArmHeight.NOT_SPECIFIED);
