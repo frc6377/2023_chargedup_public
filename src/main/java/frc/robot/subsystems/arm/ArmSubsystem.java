@@ -73,7 +73,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     final double shoudlerPositionOnStartUp = shoulderCANCoder.getPosition();
 
-    if (shoudlerPositionOnStartUp < -20) {
+    if (shoudlerPositionOnStartUp < -30) {
       shoulderCANCoder.setPosition(shoudlerPositionOnStartUp + 360);
     }
 
