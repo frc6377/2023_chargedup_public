@@ -14,15 +14,16 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.color.patterns.BIFlag;
 import frc.robot.subsystems.color.patterns.FireFlyPattern;
+import frc.robot.subsystems.color.patterns.PatternNode;
 import frc.robot.subsystems.color.patterns.TransFlag;
 
 public class ColorSubsystem extends SubsystemBase {
   private static final int patternUpdateFrequency = 10;
 
   private final CANdle gamePieceCandle;
-  private final CANdle gridPositionCandle;
+  //private final CANdle gridPositionCandle;
 
-  private static final int numberOfLEDS = 64;
+  private static final int numberOfLEDS = 70;
 
   private int tick;
   private int patternTick = 0;
@@ -39,7 +40,7 @@ public class ColorSubsystem extends SubsystemBase {
   public ColorSubsystem(int gamePieceID, int gridSelectID, BooleanTopic isCubeTopic) {
 
     gamePieceCandle = new CANdle(gamePieceID);
-    gridPositionCandle = new CANdle(gridSelectID);
+    //gridPositionCandle = new CANdle(gridSelectID);
     this.isCubeSubscriber = isCubeTopic.subscribe(true);
     CANdleConfiguration configAll = new CANdleConfiguration();
     configAll.statusLedOffWhenActive = false;
@@ -64,12 +65,12 @@ public class ColorSubsystem extends SubsystemBase {
   public void startRainbowAnimation() {
     if (disablePattern != DisablePattern.RAINBOW) return;
     gamePieceCandle.animate(rainbowAnimation);
-    gridPositionCandle.animate(rainbowAnimation);
+    //gridPositionCandle.animate(rainbowAnimation);
   }
 
   public void stopRainbowAnimation() {
     gamePieceCandle.clearAnimation(0);
-    gridPositionCandle.clearAnimation(0);
+    //gridPositionCandle.clearAnimation(0);
   }
 
   @Override
@@ -103,15 +104,16 @@ public class ColorSubsystem extends SubsystemBase {
   }
 
   private void writeLEDsGridPosition(RGB rgb) {
-    gridPositionCandle.setLEDs(rgb.red, rgb.green, rgb.blue);
+   // gridPositionCandle.setLEDs(rgb.red, rgb.green, rgb.blue);
   }
 
   private void writeLEDsGridPosition(RGB rgb, int startIdx, int count) {
-    gridPositionCandle.setLEDs(rgb.red, rgb.green, rgb.blue, rgb.white, startIdx, count);
+    //gridPositionCandle.setLEDs(rgb.red, rgb.green, rgb.blue, rgb.white, startIdx, count);
   }
 
   private void updatePattern() {
-    RGB[] pattern;
+    PatternNode[] pattern;
+    int patternLength;
 
     tick++;
     if (tick > patternUpdateFrequency) {
@@ -128,22 +130,33 @@ public class ColorSubsystem extends SubsystemBase {
         //   pattern = BIFlag.getColors(patternTick);
         //   break;
       case FIRE_FLY:
-        pattern = FireFlyPattern.getColors(patternTick);
+        pattern = FireFlyPattern.getPattern();
+        patternLength = FireFlyPattern.getPatternLength();
         break;
       case RAINBOW:
         startRainbowAnimation();
         return;
       case TRANS_FLAG:
-        pattern = TransFlag.getColors(patternTick);
+        pattern = TransFlag.getPattern();
+        patternLength = TransFlag.getPatternLength();
         break;
       default:
         startRainbowAnimation();
         return;
     }
     stopRainbowAnimation();
-    for (int i = 0; i < numberOfLEDS; i++) {
-      if (pattern.length <= i) break;
-      gamePieceCandle.setLEDs(pattern[i].red, pattern[i].green, pattern[i].blue, 125, i, i);
+    int patternIndex = 0;
+    patternTick %= patternLength;
+    int LEDIndex = -patternTick;
+    while(LEDIndex < numberOfLEDS){
+      patternIndex %= pattern.length;
+
+      PatternNode node = pattern[patternIndex];
+      RGB c = pattern[patternIndex].color;
+
+      gamePieceCandle.setLEDs(c.red, c.green, c.blue, 0, LEDIndex, node.repeat);
+      LEDIndex += node.repeat;
+      patternIndex += 1;
     }
   }
 

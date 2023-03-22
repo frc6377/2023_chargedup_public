@@ -21,7 +21,7 @@ public class ArmPowerCommand extends CommandBase {
     this.targetPose =
         new PolarPoint(
             targetPosition.getArmRotation(),
-            MathUtil.clamp(targetPosition.getArmExtension(), 0, 13));
+            MathUtil.clamp(targetPosition.getArmExtension(), 360, 13.8 * 360.0));
     this.targetWristAngle = targetPosition.getWristRotation();
     this.armSubsystem = armSubsystem;
     targetHeight = targetPosition.getHeight();

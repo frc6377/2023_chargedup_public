@@ -4,17 +4,21 @@ import frc.robot.subsystems.color.RGB;
 
 public class FireFlyPattern {
   public static int numberOfLEDS;
-  private static final RGB[] pattern = {
-    RGB.GREEN, RGB.GREEN, RGB.GREEN, RGB.GREEN, RGB.GREEN, RGB.GREEN, RGB.WHITE, RGB.WHITE,
-    RGB.WHITE, RGB.WHITE, RGB.WHITE, RGB.WHITE,
+  private static final PatternNode[] pattern = {
+    new PatternNode(RGB.GREEN, 5), new PatternNode(RGB.WHITE, 5)
   };
+  private static int patternLength;
 
-  public static RGB[] getColors(int step) {
-    int initalStep = step % pattern.length;
-    RGB[] fullPattern = new RGB[numberOfLEDS];
-    for (int i = 0; i < numberOfLEDS; i++) {
-      fullPattern[i] = pattern[(i + initalStep) % pattern.length];
-    }
-    return fullPattern;
+  static {
+    for(PatternNode p : pattern)
+    {patternLength += p.repeat;}
+  }
+
+  public static int getPatternLength(){
+    return patternLength;
+  }
+
+  public static PatternNode[] getPattern() {
+    return pattern;
   }
 }
