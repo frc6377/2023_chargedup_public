@@ -7,6 +7,7 @@ public enum ArmHeight {
   MID,
   LOW,
   NOT_SPECIFIED,
+  SINGLE_SUBSTATION,
   DOUBLE_SUBSTATION;
 
   public boolean isStowed() {

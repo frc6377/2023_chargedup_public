@@ -97,6 +97,8 @@ public class RobotContainer {
             rotationSupplier,
             pointingDriveInput));
 
+    arm.setIsCubeSupplier(cubeSub);
+
     autoChooser = new SendableChooser<>();
     addChooserOptions();
     routineFactory = new RoutineFactory(arm, endAffector, drivetrainSubsystem, autoCommand);
@@ -118,6 +120,7 @@ public class RobotContainer {
         new DriveInput(driver::getRightY, driver::getRightX, driverConfig);
     DoubleSupplier gunnerLeftYSupplier = gunner::getLeftY;
     DoubleSupplier gunnerRightYSupplier = gunner::getRightY;
+    Trigger gunnerHybridButton = gunner.rightBumper();
 
     DriveCommand driveCommand =
         new DriveCommand(
@@ -130,8 +133,8 @@ public class RobotContainer {
 
     drivetrainSubsystem.setDefaultCommand(driveCommand);
 
-    Trigger singleSubstation = driver.povUp();
-    singleSubstation.onTrue(new ArmPowerCommand(Constants.DOUBLE_SUBSTATION_ARM_POSITION, arm, 3));
+    Trigger singleSubstation = driver.y();
+    singleSubstation.onTrue(new ArmPowerCommand(Constants.SINGLE_SUBSTATION_CONE_POSITION, arm, 3));
 
     Trigger intakeButton = driver.leftTrigger(0.3);
     Trigger shootButton = driver.rightTrigger(0.3);
@@ -210,6 +213,13 @@ public class RobotContainer {
         .and(() -> !isCubeSubscriber.get())
         .onTrue(new ArmPowerCommand(Constants.HIGH_CONE_ARM_POSITION, arm, 3));
 
+        gunnerHybridButton
+        .and(() -> cubeSub.get())
+        .onTrue(new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3));
+    gunnerHybridButton
+        .and(() -> !cubeSub.get())
+        .onTrue(new ArmPowerCommand(Constants.HYBRID_CONE_ARM_POSITION, arm, 3));
+
     Trigger gunnerLefTrigger = gunner.leftTrigger();
     gunnerLefTrigger.onTrue(new AutoBalanceCommand(drivetrainSubsystem));
   }
@@ -273,5 +283,9 @@ public class RobotContainer {
     autoChooser.addOption("left 2 element no climb", Routines.LEFT_2_ELEMENT_NOCLIMB);
     autoChooser.addOption("right 2 element no climb", Routines.RIGHT_2_ELEMENT_NOCLIMB);
     SmartDashboard.putData(autoChooser);
+  }
+
+  public void setElevator() {
+    arm.setElevator();
   }
 }
