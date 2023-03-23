@@ -209,7 +209,7 @@ public class RobotContainer {
         .and(() -> !cubeSub.get())
         .onTrue(new ArmPowerCommand(Constants.HIGH_CONE_ARM_POSITION, arm, 3));
 
-        gunnerHybridButton
+    gunnerHybridButton
         .and(() -> cubeSub.get())
         .onTrue(new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3));
     gunnerHybridButton
