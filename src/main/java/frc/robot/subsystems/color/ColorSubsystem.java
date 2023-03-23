@@ -41,7 +41,7 @@ public class ColorSubsystem extends SubsystemBase {
     this.lastColorIsCube = isCube;
 
     gamePieceCandle = new CANdle(gamePieceID);
-    gridPositionCandle = new CANdle(gridSelectID);
+    // gridPositionCandle = new CANdle(gridSelectID);
     CANdleConfiguration configAll = new CANdleConfiguration();
     configAll.statusLedOffWhenActive = false;
     configAll.disableWhenLOS = false;

@@ -97,7 +97,7 @@ public class RobotContainer {
             rotationSupplier,
             pointingDriveInput));
 
-    arm.setIsCubeSupplier(cubeSub);
+    arm.setIsCubeSupplier(isCubeSubscriber);
 
     autoChooser = new SendableChooser<>();
     addChooserOptions();
@@ -214,10 +214,10 @@ public class RobotContainer {
         .onTrue(new ArmPowerCommand(Constants.HIGH_CONE_ARM_POSITION, arm, 3));
 
     gunnerHybridButton
-        .and(() -> cubeSub.get())
+        .and(() -> isCubeSubscriber.get())
         .onTrue(new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3));
     gunnerHybridButton
-        .and(() -> !cubeSub.get())
+        .and(() -> !isCubeSubscriber.get())
         .onTrue(new ArmPowerCommand(Constants.HYBRID_CONE_ARM_POSITION, arm, 3));
 
     Trigger gunnerLefTrigger = gunner.leftTrigger();
