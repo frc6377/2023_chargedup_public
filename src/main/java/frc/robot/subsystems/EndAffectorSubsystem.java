@@ -1,37 +1,33 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import edu.wpi.first.networktables.BooleanPublisher;
-import edu.wpi.first.networktables.BooleanTopic;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class EndAffectorSubsystem extends SubsystemBase {
   private WPI_TalonFX motor;
-  private boolean isCube = true;
-  private final BooleanPublisher isCubePublisher;
+  private boolean isCube;
 
-  public EndAffectorSubsystem(int ID, BooleanTopic isCubeTopic) {
+  public EndAffectorSubsystem(int ID, final boolean isCube) {
     motor = new WPI_TalonFX(ID);
+    this.isCube = isCube;
     motor.configOpenloopRamp(0.0);
-
-    isCubePublisher = isCubeTopic.publish();
-    isCubePublisher.set(isCube);
   }
 
   public void toggleGamePiece() {
     isCube = !isCube;
-    isCubePublisher.set(isCube);
+  }
+
+  public void setGamePiece(final boolean isCube) {
+    this.isCube = isCube;
   }
 
   public void setCube() {
     isCube = true;
-    isCubePublisher.set(isCube);
   }
 
   public void setCone() {
     isCube = false;
-    isCubePublisher.set(isCube);
   }
 
   public void intake() {
