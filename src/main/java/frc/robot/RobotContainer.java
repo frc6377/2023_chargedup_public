@@ -23,6 +23,7 @@ import frc.robot.commands.ArmManualCommand;
 import frc.robot.commands.ArmPowerCommand;
 import frc.robot.commands.AutoBalanceCommand;
 import frc.robot.commands.DriveCommand;
+import frc.robot.commands.EndAffectorEjectCommand;
 import frc.robot.commands.RoutineFactory;
 import frc.robot.commands.RoutineFactory.Routines;
 import frc.robot.commands.SwerveAutoFactory;
@@ -78,7 +79,7 @@ public class RobotContainer {
 
     isCubeTopic = NetworkTableInstance.getDefault().getBooleanTopic("isCube");
     cubeSub = isCubeTopic.subscribe(false);
-    endAffector = new EndAffectorSubsystem(Constants.END_AFFECTOR_ID, isCubeTopic);
+    endAffector = new EndAffectorSubsystem(Constants.END_AFFECTOR_ID, isCubeTopic, Constants.END_AFFECTOR_KP);
     colorStrip =
         new ColorSubsystem(Constants.GAME_PIECE_CANDLE, Constants.GRID_SELECT_CANDLE, isCubeTopic);
 
@@ -118,7 +119,7 @@ public class RobotContainer {
     DoubleSupplier gunnerLeftYSupplier = gunner::getLeftY;
     DoubleSupplier gunnerRightYSupplier = gunner::getRightY;
     Trigger gunnerHybridButton = gunner.rightBumper();
-
+    
     DriveCommand driveCommand =
         new DriveCommand(
             drivetrainSubsystem,
@@ -139,13 +140,14 @@ public class RobotContainer {
     intakeButton.whileTrue(
         Commands.startEnd(() -> endAffector.intake(), () -> endAffector.idle(), endAffector));
 
-    shootButton.whileTrue(
-        Commands.startEnd(() -> endAffector.fastOutake(), () -> endAffector.halt(), endAffector));
+    DoubleSupplier shootSupplier = driver::getRightTriggerAxis;
+
+    shootButton.whileTrue(new EndAffectorEjectCommand(shootSupplier, endAffector));
 
     Trigger driverGoButton = driver.a();
     Trigger driverResetFieldNorth = driver.start();
 
-    driverResetFieldNorth.onTrue(
+    driverResetFieldNorth.onTrue(   
         new InstantCommand(
             () ->
                 fieldPositioningSystem.resetRobotPosition(

@@ -49,6 +49,7 @@ public final class Constants {
   // TODO: add real value for the motor ID
   public static final int END_AFFECTOR_ID = 9;
 
+
   public static final int GAME_PIECE_CANDLE = 2;
   public static final int GRID_SELECT_CANDLE = 3;
 
@@ -150,6 +151,9 @@ public final class Constants {
   public static final double END_AFFECTOR_OUTTAKE_SPEED = 0.3;
   public static final double END_AFFECTOR_SLOW_OUTTAKE_SPEED = 0.075;
   public static final double END_AFFECTOR_IDLE_SPEED = 0.1;
+
+  public static final double END_AFFECTOR_KP = 0.2;
+  public static final double END_AFFECTOR_OFFSET = 500;
 
   // Arm Rotation
   public static final double ARM_ROTATION_KP = 0.99902;
