@@ -9,7 +9,6 @@ import com.ctre.phoenix.led.RainbowAnimation;
 import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.networktables.BooleanTopic;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.networktables.DeltaBoard;
@@ -22,7 +21,7 @@ public class ColorSubsystem extends SubsystemBase {
   private static final int patternUpdateFrequency = 10;
 
   private final CANdle gamePieceCandle;
-  //private final CANdle gridPositionCandle;
+  // private final CANdle gridPositionCandle;
 
   private static final int numberOfLEDS = 70;
 
@@ -41,7 +40,7 @@ public class ColorSubsystem extends SubsystemBase {
   public ColorSubsystem(int gamePieceID, int gridSelectID, BooleanTopic isCubeTopic) {
 
     gamePieceCandle = new CANdle(gamePieceID);
-    //gridPositionCandle = new CANdle(gridSelectID);
+    // gridPositionCandle = new CANdle(gridSelectID);
     this.isCubeSubscriber = isCubeTopic.subscribe(true);
     CANdleConfiguration configAll = new CANdleConfiguration();
     configAll.statusLedOffWhenActive = false;
@@ -66,12 +65,12 @@ public class ColorSubsystem extends SubsystemBase {
   public void startRainbowAnimation() {
     if (disablePattern != DisablePattern.RAINBOW) return;
     gamePieceCandle.animate(rainbowAnimation);
-    //gridPositionCandle.animate(rainbowAnimation);
+    // gridPositionCandle.animate(rainbowAnimation);
   }
 
   public void stopRainbowAnimation() {
     gamePieceCandle.clearAnimation(0);
-    //gridPositionCandle.clearAnimation(0);
+    // gridPositionCandle.clearAnimation(0);
   }
 
   @Override
@@ -105,11 +104,11 @@ public class ColorSubsystem extends SubsystemBase {
   }
 
   private void writeLEDsGridPosition(RGB rgb) {
-   // gridPositionCandle.setLEDs(rgb.red, rgb.green, rgb.blue);
+    // gridPositionCandle.setLEDs(rgb.red, rgb.green, rgb.blue);
   }
 
   private void writeLEDsGridPosition(RGB rgb, int startIdx, int count) {
-    //gridPositionCandle.setLEDs(rgb.red, rgb.green, rgb.blue, rgb.white, startIdx, count);
+    // gridPositionCandle.setLEDs(rgb.red, rgb.green, rgb.blue, rgb.white, startIdx, count);
   }
 
   private void updatePattern() {
@@ -149,7 +148,7 @@ public class ColorSubsystem extends SubsystemBase {
     int patternIndex = 0;
     patternTick %= patternLength;
     int LEDIndex = -patternTick;
-    while(LEDIndex < numberOfLEDS){
+    while (LEDIndex < numberOfLEDS) {
       patternIndex %= pattern.length;
 
       PatternNode node = pattern[patternIndex];
