@@ -6,8 +6,6 @@ import com.ctre.phoenix.led.CANdle.LEDStripType;
 import com.ctre.phoenix.led.CANdle.VBatOutputMode;
 import com.ctre.phoenix.led.CANdleConfiguration;
 import com.ctre.phoenix.led.RainbowAnimation;
-import edu.wpi.first.networktables.BooleanSubscriber;
-import edu.wpi.first.networktables.BooleanTopic;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -32,12 +30,15 @@ public class ColorSubsystem extends SubsystemBase {
   public final PieceColoring pieceColoring = new PieceColoring();
   public final PositionColoring positionColoring = new PositionColoring();
   public final MorseCodeAnimation morseCodeAnimation = new MorseCodeAnimation();
-  private final BooleanSubscriber isCubeSubscriber;
-  private boolean lastColor = true;
+  private boolean lastColorIsCube;
+  private boolean isCube;
 
   private final RainbowAnimation rainbowAnimation;
 
-  public ColorSubsystem(int gamePieceID, int gridSelectID, BooleanTopic isCubeTopic) {
+  public ColorSubsystem(int gamePieceID, int gridSelectID, final boolean isCube) {
+
+    this.isCube = isCube;
+    this.lastColorIsCube = isCube;
 
     gamePieceCandle = new CANdle(gamePieceID);
     // gridPositionCandle = new CANdle(gridSelectID);
@@ -48,6 +49,7 @@ public class ColorSubsystem extends SubsystemBase {
     configAll.stripType = LEDStripType.RGB;
     configAll.brightnessScalar = 0.1;
     configAll.vBatOutputMode = VBatOutputMode.Modulated;
+
     var errorcode = gamePieceCandle.configAllSettings(configAll, 100);
     if (errorcode != ErrorCode.OK) {
       System.out.println("Error initializing CANdle");
@@ -60,6 +62,20 @@ public class ColorSubsystem extends SubsystemBase {
     FireFlyPattern.numberOfLEDS = numberOfLEDS;
     BIFlag.numberOfLEDS = numberOfLEDS;
     rainbowAnimation = new RainbowAnimation(1, Constants.RAINBOW_ANIMATION_SPEED, 64);
+  }
+
+  public void setCube() {
+    updateLEDs(true);
+  }
+
+  public void setCone() {
+    updateLEDs(false);
+  }
+
+  public void updateLEDs(final boolean isCube) {
+    if (this.lastColorIsCube != isCube) {
+      forceUpdate();
+    }
   }
 
   public void startRainbowAnimation() {
@@ -75,16 +91,12 @@ public class ColorSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (lastColor != isCubeSubscriber.get()) {
-      this.pieceColoring.update();
-      lastColor = isCubeSubscriber.get();
-    }
     if (DriverStation.isDisabled()) updatePattern();
   }
 
   public void forceUpdate() {
     this.pieceColoring.update();
-    lastColor = isCubeSubscriber.get();
+    lastColorIsCube = isCube;
   }
 
   private void clearLEDsGamePiece() {
@@ -167,7 +179,7 @@ public class ColorSubsystem extends SubsystemBase {
   public class PieceColoring {
     private void update() {
 
-      RGB color = isCubeSubscriber.get() ? RGB.PURPLE : RGB.YELLOW;
+      RGB color = isCube ? RGB.PURPLE : RGB.YELLOW;
 
       writeLEDsGamePiece(color);
     }
