@@ -83,7 +83,7 @@ public class RobotContainer {
     // Default to Cube.
     isCubeTopic.publish().set(true);
     isCubeSubscriber = isCubeTopic.subscribe(false);
-    endAffector = new EndAffectorSubsystem(Constants.END_AFFECTOR_ID, isCubeTopic, Constants.END_AFFECTOR_KP);
+    endAffector = new EndAffectorSubsystem(Constants.END_AFFECTOR_ID, Constants.END_AFFECTOR_KP);
 
     colorStrip =
         new ColorSubsystem(
@@ -148,7 +148,7 @@ public class RobotContainer {
 
     DoubleSupplier shootSupplier = driver::getRightTriggerAxis;
 
-    shootButton.whileTrue(new EndAffectorEjectCommand(shootSupplier, endAffector, () -> arm.getArmGoalPosition().getHeight(), cubeSub));
+    shootButton.whileTrue(new EndAffectorEjectCommand(shootSupplier, endAffector, () -> arm.getArmGoalPosition().getHeight(), isCubeSubscriber));
 
     Trigger driverGoButton = driver.a();
     Trigger driverResetFieldNorth = driver.start();
