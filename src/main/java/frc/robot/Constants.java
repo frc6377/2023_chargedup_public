@@ -296,18 +296,17 @@ public final class Constants {
       new ArmPosition(Math.toRadians(47.5), 4800, -21000, ArmHeight.HIGH);
 
   public static final ArmPosition SINGLE_SUBSTATION_CUBE_POSITION = null;
-  public static final ArmPosition SINGLE_SUBSTATION_CONE_POSITION = 
+  public static final ArmPosition SINGLE_SUBSTATION_CONE_POSITION =
       new ArmPosition(Math.toRadians(23.5), 484, -1050, ArmHeight.SINGLE_SUBSTATION);
   public static final ArmPosition DOUBLE_SUBSTATION_ARM_POSITION =
       new ArmPosition(
           Math.toRadians(60.743408), 4.204757, -20363.000000, ArmHeight.DOUBLE_SUBSTATION);
 
-public static final ArmPosition HYBRID_CUBE_ARM_POSITION = 
-    new ArmPosition(Math.toRadians(-7.5), 360, 15000, ArmHeight.LOW);
+  public static final ArmPosition HYBRID_CUBE_ARM_POSITION =
+      new ArmPosition(Math.toRadians(-7.5), 360, 15000, ArmHeight.LOW);
 
-    public static final ArmPosition HYBRID_CONE_ARM_POSITION = 
-    new ArmPosition(Math.toRadians(35), 360, -27000, ArmHeight.LOW);
-
+  public static final ArmPosition HYBRID_CONE_ARM_POSITION =
+      new ArmPosition(Math.toRadians(35), 360, -27000, ArmHeight.LOW);
 
   // A value between 0 and 1.
   public static final double RAINBOW_ANIMATION_SPEED = 0.5;

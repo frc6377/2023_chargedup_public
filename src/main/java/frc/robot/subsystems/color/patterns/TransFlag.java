@@ -15,11 +15,12 @@ public class TransFlag {
   private static int patternLength;
 
   static {
-    for(PatternNode p : pattern)
-    {patternLength += p.repeat;}
+    for (PatternNode p : pattern) {
+      patternLength += p.repeat;
+    }
   }
 
-  public static int getPatternLength(){
+  public static int getPatternLength() {
     return patternLength;
   }
 

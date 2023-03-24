@@ -54,7 +54,7 @@ public class RobotContainer {
   private final DeploySubsystem deploySubsystem = new DeploySubsystem();
   private final ArmSubsystem arm = new ArmSubsystem();
   private final BooleanTopic isCubeTopic;
-  private final BooleanSubscriber cubeSub;
+  private final BooleanSubscriber isCubeSubscriber;
   private final EndAffectorSubsystem endAffector;
   private final ColorSubsystem colorStrip;
   private final FieldPositioningSystem fieldPositioningSystem = new FieldPositioningSystem();
@@ -78,10 +78,16 @@ public class RobotContainer {
         new DriveInput(driver::getRightY, driver::getRightX, driverConfig);
 
     isCubeTopic = NetworkTableInstance.getDefault().getBooleanTopic("isCube");
-    cubeSub = isCubeTopic.subscribe(false);
+
+    
+    // Default to Cube.
+    isCubeTopic.publish().set(true);
+    isCubeSubscriber = isCubeTopic.subscribe(false);
     endAffector = new EndAffectorSubsystem(Constants.END_AFFECTOR_ID, isCubeTopic, Constants.END_AFFECTOR_KP);
+
     colorStrip =
-        new ColorSubsystem(Constants.GAME_PIECE_CANDLE, Constants.GRID_SELECT_CANDLE, isCubeTopic);
+        new ColorSubsystem(
+            Constants.GAME_PIECE_CANDLE, Constants.GRID_SELECT_CANDLE, isCubeSubscriber.get());
 
     fieldPositioningSystem.setDriveTrainSupplier(
         () -> drivetrainSubsystem.getOdometry(), drivetrainSubsystem.getKinematics());
@@ -95,7 +101,7 @@ public class RobotContainer {
             rotationSupplier,
             pointingDriveInput));
 
-    arm.setIsCubeSupplier(cubeSub);
+    arm.setIsCubeSupplier(isCubeSubscriber);
 
     autoChooser = new SendableChooser<>();
     addChooserOptions();
@@ -162,7 +168,8 @@ public class RobotContainer {
     // driverGoButton.onTrue(autoCommand.generateGridCommand(getBay()).until(this::isDriving));
 
     Trigger driverToggleGamePieceButton = driver.leftBumper();
-    driverToggleGamePieceButton.onTrue(new SwitchTargetObject(endAffector, arm, isCubeTopic));
+    driverToggleGamePieceButton.onTrue(
+        new SwitchTargetObject(endAffector, arm, colorStrip, isCubeTopic));
 
     Trigger driverStowed = driver.x();
     Trigger gunnerStowed = gunner.x();
@@ -193,29 +200,29 @@ public class RobotContainer {
         .onTrue(new ArmManualCommand(gunnerLeftYSupplier, gunnerRightYSupplier, arm));
 
     gunnerLowButton
-        .and(() -> cubeSub.get())
+        .and(() -> isCubeSubscriber.get())
         .onTrue(new ArmPowerCommand(Constants.LOW_CUBE_ARM_POSITION, arm, 3));
     gunnerLowButton
-        .and(() -> !cubeSub.get())
+        .and(() -> !isCubeSubscriber.get())
         .onTrue(new ArmPowerCommand(Constants.LOW_CONE_ARM_POSITION, arm, 3));
     gunnerMidButton
-        .and(() -> cubeSub.get())
+        .and(() -> isCubeSubscriber.get())
         .onTrue(new ArmPowerCommand(Constants.MID_CUBE_ARM_POSITION, arm, 3));
     gunnerMidButton
-        .and(() -> !cubeSub.get())
+        .and(() -> !isCubeSubscriber.get())
         .onTrue(new ArmPowerCommand(Constants.MID_CONE_ARM_POSITION, arm, 3));
     gunnerHighButton
-        .and(() -> cubeSub.get())
+        .and(() -> isCubeSubscriber.get())
         .onTrue(new ArmPowerCommand(Constants.HIGH_CUBE_ARM_POSITION, arm, 3));
     gunnerHighButton
-        .and(() -> !cubeSub.get())
+        .and(() -> !isCubeSubscriber.get())
         .onTrue(new ArmPowerCommand(Constants.HIGH_CONE_ARM_POSITION, arm, 3));
 
-        gunnerHybridButton
-        .and(() -> cubeSub.get())
+    gunnerHybridButton
+        .and(() -> isCubeSubscriber.get())
         .onTrue(new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3));
     gunnerHybridButton
-        .and(() -> !cubeSub.get())
+        .and(() -> !isCubeSubscriber.get())
         .onTrue(new ArmPowerCommand(Constants.HYBRID_CONE_ARM_POSITION, arm, 3));
 
     Trigger gunnerLefTrigger = gunner.leftTrigger();
@@ -226,7 +233,7 @@ public class RobotContainer {
     if (arm.getArmPosition().getHeight() == ArmHeight.STOWED
         || arm.getArmPosition().getHeight() == ArmHeight.STOWED) {
       ArmPosition targetPosition =
-          ArmPosition.getArmPositionFromHeightAndType(ArmHeight.LOW, cubeSub.get());
+          ArmPosition.getArmPositionFromHeightAndType(ArmHeight.LOW, isCubeSubscriber.get());
       return new ArmPowerCommand(targetPosition, arm, 3);
     } else {
       return new ArmPowerCommand(Constants.STOWED_ARM_POSITION, arm, 3);
