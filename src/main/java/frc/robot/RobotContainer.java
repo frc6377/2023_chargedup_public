@@ -142,7 +142,7 @@ public class RobotContainer {
 
     DoubleSupplier shootSupplier = driver::getRightTriggerAxis;
 
-    shootButton.whileTrue(new EndAffectorEjectCommand(shootSupplier, endAffector));
+    shootButton.whileTrue(new EndAffectorEjectCommand(shootSupplier, endAffector, () -> arm.getArmGoalPosition().getHeight(), cubeSub));
 
     Trigger driverGoButton = driver.a();
     Trigger driverResetFieldNorth = driver.start();

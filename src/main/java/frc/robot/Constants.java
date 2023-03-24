@@ -153,7 +153,7 @@ public final class Constants {
   public static final double END_AFFECTOR_IDLE_SPEED = 0.1;
 
   public static final double END_AFFECTOR_KP = 0.2;
-  public static final double END_AFFECTOR_OFFSET = 500;
+  public static final double END_AFFECTOR_OFFSET = -2100;
 
   // Arm Rotation
   public static final double ARM_ROTATION_KP = 0.99902;
