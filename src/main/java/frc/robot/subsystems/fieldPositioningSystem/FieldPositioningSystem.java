@@ -39,6 +39,8 @@ public class FieldPositioningSystem extends SubsystemBase {
   private final Pose2DPublisher pub = Topics.PoseTopic().publish();
   private final DoubleArrayPublisher yprPub =
       NetworkTableInstance.getDefault().getDoubleArrayTopic("pitch").publish();
+  private final DoubleArrayPublisher yprOmegaPub =
+      NetworkTableInstance.getDefault().getDoubleArrayTopic("omegas").publish();
 
   class FieldPositioningSystemError extends RuntimeException {
     public FieldPositioningSystemError(final String message, final Throwable throwable) {
@@ -135,9 +137,12 @@ public class FieldPositioningSystem extends SubsystemBase {
     field.setRobotPose(currentRobotPose);
     pub.accept(currentRobotPose);
     double[] ypr = new double[3];
+    double[] yprVelocity = new double[3];
     inertialMeasurementUnit.getYawPitchRoll(ypr);
+    inertialMeasurementUnit.getRawGyro(yprVelocity);
     ypr[0] = getRobotXYPose().getRotation().getDegrees();
     yprPub.accept(ypr);
+    yprOmegaPub.accept(yprVelocity);
     DeltaBoard.putString("pose", currentRobotPose.getX() + " " + currentRobotPose.getY());
   }
 
