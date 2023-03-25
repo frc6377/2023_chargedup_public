@@ -1,8 +1,7 @@
 package frc.robot.networktables;
 
-import java.util.Hashtable;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import java.util.Hashtable;
 
 public class DeltaBoard {
   private static Hashtable<String, String> stringTable = new Hashtable<>();
