@@ -1,13 +1,10 @@
 package frc.robot.commands;
 
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
 import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
 
 public class OmegaBalance extends CommandBase {
@@ -15,10 +12,10 @@ public class OmegaBalance extends CommandBase {
       NetworkTableInstance.getDefault()
           .getDoubleArrayTopic("omegas")
           .subscribe(new double[] {0, 0, 0});
-          private final DoubleArraySubscriber thetaSub =
-          NetworkTableInstance.getDefault()
-              .getDoubleArrayTopic("pitch")
-              .subscribe(new double[] {0, 0, 0});
+  private final DoubleArraySubscriber thetaSub =
+      NetworkTableInstance.getDefault()
+          .getDoubleArrayTopic("pitch")
+          .subscribe(new double[] {0, 0, 0});
   private final DrivetrainSubsystem drive;
   private int count = 0;
   private final double driveVelocity;
@@ -34,7 +31,7 @@ public class OmegaBalance extends CommandBase {
   public void execute() {
     drive.drive(
         ChassisSpeeds.fromFieldRelativeSpeeds(
-            new ChassisSpeeds(driveVelocity*computeSign(), 0, 0),
+            new ChassisSpeeds(driveVelocity * computeSign(), 0, 0),
             new Rotation2d(Math.toRadians(omegaSub.get()[0]))));
   }
 
@@ -48,7 +45,6 @@ public class OmegaBalance extends CommandBase {
 
     return count > 3 || isLevel();
   }
-  
 
   @Override
   public void end(boolean interupted) {
@@ -62,8 +58,8 @@ public class OmegaBalance extends CommandBase {
     System.out.println("pitch " + pitch + " roll " + roll);
     return Math.hypot(roll, pitch);
   }
-    // DONT TOUCH UNLESS U HAVE A FIX. I AM A BROKEN MAN
-private double computeSign(){
+  // DONT TOUCH UNLESS U HAVE A FIX. I AM A BROKEN MAN
+  private double computeSign() {
     double yaw = (thetaSub.get()[0]);
     double pitch = (thetaSub.get()[1]);
     double roll = (thetaSub.get()[2]);
@@ -82,10 +78,9 @@ private double computeSign(){
     }
 
     return Math.copySign(1, sign);
-    
   }
 
-  private boolean isLevel(){
+  private boolean isLevel() {
     double pitch = (thetaSub.get()[1]);
     double roll = (thetaSub.get()[2]);
 

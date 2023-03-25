@@ -39,7 +39,7 @@ public class FieldPositioningSystem extends SubsystemBase {
   private final DoubleArrayPublisher yprPub =
       NetworkTableInstance.getDefault().getDoubleArrayTopic("pitch").publish();
   private final DoubleArrayPublisher yprOmegaPub =
-  NetworkTableInstance.getDefault().getDoubleArrayTopic("omegas").publish();
+      NetworkTableInstance.getDefault().getDoubleArrayTopic("omegas").publish();
 
   class FieldPositioningSystemError extends RuntimeException {
     public FieldPositioningSystemError(final String message, final Throwable throwable) {
