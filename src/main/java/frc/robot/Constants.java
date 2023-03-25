@@ -49,7 +49,6 @@ public final class Constants {
   // TODO: add real value for the motor ID
   public static final int END_AFFECTOR_ID = 9;
 
-
   public static final int GAME_PIECE_CANDLE = 2;
   public static final int GRID_SELECT_CANDLE = 3;
 

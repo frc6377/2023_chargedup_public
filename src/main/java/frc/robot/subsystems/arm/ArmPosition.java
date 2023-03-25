@@ -82,28 +82,33 @@ public class ArmPosition {
   }
 
   public ArmPosition clamp(ArmPosition armMinPosition, ArmPosition armMaxPosition) {
-    ArmPosition clamped = new ArmPosition(
-      MathUtil.clamp(
-          this.armRotation, armMinPosition.getArmRotation(), armMaxPosition.getArmRotation()),
-      MathUtil.clamp(
-          this.armExtension, armMinPosition.getArmExtension(), armMaxPosition.getArmExtension()),
-      MathUtil.clamp(
-          this.wristRotation,
-          armMinPosition.getWristRotation(),
-          armMaxPosition.getWristRotation()),
-      ArmHeight.NOT_SPECIFIED);
+    ArmPosition clamped =
+        new ArmPosition(
+            MathUtil.clamp(
+                this.armRotation, armMinPosition.getArmRotation(), armMaxPosition.getArmRotation()),
+            MathUtil.clamp(
+                this.armExtension,
+                armMinPosition.getArmExtension(),
+                armMaxPosition.getArmExtension()),
+            MathUtil.clamp(
+                this.wristRotation,
+                armMinPosition.getWristRotation(),
+                armMaxPosition.getWristRotation()),
+            ArmHeight.NOT_SPECIFIED);
 
-    if(clamped.equals(this)){
+    if (clamped.equals(this)) {
       return this;
-    }else{
+    } else {
       return clamped;
     }
   }
 
   @Override
-  public boolean equals(Object o){
-    if(o.getClass() != this.getClass()) return false;
-    ArmPosition  other = (ArmPosition) o;
-    return other.armExtension == this.armExtension && this.armRotation == other.armRotation && this.wristRotation == other.wristRotation;
+  public boolean equals(Object o) {
+    if (o.getClass() != this.getClass()) return false;
+    ArmPosition other = (ArmPosition) o;
+    return other.armExtension == this.armExtension
+        && this.armRotation == other.armRotation
+        && this.wristRotation == other.wristRotation;
   }
 }

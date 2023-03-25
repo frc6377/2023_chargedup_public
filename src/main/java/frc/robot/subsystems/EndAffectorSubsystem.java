@@ -41,11 +41,11 @@ public class EndAffectorSubsystem extends SubsystemBase {
     motor.set(-Constants.END_AFFECTOR_OUTTAKE_SPEED * (isCube ? -1 : 30));
   }
 
-  public double getIntakePosition(){
+  public double getIntakePosition() {
     return motor.getSelectedSensorPosition();
   }
 
-  public void partialEject(double target){
+  public void partialEject(double target) {
     motor.set(ControlMode.Position, target);
   }
 

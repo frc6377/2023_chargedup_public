@@ -79,7 +79,6 @@ public class RobotContainer {
 
     isCubeTopic = NetworkTableInstance.getDefault().getBooleanTopic("isCube");
 
-    
     // Default to Cube.
     isCubeTopic.publish().set(true);
     isCubeSubscriber = isCubeTopic.subscribe(false);
@@ -125,7 +124,7 @@ public class RobotContainer {
     DoubleSupplier gunnerLeftYSupplier = gunner::getLeftY;
     DoubleSupplier gunnerRightYSupplier = gunner::getRightY;
     Trigger gunnerHybridButton = gunner.rightBumper();
-    
+
     DriveCommand driveCommand =
         new DriveCommand(
             drivetrainSubsystem,
@@ -148,12 +147,17 @@ public class RobotContainer {
 
     DoubleSupplier shootSupplier = driver::getRightTriggerAxis;
 
-    shootButton.whileTrue(new EndAffectorEjectCommand(shootSupplier, endAffector, () -> arm.getArmGoalPosition().getHeight(), isCubeSubscriber));
+    shootButton.whileTrue(
+        new EndAffectorEjectCommand(
+            shootSupplier,
+            endAffector,
+            () -> arm.getArmGoalPosition().getHeight(),
+            isCubeSubscriber));
 
     Trigger driverGoButton = driver.a();
     Trigger driverResetFieldNorth = driver.start();
 
-    driverResetFieldNorth.onTrue(   
+    driverResetFieldNorth.onTrue(
         new InstantCommand(
             () ->
                 fieldPositioningSystem.resetRobotPosition(
