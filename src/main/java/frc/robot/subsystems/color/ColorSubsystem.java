@@ -72,6 +72,7 @@ public class ColorSubsystem extends SubsystemBase {
   }
 
   public void updateLEDs(final boolean isCube) {
+    this.isCube = isCube;
     if (this.lastColorIsCube != isCube) {
       forceUpdate();
     }
