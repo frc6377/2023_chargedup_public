@@ -79,7 +79,6 @@ public class RobotContainer {
 
     isCubeTopic = NetworkTableInstance.getDefault().getBooleanTopic("isCube");
 
-
     // Default to Cube.
     isCubeTopic.publish().set(true);
     isCubeSubscriber = isCubeTopic.subscribe(false);

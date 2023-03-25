@@ -9,7 +9,6 @@ public class EndAffectorSubsystem extends SubsystemBase {
   private WPI_TalonFX motor;
   private boolean isCube;
 
-
   public EndAffectorSubsystem(int ID, double kP) {
 
     motor = new WPI_TalonFX(ID);
