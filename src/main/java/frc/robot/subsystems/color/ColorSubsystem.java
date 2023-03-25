@@ -72,8 +72,11 @@ public class ColorSubsystem extends SubsystemBase {
   }
 
   public void updateLEDs(final boolean isCube) {
+    System.out.println("UpdatingLEDs");
+    this.isCube = isCube;
     if (this.lastColorIsCube != isCube) {
       forceUpdate();
+      System.out.println("Delta Detected");
     }
   }
 
@@ -94,7 +97,8 @@ public class ColorSubsystem extends SubsystemBase {
   }
 
   public void forceUpdate() {
-    this.pieceColoring.update();
+    RGB color = isCube ? RGB.PURPLE : RGB.YELLOW;
+    writeLEDsGamePiece(color);
     lastColorIsCube = isCube;
   }
 
