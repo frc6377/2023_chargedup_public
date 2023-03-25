@@ -13,7 +13,8 @@ public enum RobotVersion {
     System.out.println("Actual mac address" + actualMacAddress);
     switch (actualMacAddress) {
       case Constants.V2_MAC_ADDRESS:
-        System.out.println("Mac Adress matched V2 address (" + Constants.V2_MAC_ADDRESS+") using V2 config");
+        System.out.println(
+            "Mac Adress matched V2 address (" + Constants.V2_MAC_ADDRESS + ") using V2 config");
         return V2;
       default:
         System.out.println("Selected V2 Config");

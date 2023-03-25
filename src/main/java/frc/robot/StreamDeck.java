@@ -1,7 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.GenericHID;
-
 public class StreamDeck {
   // private GenericHID streamDeck;
   private int numButtons;

@@ -37,8 +37,8 @@ public class EndAffectorEjectCommand extends CommandBase {
 
   @Override
   public void execute() {
-    if (shootSupplier.getAsDouble() > 0.3) {
-      if (enablePartial && shootSupplier.getAsDouble() < 0.9) {
+    if (shootSupplier.getAsDouble() > 0.2) {
+      if (enablePartial && shootSupplier.getAsDouble() < 0.95) {
         endAffector.partialEject(target);
       } else {
         endAffector.fastOutake();

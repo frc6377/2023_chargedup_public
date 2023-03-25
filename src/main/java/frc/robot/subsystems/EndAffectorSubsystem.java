@@ -60,4 +60,8 @@ public class EndAffectorSubsystem extends SubsystemBase {
   public void idle() {
     motor.set(Constants.END_AFFECTOR_IDLE_SPEED * (isCube ? -1 : 1));
   }
+
+  public double getVelocity() {
+    return motor.getSelectedSensorVelocity();
+  }
 }

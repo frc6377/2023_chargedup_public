@@ -29,10 +29,10 @@ public final class Constants {
   private static final double BACK_LEFT_V1_CANCODER_OFFSET = 200.742;
   private static final double BACK_RIGHT_V1_CANCODER_OFFSET = 156.182;
 
-  private static final double FRONT_LEFT_V2_CANCODER_OFFSET  = 180+261.123;
-  private static final double FRONT_RIGHT_V2_CANCODER_OFFSET = 180+106.172;
-  private static final double BACK_LEFT_V2_CANCODER_OFFSET   = 180+287.139;
-  private static final double BACK_RIGHT_V2_CANCODER_OFFSET  = 180+53.350;
+  private static final double FRONT_LEFT_V2_CANCODER_OFFSET = 180 + 261.123;
+  private static final double FRONT_RIGHT_V2_CANCODER_OFFSET = 180 + 106.172;
+  private static final double BACK_LEFT_V2_CANCODER_OFFSET = 180 + 287.139;
+  private static final double BACK_RIGHT_V2_CANCODER_OFFSET = 180 + 53.350;
 
   public static final int DEGREES_0 = 0;
   public static final int DEGREES_45 = 45;
@@ -296,7 +296,7 @@ public final class Constants {
 
   public static final ArmPosition SINGLE_SUBSTATION_CUBE_POSITION = null;
   public static final ArmPosition SINGLE_SUBSTATION_CONE_POSITION =
-      new ArmPosition(Math.toRadians(51.877441), 0, -20363, ArmHeight.SINGLE_SUBSTATION);
+      new ArmPosition(Math.toRadians(48.416748), 6.591797, -12481.000000, ArmHeight.SINGLE_SUBSTATION);
 
   public static final ArmPosition HYBRID_CUBE_ARM_POSITION =
       new ArmPosition(Math.toRadians(-7.5), 360, 15000, ArmHeight.LOW);
