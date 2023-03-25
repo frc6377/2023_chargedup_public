@@ -178,7 +178,7 @@ public class RobotContainer {
     Trigger driverStowed = driver.x();
     Trigger gunnerStowed = gunner.x();
 
-    gunnerStowed.onTrue(new ArmPowerCommand(Constants.STOWED_ARM_POSITION, arm, 3));
+    gunnerStowed.onTrue(new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3));
     driverStowed.onTrue(
         Commands.runOnce(() -> driverStowBehavior().schedule(), new Subsystem[] {}));
 

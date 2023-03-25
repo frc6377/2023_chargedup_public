@@ -11,7 +11,6 @@ public enum ArmHeight {
   DOUBLE_SUBSTATION;
 
   public boolean isStowed() {
-    System.out.println(this);
     return this == ArmHeight.STOWED || this == ArmHeight.HIGH_STOWED;
   }
 }
