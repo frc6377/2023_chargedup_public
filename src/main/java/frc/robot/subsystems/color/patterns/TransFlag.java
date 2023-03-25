@@ -4,41 +4,27 @@ import frc.robot.subsystems.color.RGB;
 
 public class TransFlag {
   public static int numberOfLEDS;
-  private static final RGB[] pattern = {
-    RGB.BLACK,
-    RGB.HOWDY_BLUE,
-    RGB.HOWDY_BLUE,
-    RGB.HOWDY_BLUE,
-    RGB.HOWDY_BLUE,
-    RGB.HOWDY_BLUE,
-    RGB.PINK,
-    RGB.PINK,
-    RGB.PINK,
-    RGB.PINK,
-    RGB.PINK,
-    RGB.WHITE,
-    RGB.WHITE,
-    RGB.WHITE,
-    RGB.WHITE,
-    RGB.WHITE,
-    RGB.PINK,
-    RGB.PINK,
-    RGB.PINK,
-    RGB.PINK,
-    RGB.PINK,
-    RGB.HOWDY_BLUE,
-    RGB.HOWDY_BLUE,
-    RGB.HOWDY_BLUE,
-    RGB.HOWDY_BLUE,
-    RGB.HOWDY_BLUE,
+  private static final PatternNode[] pattern = {
+    new PatternNode(RGB.BLACK, 1),
+    new PatternNode(RGB.HOWDY_BLUE, 4),
+    new PatternNode(RGB.PINK, 4),
+    new PatternNode(RGB.WHITE, 4),
+    new PatternNode(RGB.PINK, 4),
+    new PatternNode(RGB.HOWDY_BLUE, 4),
   };
+  private static int patternLength;
 
-  public static RGB[] getColors(int step) {
-    int initalStep = step % pattern.length;
-    RGB[] fullPattern = new RGB[numberOfLEDS];
-    for (int i = 0; i < numberOfLEDS; i++) {
-      fullPattern[i] = pattern[(i + initalStep) % pattern.length];
+  static {
+    for (PatternNode p : pattern) {
+      patternLength += p.repeat;
     }
-    return fullPattern;
+  }
+
+  public static int getPatternLength() {
+    return patternLength;
+  }
+
+  public static PatternNode[] getPattern() {
+    return pattern;
   }
 }

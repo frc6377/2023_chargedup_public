@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.networktables.DeltaBoard;
 import frc.robot.networktables.Pose2DPublisher;
 import frc.robot.networktables.Topics;
 import java.io.IOException;
@@ -142,7 +143,7 @@ public class FieldPositioningSystem extends SubsystemBase {
     ypr[0] = getRobotXYPose().getRotation().getDegrees();
     yprPub.accept(ypr);
     yprOmegaPub.accept(yprVelocity);
-    SmartDashboard.putString("pose", currentRobotPose.getX() + " " + currentRobotPose.getY());
+    DeltaBoard.putString("pose", currentRobotPose.getX() + " " + currentRobotPose.getY());
   }
 
   /**

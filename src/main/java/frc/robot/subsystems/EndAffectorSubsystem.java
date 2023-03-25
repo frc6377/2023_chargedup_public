@@ -1,41 +1,36 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import edu.wpi.first.networktables.BooleanPublisher;
-import edu.wpi.first.networktables.BooleanTopic;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class EndAffectorSubsystem extends SubsystemBase {
   private WPI_TalonFX motor;
-  private boolean isCube = true;
-  private final BooleanPublisher isCubePublisher;
+  private boolean isCube;
 
-  public EndAffectorSubsystem(int ID, BooleanTopic isCubeTopic) {
+  public EndAffectorSubsystem(int ID, double kP) {
+
     motor = new WPI_TalonFX(ID);
-    motor.configOpenloopRamp(0.25);
-
-    isCubePublisher = isCubeTopic.publish();
-    isCubePublisher.set(isCube);
-  }
-
-  public boolean isCube() {
-    return isCube;
+    this.isCube = isCube;
+    motor.configOpenloopRamp(0.0);
+    motor.config_kP(0, kP);
   }
 
   public void toggleGamePiece() {
     isCube = !isCube;
-    isCubePublisher.set(isCube);
+  }
+
+  public void setGamePiece(final boolean isCube) {
+    this.isCube = isCube;
   }
 
   public void setCube() {
     isCube = true;
-    isCubePublisher.set(isCube);
   }
 
   public void setCone() {
     isCube = false;
-    isCubePublisher.set(isCube);
   }
 
   public void intake() {
@@ -43,11 +38,19 @@ public class EndAffectorSubsystem extends SubsystemBase {
   }
 
   public void fastOutake() {
-    motor.set(-Constants.END_AFFECTOR_OUTTAKE_SPEED * (isCube ? -1 : 1.25));
+    motor.set(-Constants.END_AFFECTOR_OUTTAKE_SPEED * (isCube ? -1 : 30));
+  }
+
+  public double getIntakePosition() {
+    return motor.getSelectedSensorPosition();
+  }
+
+  public void partialEject(double target) {
+    motor.set(ControlMode.Position, target);
   }
 
   public void slowOutake() {
-    motor.set(-Constants.END_AFFECTOR_SLOW_OUTTAKE_SPEED * (isCube ? -1 : 1.25));
+    motor.set(-Constants.END_AFFECTOR_SLOW_OUTTAKE_SPEED * (isCube ? -1 : 300));
   }
 
   public void halt() {

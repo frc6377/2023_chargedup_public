@@ -6,23 +6,22 @@ import com.ctre.phoenix.led.CANdle.LEDStripType;
 import com.ctre.phoenix.led.CANdle.VBatOutputMode;
 import com.ctre.phoenix.led.CANdleConfiguration;
 import com.ctre.phoenix.led.RainbowAnimation;
-import edu.wpi.first.networktables.BooleanSubscriber;
-import edu.wpi.first.networktables.BooleanTopic;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.networktables.DeltaBoard;
 import frc.robot.subsystems.color.patterns.BIFlag;
 import frc.robot.subsystems.color.patterns.FireFlyPattern;
+import frc.robot.subsystems.color.patterns.PatternNode;
 import frc.robot.subsystems.color.patterns.TransFlag;
 
 public class ColorSubsystem extends SubsystemBase {
   private static final int patternUpdateFrequency = 10;
 
   private final CANdle gamePieceCandle;
-  private final CANdle gridPositionCandle;
+  // private final CANdle gridPositionCandle;
 
-  private static final int numberOfLEDS = 64;
+  private static final int numberOfLEDS = 70;
 
   private int tick;
   private int patternTick = 0;
@@ -31,22 +30,25 @@ public class ColorSubsystem extends SubsystemBase {
   public final PieceColoring pieceColoring = new PieceColoring();
   public final PositionColoring positionColoring = new PositionColoring();
   public final MorseCodeAnimation morseCodeAnimation = new MorseCodeAnimation();
-  private final BooleanSubscriber isCubeSubscriber;
-  private boolean lastColor = true;
+  private boolean lastColorIsCube;
+  private boolean isCube;
 
   private final RainbowAnimation rainbowAnimation;
 
-  public ColorSubsystem(int gamePieceID, int gridSelectID, BooleanTopic isCubeTopic) {
+  public ColorSubsystem(int gamePieceID, int gridSelectID, final boolean isCube) {
+
+    this.isCube = isCube;
+    this.lastColorIsCube = isCube;
 
     gamePieceCandle = new CANdle(gamePieceID);
-    gridPositionCandle = new CANdle(gridSelectID);
-    this.isCubeSubscriber = isCubeTopic.subscribe(true);
+    // gridPositionCandle = new CANdle(gridSelectID);
     CANdleConfiguration configAll = new CANdleConfiguration();
     configAll.statusLedOffWhenActive = false;
     configAll.disableWhenLOS = false;
     configAll.stripType = LEDStripType.RGB;
     configAll.brightnessScalar = 0.1;
     configAll.vBatOutputMode = VBatOutputMode.Modulated;
+
     var errorcode = gamePieceCandle.configAllSettings(configAll, 100);
     if (errorcode != ErrorCode.OK) {
       System.out.println("Error initializing CANdle");
@@ -61,29 +63,39 @@ public class ColorSubsystem extends SubsystemBase {
     rainbowAnimation = new RainbowAnimation(1, Constants.RAINBOW_ANIMATION_SPEED, 64);
   }
 
+  public void setCube() {
+    updateLEDs(true);
+  }
+
+  public void setCone() {
+    updateLEDs(false);
+  }
+
+  public void updateLEDs(final boolean isCube) {
+    if (this.lastColorIsCube != isCube) {
+      forceUpdate();
+    }
+  }
+
   public void startRainbowAnimation() {
     if (disablePattern != DisablePattern.RAINBOW) return;
     gamePieceCandle.animate(rainbowAnimation);
-    gridPositionCandle.animate(rainbowAnimation);
+    // gridPositionCandle.animate(rainbowAnimation);
   }
 
   public void stopRainbowAnimation() {
     gamePieceCandle.clearAnimation(0);
-    gridPositionCandle.clearAnimation(0);
+    // gridPositionCandle.clearAnimation(0);
   }
 
   @Override
   public void periodic() {
-    if (lastColor != isCubeSubscriber.get()) {
-      this.pieceColoring.update();
-      lastColor = isCubeSubscriber.get();
-    }
     if (DriverStation.isDisabled()) updatePattern();
   }
 
   public void forceUpdate() {
     this.pieceColoring.update();
-    lastColor = isCubeSubscriber.get();
+    lastColorIsCube = isCube;
   }
 
   private void clearLEDsGamePiece() {
@@ -103,15 +115,16 @@ public class ColorSubsystem extends SubsystemBase {
   }
 
   private void writeLEDsGridPosition(RGB rgb) {
-    gridPositionCandle.setLEDs(rgb.red, rgb.green, rgb.blue);
+    // gridPositionCandle.setLEDs(rgb.red, rgb.green, rgb.blue);
   }
 
   private void writeLEDsGridPosition(RGB rgb, int startIdx, int count) {
-    gridPositionCandle.setLEDs(rgb.red, rgb.green, rgb.blue, rgb.white, startIdx, count);
+    // gridPositionCandle.setLEDs(rgb.red, rgb.green, rgb.blue, rgb.white, startIdx, count);
   }
 
   private void updatePattern() {
-    RGB[] pattern;
+    PatternNode[] pattern;
+    int patternLength;
 
     tick++;
     if (tick > patternUpdateFrequency) {
@@ -121,29 +134,40 @@ public class ColorSubsystem extends SubsystemBase {
       return;
     }
 
-    SmartDashboard.putString("Disable Pattern", disablePattern.name());
+    DeltaBoard.putString("Disable Pattern", disablePattern.name());
 
     switch (disablePattern) {
         // case BI_FLAG:
         //   pattern = BIFlag.getColors(patternTick);
         //   break;
       case FIRE_FLY:
-        pattern = FireFlyPattern.getColors(patternTick);
+        pattern = FireFlyPattern.getPattern();
+        patternLength = FireFlyPattern.getPatternLength();
         break;
       case RAINBOW:
         startRainbowAnimation();
         return;
       case TRANS_FLAG:
-        pattern = TransFlag.getColors(patternTick);
+        pattern = TransFlag.getPattern();
+        patternLength = TransFlag.getPatternLength();
         break;
       default:
         startRainbowAnimation();
         return;
     }
     stopRainbowAnimation();
-    for (int i = 0; i < numberOfLEDS; i++) {
-      if (pattern.length <= i) break;
-      gamePieceCandle.setLEDs(pattern[i].red, pattern[i].green, pattern[i].blue, 125, i, i);
+    int patternIndex = 0;
+    patternTick %= patternLength;
+    int LEDIndex = -patternTick;
+    while (LEDIndex < numberOfLEDS) {
+      patternIndex %= pattern.length;
+
+      PatternNode node = pattern[patternIndex];
+      RGB c = pattern[patternIndex].color;
+
+      gamePieceCandle.setLEDs(c.red, c.green, c.blue, 0, LEDIndex, node.repeat);
+      LEDIndex += node.repeat;
+      patternIndex += 1;
     }
   }
 
@@ -154,7 +178,7 @@ public class ColorSubsystem extends SubsystemBase {
   public class PieceColoring {
     private void update() {
 
-      RGB color = isCubeSubscriber.get() ? RGB.PURPLE : RGB.YELLOW;
+      RGB color = isCube ? RGB.PURPLE : RGB.YELLOW;
 
       writeLEDsGamePiece(color);
     }

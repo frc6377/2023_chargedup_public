@@ -13,6 +13,11 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
+  public Robot() {
+    super();
+    addPeriodic(() -> m_robotContainer.setElevator(), 0.005);
+  }
+
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();

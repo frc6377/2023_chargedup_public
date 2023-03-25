@@ -1,9 +1,9 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
+import frc.robot.networktables.DeltaBoard;
 import frc.robot.subsystems.arm.ArmHeight;
 import frc.robot.subsystems.arm.ArmPosition;
 import frc.robot.subsystems.arm.ArmSubsystem;
@@ -21,7 +21,7 @@ public class ArmPowerCommand extends CommandBase {
     this.targetPose =
         new PolarPoint(
             targetPosition.getArmRotation(),
-            MathUtil.clamp(targetPosition.getArmExtension(), 0, 13));
+            MathUtil.clamp(targetPosition.getArmExtension(), 360, 13.8 * 360.0));
     this.targetWristAngle = targetPosition.getWristRotation();
     this.armSubsystem = armSubsystem;
     targetHeight = targetPosition.getHeight();
@@ -51,7 +51,7 @@ public class ArmPowerCommand extends CommandBase {
                 Math.min(targetPose.r, initalPose.r),
                 Math.max(targetPose.r, initalPose.r)),
             targetWristAngle,
-            ArmHeight.NOT_SPECIFIED));
+            targetHeight));
   }
 
   @Override
@@ -68,7 +68,7 @@ public class ArmPowerCommand extends CommandBase {
     double theta = armSubsystem.thetaFromPPC();
     double thetaRatio = (theta - initalPose.theta) / (targetPose.theta - initalPose.theta);
     double extensionDelta = targetPose.r - initalPose.r;
-    SmartDashboard.putNumber("Pow", computePow(extensionDelta));
+    DeltaBoard.putNumber("Pow", computePow(extensionDelta));
     return Math.pow(thetaRatio, computePow(extensionDelta)) * extensionDelta + initalPose.r;
   }
 
