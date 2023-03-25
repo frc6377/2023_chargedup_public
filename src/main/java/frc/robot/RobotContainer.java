@@ -23,6 +23,7 @@ import frc.robot.commands.ArmManualCommand;
 import frc.robot.commands.ArmPowerCommand;
 import frc.robot.commands.AutoBalanceCommand;
 import frc.robot.commands.DriveCommand;
+import frc.robot.commands.EndAffectorEjectCommand;
 import frc.robot.commands.RoutineFactory;
 import frc.robot.commands.RoutineFactory.Routines;
 import frc.robot.commands.SwerveAutoFactory;
@@ -77,10 +78,13 @@ public class RobotContainer {
         new DriveInput(driver::getRightY, driver::getRightX, driverConfig);
 
     isCubeTopic = NetworkTableInstance.getDefault().getBooleanTopic("isCube");
+
+
     // Default to Cube.
     isCubeTopic.publish().set(true);
     isCubeSubscriber = isCubeTopic.subscribe(false);
-    endAffector = new EndAffectorSubsystem(Constants.END_AFFECTOR_ID, isCubeSubscriber.get());
+    endAffector = new EndAffectorSubsystem(Constants.END_AFFECTOR_ID, Constants.END_AFFECTOR_KP);
+
     colorStrip =
         new ColorSubsystem(
             Constants.GAME_PIECE_CANDLE, Constants.GRID_SELECT_CANDLE, isCubeSubscriber.get());
@@ -142,8 +146,14 @@ public class RobotContainer {
     intakeButton.whileTrue(
         Commands.startEnd(() -> endAffector.intake(), () -> endAffector.idle(), endAffector));
 
+    DoubleSupplier shootSupplier = driver::getRightTriggerAxis;
+
     shootButton.whileTrue(
-        Commands.startEnd(() -> endAffector.fastOutake(), () -> endAffector.halt(), endAffector));
+        new EndAffectorEjectCommand(
+            shootSupplier,
+            endAffector,
+            () -> arm.getArmGoalPosition().getHeight(),
+            isCubeSubscriber));
 
     Trigger driverGoButton = driver.a();
     Trigger driverResetFieldNorth = driver.start();

@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.networktables.DeltaBoard;
 import frc.robot.networktables.Pose2DPublisher;
 import frc.robot.networktables.Topics;
 import java.io.IOException;
@@ -38,6 +39,8 @@ public class FieldPositioningSystem extends SubsystemBase {
   private final Pose2DPublisher pub = Topics.PoseTopic().publish();
   private final DoubleArrayPublisher yprPub =
       NetworkTableInstance.getDefault().getDoubleArrayTopic("pitch").publish();
+  private final DoubleArrayPublisher yprOmegaPub =
+      NetworkTableInstance.getDefault().getDoubleArrayTopic("omegas").publish();
 
   class FieldPositioningSystemError extends RuntimeException {
     public FieldPositioningSystemError(final String message, final Throwable throwable) {
@@ -134,10 +137,13 @@ public class FieldPositioningSystem extends SubsystemBase {
     field.setRobotPose(currentRobotPose);
     pub.accept(currentRobotPose);
     double[] ypr = new double[3];
+    double[] yprVelocity = new double[3];
     inertialMeasurementUnit.getYawPitchRoll(ypr);
+    inertialMeasurementUnit.getRawGyro(yprVelocity);
     ypr[0] = getRobotXYPose().getRotation().getDegrees();
     yprPub.accept(ypr);
-    SmartDashboard.putString("pose", currentRobotPose.getX() + " " + currentRobotPose.getY());
+    yprOmegaPub.accept(yprVelocity);
+    DeltaBoard.putString("pose", currentRobotPose.getX() + " " + currentRobotPose.getY());
   }
 
   /**

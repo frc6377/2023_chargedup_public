@@ -151,6 +151,9 @@ public final class Constants {
   public static final double END_AFFECTOR_SLOW_OUTTAKE_SPEED = 0.075;
   public static final double END_AFFECTOR_IDLE_SPEED = 0.1;
 
+  public static final double END_AFFECTOR_KP = 0.2;
+  public static final double END_AFFECTOR_OFFSET = -2250;
+
   // Arm Rotation
   public static final double ARM_ROTATION_KP = 0.99902;
   public static final double ARM_ROTATION_MAX_VELOCITY = 15;
