@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -8,10 +9,12 @@ public class EndAffectorSubsystem extends SubsystemBase {
   private WPI_TalonFX motor;
   private boolean isCube;
 
-  public EndAffectorSubsystem(int ID, final boolean isCube) {
+  public EndAffectorSubsystem(int ID, double kP) {
+
     motor = new WPI_TalonFX(ID);
     this.isCube = isCube;
     motor.configOpenloopRamp(0.0);
+    motor.config_kP(0, kP);
   }
 
   public void toggleGamePiece() {
@@ -36,6 +39,14 @@ public class EndAffectorSubsystem extends SubsystemBase {
 
   public void fastOutake() {
     motor.set(-Constants.END_AFFECTOR_OUTTAKE_SPEED * (isCube ? -1 : 30));
+  }
+
+  public double getIntakePosition() {
+    return motor.getSelectedSensorPosition();
+  }
+
+  public void partialEject(double target) {
+    motor.set(ControlMode.Position, target);
   }
 
   public void slowOutake() {
