@@ -42,7 +42,6 @@ public class ColorSubsystem extends SubsystemBase {
 
     gamePieceCandle = new CANdle(gamePieceID);
     // gridPositionCandle = new CANdle(gridSelectID);
-    this.isCubeSubscriber = isCubeTopic.subscribe(true);
     CANdleConfiguration configAll = new CANdleConfiguration();
     configAll.statusLedOffWhenActive = false;
     configAll.disableWhenLOS = false;
