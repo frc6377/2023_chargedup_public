@@ -7,9 +7,9 @@ import com.ctre.phoenix.led.CANdle.VBatOutputMode;
 import com.ctre.phoenix.led.CANdleConfiguration;
 import com.ctre.phoenix.led.RainbowAnimation;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.networktables.DeltaBoard;
 import frc.robot.subsystems.color.patterns.BIFlag;
 import frc.robot.subsystems.color.patterns.FireFlyPattern;
 import frc.robot.subsystems.color.patterns.PatternNode;
@@ -134,7 +134,7 @@ public class ColorSubsystem extends SubsystemBase {
       return;
     }
 
-    SmartDashboard.putString("Disable Pattern", disablePattern.name());
+    DeltaBoard.putString("Disable Pattern", disablePattern.name());
 
     switch (disablePattern) {
         // case BI_FLAG:

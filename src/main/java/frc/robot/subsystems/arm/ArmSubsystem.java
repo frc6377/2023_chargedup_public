@@ -14,9 +14,9 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.networktables.DeltaBoard;
 import java.util.function.BooleanSupplier;
 
 public class ArmSubsystem extends SubsystemBase {
@@ -151,19 +151,18 @@ public class ArmSubsystem extends SubsystemBase {
     double shoulderOutput;
     shoulderOutput = computeShoulderOutput();
 
-    SmartDashboard.putNumber("Shoulder Output", shoulderOutput);
+    DeltaBoard.putNumber("Shoulder Output", shoulderOutput);
     leftShoulder.set(shoulderOutput);
-    SmartDashboard.putNumber("Reported Shoulder Output", rightShoulder.get());
+    DeltaBoard.putNumber("Reported Shoulder Output", rightShoulder.get());
 
-    SmartDashboard.putNumber("arb ffw", computeShoulderArbitraryFeedForward());
-    SmartDashboard.putNumber("Arm Extension (encoder pos)", elevatorCANCoder.getPosition());
-    SmartDashboard.putNumber("elevator setpoint raw", armPosition.armExtension);
-    SmartDashboard.putNumber("Elevator ffw", computeElevatorFeedForward());
+    DeltaBoard.putNumber("arb ffw", computeShoulderArbitraryFeedForward());
+    DeltaBoard.putNumber("Arm Extension (encoder pos)", elevatorCANCoder.getPosition());
+    DeltaBoard.putNumber("elevator setpoint raw", armPosition.armExtension);
+    DeltaBoard.putNumber("Elevator ffw", computeElevatorFeedForward());
 
-    SmartDashboard.putNumber("Wrist Position (Ticks)", wristMotor.getSelectedSensorPosition());
-    SmartDashboard.putNumber(
-        "shoulder angle (degrees)", Math.toDegrees(shoulderThetaFromCANCoder()));
-    SmartDashboard.putNumber("Elevator Target (meters)", currentArmExtenstionMeters());
+    DeltaBoard.putNumber("Wrist Position (Ticks)", wristMotor.getSelectedSensorPosition());
+    DeltaBoard.putNumber("shoulder angle (degrees)", Math.toDegrees(shoulderThetaFromCANCoder()));
+    DeltaBoard.putNumber("Elevator Target (meters)", currentArmExtenstionMeters());
   }
 
   public void setElevatorPercent(double elevatorPercentOutput) {
@@ -185,7 +184,7 @@ public class ArmSubsystem extends SubsystemBase {
     shoulderPPC.setGoal(this.armPosition.armRotation);
     elevatorPPC.setGoal(this.armPosition.armExtension);
     wristMotor.set(ControlMode.MotionMagic, this.armPosition.wristRotation);
-    SmartDashboard.putNumber("Shoulder Target", armPosition.armRotation);
+    DeltaBoard.putNumber("Shoulder Target", armPosition.armRotation);
   }
 
   /**
@@ -210,7 +209,7 @@ public class ArmSubsystem extends SubsystemBase {
     double numMotors = 2;
     double torque = Math.cos(theta) * 9.81 * mass * centerOfMass;
     double out = torque / (Constants.STALLED_TORQUE * 0.85 * gearRatio * numMotors);
-    SmartDashboard.putNumber("shoulder arb ffw", out);
+    DeltaBoard.putNumber("shoulder arb ffw", out);
     return out;
   }
 
@@ -235,9 +234,9 @@ public class ArmSubsystem extends SubsystemBase {
    */
   public double shoulderThetaFromCANCoder() {
     double rawPos = shoulderCANCoder.getPosition();
-    SmartDashboard.putNumber("raw CANcoder", rawPos);
+    DeltaBoard.putNumber("raw CANcoder", rawPos);
     double theta = Math.toRadians(rawPos * (6.0 / 16.0));
-    SmartDashboard.putNumber("shoulder theta", theta);
+    DeltaBoard.putNumber("shoulder theta", theta);
     return theta;
   }
 
@@ -263,7 +262,7 @@ public class ArmSubsystem extends SubsystemBase {
   private double computeElevatorOutput() {
     double output =
         elevatorPPC.calculate(elevatorCANCoder.getPosition()) + computeElevatorFeedForward();
-    SmartDashboard.putNumber("elevator output", output);
+    DeltaBoard.putNumber("elevator output", output);
     return output;
   }
 
