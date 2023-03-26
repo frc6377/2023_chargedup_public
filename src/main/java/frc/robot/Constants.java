@@ -29,10 +29,10 @@ public final class Constants {
   private static final double BACK_LEFT_V1_CANCODER_OFFSET = 200.742;
   private static final double BACK_RIGHT_V1_CANCODER_OFFSET = 156.182;
 
-  private static final double FRONT_LEFT_V2_CANCODER_OFFSET = 81.035;
-  private static final double FRONT_RIGHT_V2_CANCODER_OFFSET = 284.678;
-  private static final double BACK_LEFT_V2_CANCODER_OFFSET = 108.984;
-  private static final double BACK_RIGHT_V2_CANCODER_OFFSET = 233.965;
+  private static final double FRONT_LEFT_V2_CANCODER_OFFSET = 180 + 261.123;
+  private static final double FRONT_RIGHT_V2_CANCODER_OFFSET = 180 + 106.172;
+  private static final double BACK_LEFT_V2_CANCODER_OFFSET = 180 + 287.139;
+  private static final double BACK_RIGHT_V2_CANCODER_OFFSET = 180 + 53.350;
 
   public static final int DEGREES_0 = 0;
   public static final int DEGREES_45 = 45;
@@ -272,7 +272,7 @@ public final class Constants {
   public static final ArmPosition ARM_MAX_POSITION =
       new ArmPosition(110, 360 * 13.8, 15000, ArmHeight.NOT_SPECIFIED);
   public static final ArmPosition ARM_MIN_POSITION =
-      new ArmPosition(-6, 360, -21788, ArmHeight.NOT_SPECIFIED);
+      new ArmPosition(-6, 0, -21788, ArmHeight.NOT_SPECIFIED);
 
   public static final ArmPosition STOWED_ARM_POSITION =
       new ArmPosition(Math.toRadians(-7.5), 360, 8000, ArmHeight.STOWED);
@@ -280,7 +280,7 @@ public final class Constants {
       new ArmPosition(Math.toRadians(70), 360, -16000, ArmHeight.HIGH_STOWED);
 
   public static final ArmPosition LOW_CUBE_ARM_POSITION =
-      new ArmPosition(Math.toRadians(-7.5), 360, 4600, ArmHeight.LOW);
+      new ArmPosition(Math.toRadians(-7.5), 360, 3300, ArmHeight.LOW);
   public static final ArmPosition LOW_CONE_ARM_POSITION =
       new ArmPosition(Math.toRadians(-7.5), 360, -5700, ArmHeight.LOW);
 
@@ -296,10 +296,8 @@ public final class Constants {
 
   public static final ArmPosition SINGLE_SUBSTATION_CUBE_POSITION = null;
   public static final ArmPosition SINGLE_SUBSTATION_CONE_POSITION =
-      new ArmPosition(Math.toRadians(23.5), 484, -1050, ArmHeight.SINGLE_SUBSTATION);
-  public static final ArmPosition DOUBLE_SUBSTATION_ARM_POSITION =
       new ArmPosition(
-          Math.toRadians(60.743408), 4.204757, -20363.000000, ArmHeight.DOUBLE_SUBSTATION);
+          Math.toRadians(48.416748), 6.591797, -12481.000000, ArmHeight.SINGLE_SUBSTATION);
 
   public static final ArmPosition HYBRID_CUBE_ARM_POSITION =
       new ArmPosition(Math.toRadians(-7.5), 360, 15000, ArmHeight.LOW);

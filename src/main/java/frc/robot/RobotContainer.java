@@ -9,6 +9,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.networktables.BooleanTopic;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -24,6 +26,7 @@ import frc.robot.commands.ArmPowerCommand;
 import frc.robot.commands.AutoBalanceCommand;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.EndAffectorEjectCommand;
+import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.RoutineFactory;
 import frc.robot.commands.RoutineFactory.Routines;
 import frc.robot.commands.SwerveAutoFactory;
@@ -50,6 +53,7 @@ public class RobotContainer {
   private final CommandXboxController gunner =
       new CommandXboxController(Constants.GUNNER_CONTROLLER_ID);
   private final StreamDeck streamDeck = new StreamDeck(2, 36);
+  private final XboxController driverRumble = new XboxController(Constants.DRIVER_CONTROLLER_ID);
   // Subsystems
   private final DeploySubsystem deploySubsystem = new DeploySubsystem();
   private final ArmSubsystem arm = new ArmSubsystem();
@@ -143,7 +147,8 @@ public class RobotContainer {
     Trigger shootButton = driver.rightTrigger(0.3);
 
     intakeButton.whileTrue(
-        Commands.startEnd(() -> endAffector.intake(), () -> endAffector.idle(), endAffector));
+        new IntakeCommand(endAffector, (a) -> driverRumble.setRumble(RumbleType.kBothRumble, a)));
+    //        Commands.startEnd(() -> endAffector.intake(), () -> endAffector.idle(), endAffector));
 
     DoubleSupplier shootSupplier = driver::getRightTriggerAxis;
 
@@ -178,7 +183,7 @@ public class RobotContainer {
     Trigger driverStowed = driver.x();
     Trigger gunnerStowed = gunner.x();
 
-    gunnerStowed.onTrue(new ArmPowerCommand(Constants.STOWED_ARM_POSITION, arm, 3));
+    gunnerStowed.onTrue(new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3));
     driverStowed.onTrue(
         Commands.runOnce(() -> driverStowBehavior().schedule(), new Subsystem[] {}));
 
