@@ -21,13 +21,13 @@ import java.util.List;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static final String V1_MAC_ADDRESS = "00:80:2F:36:7C:0F";
+  public static final String V1_MAC_ADDRESS = "00:80:2F:33:9E:07";
   public static final String V2_MAC_ADDRESS = "00:80:2F:35:D5:2C";
 
-  private static final double FRONT_LEFT_V1_CANCODER_OFFSET = 14.150;
-  private static final double FRONT_RIGHT_V1_CANCODER_OFFSET = 210.762;
-  private static final double BACK_LEFT_V1_CANCODER_OFFSET = 200.742;
-  private static final double BACK_RIGHT_V1_CANCODER_OFFSET = 156.182;
+  private static final double FRONT_LEFT_V1_CANCODER_OFFSET = 194.590;
+  private static final double FRONT_RIGHT_V1_CANCODER_OFFSET = 63.896 + 180;
+  private static final double BACK_LEFT_V1_CANCODER_OFFSET = 214.805;
+  private static final double BACK_RIGHT_V1_CANCODER_OFFSET = 108.809 + 180;
 
   private static final double FRONT_LEFT_V2_CANCODER_OFFSET = 180 + 261.123;
   private static final double FRONT_RIGHT_V2_CANCODER_OFFSET = 180 + 106.172;
@@ -188,14 +188,13 @@ public final class Constants {
   public static final int DRIVETRAIN_PIGEON_ID = 1;
 
   public static final PodConfig FRONT_LEFT_V1_CONFIG =
-      new PodConfig(3, 4, 4, -Math.toRadians(FRONT_LEFT_V1_CANCODER_OFFSET + 180), "front left v1");
+      new PodConfig(3, 4, 4, -Math.toRadians(FRONT_LEFT_V1_CANCODER_OFFSET), "front left v1");
   public static final PodConfig FRONT_RIGHT_V1_CONFIG =
-      new PodConfig(
-          5, 6, 6, -Math.toRadians(FRONT_RIGHT_V1_CANCODER_OFFSET + 180), "front right v1");
+      new PodConfig(5, 6, 6, -Math.toRadians(FRONT_RIGHT_V1_CANCODER_OFFSET), "front right v1");
   public static final PodConfig BACK_LEFT_V1_CONFIG =
-      new PodConfig(1, 2, 2, -Math.toRadians(BACK_LEFT_V1_CANCODER_OFFSET + 180), "back left v1");
+      new PodConfig(1, 2, 2, -Math.toRadians(BACK_LEFT_V1_CANCODER_OFFSET), "back left v1");
   public static final PodConfig BACK_RIGHT_V1_CONFIG =
-      new PodConfig(7, 8, 8, -Math.toRadians(BACK_RIGHT_V1_CANCODER_OFFSET + 180), "back right v1");
+      new PodConfig(7, 8, 8, -Math.toRadians(BACK_RIGHT_V1_CANCODER_OFFSET), "back right v1");
 
   public static final PodConfig FRONT_LEFT_V2_CONFIG =
       new PodConfig(3, 4, 4, -Math.toRadians(FRONT_LEFT_V2_CANCODER_OFFSET), "front left v2");
