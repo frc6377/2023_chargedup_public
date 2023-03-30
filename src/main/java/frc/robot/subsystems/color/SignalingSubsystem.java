@@ -14,8 +14,9 @@ import frc.robot.subsystems.color.patterns.BIFlag;
 import frc.robot.subsystems.color.patterns.FireFlyPattern;
 import frc.robot.subsystems.color.patterns.PatternNode;
 import frc.robot.subsystems.color.patterns.TransFlag;
+import java.util.function.Consumer;
 
-public class ColorSubsystem extends SubsystemBase {
+public class SignalingSubsystem extends SubsystemBase {
   private static final int patternUpdateFrequency = 10;
 
   private final CANdle gamePieceCandle;
@@ -27,18 +28,17 @@ public class ColorSubsystem extends SubsystemBase {
   private int patternTick = 0;
   private DisablePattern disablePattern = DisablePattern.getRandom();
 
-  public final PieceColoring pieceColoring = new PieceColoring();
-  public final PositionColoring positionColoring = new PositionColoring();
-  public final MorseCodeAnimation morseCodeAnimation = new MorseCodeAnimation();
-  private boolean lastColorIsCube;
-  private boolean isCube;
+  private GamePieceMode mode;
+  private boolean hasGamePiece;
+  private final Consumer<Double> driverRumbleConsumer;
 
   private final RainbowAnimation rainbowAnimation;
 
-  public ColorSubsystem(int gamePieceID, int gridSelectID, final boolean isCube) {
+  public SignalingSubsystem(
+      int gamePieceID, final GamePieceMode gamePieceMode, Consumer<Double> driverRumbleConsumer) {
 
-    this.isCube = isCube;
-    this.lastColorIsCube = isCube;
+    this.mode = gamePieceMode;
+    this.driverRumbleConsumer = driverRumbleConsumer;
 
     gamePieceCandle = new CANdle(gamePieceID);
     // gridPositionCandle = new CANdle(gridSelectID);
@@ -55,7 +55,6 @@ public class ColorSubsystem extends SubsystemBase {
     }
 
     clearLEDsGamePiece();
-    clearLEDsGridPosition();
 
     TransFlag.numberOfLEDS = numberOfLEDS;
     FireFlyPattern.numberOfLEDS = numberOfLEDS;
@@ -63,18 +62,15 @@ public class ColorSubsystem extends SubsystemBase {
     rainbowAnimation = new RainbowAnimation(1, Constants.RAINBOW_ANIMATION_SPEED, 64);
   }
 
-  public void setCube() {
-    updateLEDs(true);
+  public void setGamePiece(GamePieceMode mode) {
+    this.mode = mode;
+    updateLEDs();
   }
 
-  public void setCone() {
-    updateLEDs(false);
-  }
-
-  public void updateLEDs(final boolean isCube) {
-    this.isCube = isCube;
-    if (this.lastColorIsCube != isCube) {
-      forceUpdate();
+  public void updateLEDs() {
+    if (hasGamePiece) writeLEDsGamePiece(RGB.HOWDY_BLUE);
+    else {
+      writeLEDsGamePiece(mode.color());
     }
   }
 
@@ -94,9 +90,16 @@ public class ColorSubsystem extends SubsystemBase {
     if (DriverStation.isDisabled()) updatePattern();
   }
 
-  public void forceUpdate() {
-    this.pieceColoring.update();
-    lastColorIsCube = isCube;
+  public void hasGamePieceSignalStart() {
+    hasGamePiece = true;
+    driverRumbleConsumer.accept(Constants.RUMBLE_INTENSITY);
+    updateLEDs();
+  }
+
+  public void hasGamePieceSignalStop() {
+    hasGamePiece = false;
+    driverRumbleConsumer.accept(0.0);
+    updateLEDs();
   }
 
   private void clearLEDsGamePiece() {
@@ -105,22 +108,6 @@ public class ColorSubsystem extends SubsystemBase {
 
   private void writeLEDsGamePiece(RGB rgb) {
     gamePieceCandle.setLEDs(rgb.red, rgb.green, rgb.blue);
-  }
-
-  private void writeLEDsGamePiece(RGB rgb, int startIdx, int count) {
-    gamePieceCandle.setLEDs(rgb.red, rgb.green, rgb.blue, rgb.white, startIdx, count);
-  }
-
-  private void clearLEDsGridPosition() {
-    writeLEDsGamePiece(RGB.BLACK);
-  }
-
-  private void writeLEDsGridPosition(RGB rgb) {
-    // gridPositionCandle.setLEDs(rgb.red, rgb.green, rgb.blue);
-  }
-
-  private void writeLEDsGridPosition(RGB rgb, int startIdx, int count) {
-    // gridPositionCandle.setLEDs(rgb.red, rgb.green, rgb.blue, rgb.white, startIdx, count);
   }
 
   private void updatePattern() {
@@ -174,73 +161,6 @@ public class ColorSubsystem extends SubsystemBase {
 
   public void randomizePattern() {
     disablePattern = DisablePattern.getRandom();
-  }
-
-  public class PieceColoring {
-    private void update() {
-
-      RGB color = isCube ? RGB.PURPLE : RGB.YELLOW;
-
-      writeLEDsGamePiece(color);
-    }
-  }
-
-  public class MorseCodeAnimation {
-    // "HOWDY" in morse code
-    private final int[] animation = {
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0,
-      0, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1,
-      1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0
-    };
-  }
-
-  public class PositionColoring {
-    private final int MaxPosition = 9;
-
-    private int cursor = 0; // 0 to 8
-
-    public void SetPosition(int position) {
-      cursor = position % MaxPosition;
-      clearLEDsGridPosition();
-      update();
-    }
-
-    public void Increment() {
-      cursor = (cursor + 1) % MaxPosition;
-      clearLEDsGridPosition();
-      update();
-    }
-
-    public void Decrement() {
-      cursor = (cursor + (MaxPosition - 1)) % MaxPosition;
-      clearLEDsGridPosition();
-      update();
-    }
-
-    public void update() {
-      final int StartIndex = 8;
-      final int Spacer1 = StartIndex + 3;
-      final int Spacer2 = StartIndex + 7;
-
-      // 8 9 10 [11] 12 13 14 [15] 16 17 18
-
-      clearLEDsGridPosition();
-      writeLEDsGridPosition(RGB.WHITE, Spacer1, 1);
-      writeLEDsGridPosition(RGB.WHITE, Spacer2, 1);
-
-      int cursorLocation = cursor + StartIndex + (int) (cursor / 3);
-
-      if (cursor % 3 == 0) {
-        writeLEDsGridPosition(RGB.RED, cursorLocation, 1);
-      }
-      if (cursor % 3 == 1) {
-        writeLEDsGridPosition(RGB.YELLOW, cursorLocation, 1);
-      }
-      if (cursor % 3 == 2) {
-        writeLEDsGridPosition(RGB.GREEN, cursorLocation, 1);
-      }
-    }
   }
 
   private enum DisablePattern {

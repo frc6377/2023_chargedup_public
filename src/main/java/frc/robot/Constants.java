@@ -267,7 +267,7 @@ public final class Constants {
   public static final double SHOULDER_CANCODER_OFFSET = 109.6;
 
   public static final int WRIST_CANCODER_ID = 14;
-  public static final double WRIST_CANCODER_OFFSET = -149.590;
+  public static final double WRIST_CANCODER_OFFSET = 105.205;
 
   public static final ArmPosition ARM_MAX_POSITION =
       new ArmPosition(110, 360 * 13.8, 15000, ArmHeight.NOT_SPECIFIED);
@@ -287,14 +287,12 @@ public final class Constants {
   public static final ArmPosition MID_CUBE_ARM_POSITION =
       new ArmPosition(Math.toRadians(35), 360.0 * 5.95, -2358, ArmHeight.MID);
   public static final ArmPosition MID_CONE_ARM_POSITION =
-      new ArmPosition(Math.toRadians(42.75), 360.0 * 9.16, -28866, ArmHeight.MID);
+      new ArmPosition(Math.toRadians(42.75), 360.0 * 9.16, -21787, ArmHeight.MID);
 
   public static final ArmPosition HIGH_CUBE_ARM_POSITION =
       new ArmPosition(Math.toRadians(34.94), 360 * 10.35, 3498, ArmHeight.HIGH);
   public static final ArmPosition HIGH_CONE_ARM_POSITION =
       new ArmPosition(Math.toRadians(47.5), 4800, -21000, ArmHeight.HIGH);
-
-  public static final ArmPosition SINGLE_SUBSTATION_CUBE_POSITION = null;
   public static final ArmPosition SINGLE_SUBSTATION_CONE_POSITION =
       new ArmPosition(
           Math.toRadians(48.416748), 6.591797, -12481.000000, ArmHeight.SINGLE_SUBSTATION);
@@ -307,7 +305,13 @@ public final class Constants {
 
   // A value between 0 and 1.
   public static final double RAINBOW_ANIMATION_SPEED = 0.5;
+
   public static final double ELEVATOR_ZEROING_PERCENT = -0.2;
   public static final int ELEVATOR_ZERO_AMPRAGE = 20;
   public static final double ELEVATOR_ZEROING_TIME_SECONDS = 0.2;
+
+  public static final int GAME_PIECE_DETECTION_VELOCITY = 5;
+  public static final double GAME_PIECE_DETECTION_WAIT = 0.3;
+  public static final double HAS_GAME_PIECE_SIGNAL_TIME = 1;
+  public static final double RUMBLE_INTENSITY = 0.5;
 }

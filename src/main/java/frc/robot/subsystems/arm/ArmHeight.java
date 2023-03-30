@@ -7,6 +7,7 @@ public enum ArmHeight {
   MID,
   LOW,
   NOT_SPECIFIED,
+  HYBRID,
   SINGLE_SUBSTATION,
   DOUBLE_SUBSTATION;
 

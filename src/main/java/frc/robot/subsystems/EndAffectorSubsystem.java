@@ -4,41 +4,37 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.subsystems.color.GamePieceMode;
 
 public class EndAffectorSubsystem extends SubsystemBase {
-  private WPI_TalonFX motor;
-  private boolean isCube;
+  private final WPI_TalonFX motor;
+  private GamePieceMode gamePieceMode;
 
   public EndAffectorSubsystem(int ID, double kP) {
 
     motor = new WPI_TalonFX(ID);
-    this.isCube = isCube;
     motor.configOpenloopRamp(0.0);
     motor.config_kP(0, kP);
   }
 
-  public void toggleGamePiece() {
-    isCube = !isCube;
-  }
-
-  public void setGamePiece(final boolean isCube) {
-    this.isCube = isCube;
+  public void setGamePiece(final GamePieceMode gamePieceMode) {
+    this.gamePieceMode = gamePieceMode;
   }
 
   public void setCube() {
-    isCube = true;
+    gamePieceMode = GamePieceMode.CUBE;
   }
 
   public void setCone() {
-    isCube = false;
+    gamePieceMode = GamePieceMode.CONE;
   }
 
   public void intake() {
-    motor.set(Constants.END_AFFECTOR_INTAKE_SPEED * (isCube ? -1 : 1));
+    motor.set(Constants.END_AFFECTOR_INTAKE_SPEED * ((gamePieceMode.isCube()) ? -1 : 1));
   }
 
   public void fastOutake() {
-    motor.set(-Constants.END_AFFECTOR_OUTTAKE_SPEED * (isCube ? -1 : 30));
+    motor.set(-Constants.END_AFFECTOR_OUTTAKE_SPEED * ((gamePieceMode.isCube()) ? -1 : 30));
   }
 
   public double getIntakePosition() {
@@ -50,7 +46,7 @@ public class EndAffectorSubsystem extends SubsystemBase {
   }
 
   public void slowOutake() {
-    motor.set(-Constants.END_AFFECTOR_SLOW_OUTTAKE_SPEED * (isCube ? -1 : 300));
+    motor.set(-Constants.END_AFFECTOR_SLOW_OUTTAKE_SPEED * ((gamePieceMode.isCube()) ? -1 : 300));
   }
 
   public void halt() {
@@ -58,7 +54,7 @@ public class EndAffectorSubsystem extends SubsystemBase {
   }
 
   public void idle() {
-    motor.set(Constants.END_AFFECTOR_IDLE_SPEED * (isCube ? -1 : 1));
+    motor.set(Constants.END_AFFECTOR_IDLE_SPEED * ((gamePieceMode.isCube()) ? -1 : 1));
   }
 
   public double getVelocity() {

@@ -2,6 +2,7 @@ package frc.robot.subsystems.arm;
 
 import edu.wpi.first.math.MathUtil;
 import frc.robot.Constants;
+import frc.robot.subsystems.color.GamePieceMode;
 
 public class ArmPosition {
   protected final double armRotation;
@@ -54,7 +55,9 @@ public class ArmPosition {
     return description;
   }
 
-  public static ArmPosition getArmPositionFromHeightAndType(ArmHeight height, boolean isCube) {
+  public static ArmPosition getArmPositionFromHeightAndType(
+      ArmHeight height, GamePieceMode gamePieceMode) {
+    boolean isCube = gamePieceMode.isCube();
     switch (height) {
       case HIGH:
         if (isCube) {
@@ -62,7 +65,9 @@ public class ArmPosition {
         } else return Constants.HIGH_CONE_ARM_POSITION;
 
       case HIGH_STOWED:
-        return Constants.HIGH_STOWED_ARM_POSITION;
+        if (gamePieceMode == GamePieceMode.SINGLE_SUBSTATION) {
+          return Constants.SINGLE_SUBSTATION_CONE_POSITION;
+        } else return Constants.HIGH_STOWED_ARM_POSITION;
 
       case LOW:
         if (isCube) return Constants.LOW_CUBE_ARM_POSITION;
@@ -72,6 +77,11 @@ public class ArmPosition {
         if (isCube) {
           return Constants.MID_CUBE_ARM_POSITION;
         } else return Constants.MID_CONE_ARM_POSITION;
+
+      case HYBRID:
+        if (isCube) {
+          return Constants.HYBRID_CUBE_ARM_POSITION;
+        } else return Constants.HYBRID_CONE_ARM_POSITION;
 
       case STOWED:
         return Constants.STOWED_ARM_POSITION;

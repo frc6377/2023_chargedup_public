@@ -17,7 +17,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.networktables.DeltaBoard;
-import java.util.function.BooleanSupplier;
+import frc.robot.subsystems.color.GamePieceMode;
+import java.util.function.Supplier;
 
 public class ArmSubsystem extends SubsystemBase {
 
@@ -42,16 +43,16 @@ public class ArmSubsystem extends SubsystemBase {
 
   private final WPI_TalonFX wristMotor;
 
-  private BooleanSupplier isCubeSupplier;
+  private Supplier<GamePieceMode> gamePieceModeSupplier;
 
   // State Tracking
   private ArmPosition armPosition = Constants.LOW_CUBE_ARM_POSITION;
   private boolean elevatorInPercentControl = false;
   private double elevatorPercentOutput = 0;
 
-  public ArmSubsystem(BooleanSupplier supplier) {
+  public ArmSubsystem(Supplier<GamePieceMode> supplier) {
     this();
-    this.isCubeSupplier = supplier;
+    this.gamePieceModeSupplier = supplier;
   }
 
   public ArmSubsystem() {
@@ -142,8 +143,8 @@ public class ArmSubsystem extends SubsystemBase {
     System.out.println("Complete Construct ArmSubsystem");
   }
 
-  public void setIsCubeSupplier(BooleanSupplier supplier) {
-    isCubeSupplier = supplier;
+  public void setModeSupplier(Supplier<GamePieceMode> supplier) {
+    gamePieceModeSupplier = supplier;
   }
 
   @Override
@@ -197,8 +198,8 @@ public class ArmSubsystem extends SubsystemBase {
   private double computeShoulderArbitraryFeedForward() {
     double mass = 4.2;
 
-    if (isCubeSupplier != null) {
-      if (!isCubeSupplier.getAsBoolean() && armPosition.getHeight() == ArmHeight.HIGH) {
+    if (gamePieceModeSupplier != null) {
+      if ((gamePieceModeSupplier.get().isCone()) && armPosition.getHeight() == ArmHeight.HIGH) {
         mass += 0.45;
       }
     }

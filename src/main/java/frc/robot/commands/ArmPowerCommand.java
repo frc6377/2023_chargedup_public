@@ -42,7 +42,6 @@ public class ArmPowerCommand extends CommandBase {
         (targetPose.theta != initalPose.theta)
             ? computeExtension()
             : targetPose.r; // math breaks if theta doesnt change
-
     armSubsystem.setTarget(
         new ArmPosition(
             targetPose.theta,
