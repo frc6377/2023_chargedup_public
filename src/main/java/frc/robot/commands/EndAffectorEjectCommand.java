@@ -33,7 +33,9 @@ public class EndAffectorEjectCommand extends CommandBase {
   public void initialize() {
     target = endAffector.getIntakePosition() + Constants.END_AFFECTOR_OFFSET;
     enablePartial =
-        armHeightSupplier.get() == ArmHeight.HIGH && (gamePieceMode.get() != GamePieceMode.CUBE);
+        (armHeightSupplier.get() == ArmHeight.HIGH || armHeightSupplier.get() == ArmHeight.MID)
+            && (gamePieceMode.get().isCone());
+    System.out.println("Partial:" + enablePartial + " armHeight" + armHeightSupplier.get());
   }
 
   @Override

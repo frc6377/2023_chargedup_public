@@ -328,4 +328,31 @@ public class ArmSubsystem extends SubsystemBase {
       extendMotor.set(elevatorPercentOutput);
     }
   }
+
+  public boolean stalledAtZero() {
+    boolean atZero = elevatorPPC.getGoal().position == 0; // is our final goal zero?
+    boolean stalled =
+        Math.abs(elevatorCANCoder.getVelocity())
+            < 2; // moving at less than 2 degrees/sec either direction
+    boolean plausablyZero =
+        elevatorCANCoder.getPosition()
+            < 360; // sanity check. We should never come close to hitting this slip between zeros
+    boolean hasError = !elevatorPPC.atGoal(); // cant be at goal
+    boolean hasDraw = extendMotor.getOutputCurrent() > 20; // must be drawing some amt of current
+
+    return atZero && stalled && plausablyZero && hasError && hasDraw;
+  }
+
+  public boolean zeroElevator() {
+
+    if (elevatorPPC.getGoal().position == 0) {
+      System.out.println("Rezero delta:" + elevatorCANCoder.getPosition() + " degrees");
+      elevatorCANCoder.setPosition(0);
+
+      return true;
+    } else {
+      System.out.println("zero rejected! PPC goal not zero!");
+      return false;
+    }
+  }
 }

@@ -2,7 +2,6 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
 import frc.robot.networktables.DeltaBoard;
 import frc.robot.subsystems.arm.ArmHeight;
 import frc.robot.subsystems.arm.ArmPosition;
@@ -55,10 +54,15 @@ public class ArmPowerCommand extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return Math.abs(armSubsystem.thetaFromPPC() - targetPose.theta)
-            < Constants.ARM_ALLOWED_ANGLE_ERROR
-        && Math.abs(armSubsystem.currentArmExtenstionRevs() - targetPose.r)
-            < Constants.ARM_ALLOWED_EXTENSION_ERROR;
+    return armSubsystem.thetaFromPPC()
+        == targetPose
+            .theta; // once this is true the command has delivered its final setpoint and its job is
+    // done
+  }
+
+  @Override
+  public void end(boolean interrupted) {
+    System.out.println("Arm power command finished | interupted: " + interrupted);
   }
 
   private double computeExtension() {
@@ -73,7 +77,7 @@ public class ArmPowerCommand extends CommandBase {
 
   private double computePow(double extensionDelta) {
     // if we extend more we want to it last, if we retract we want to do it first.
-    return (extensionDelta < 0) ? 1 / pow : pow;
+    return (extensionDelta < 0) ? pow : pow;
   }
 
   private class PolarPoint {

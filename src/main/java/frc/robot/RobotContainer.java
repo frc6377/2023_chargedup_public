@@ -17,6 +17,7 @@ import frc.config.IdentifyRoborio;
 import frc.config.RobotVersion;
 import frc.robot.commands.ArmManualCommand;
 import frc.robot.commands.ArmPowerCommand;
+import frc.robot.commands.ArmPowerCommandWithZero;
 import frc.robot.commands.AutoBalanceCommand;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.EndAffectorEjectCommand;
@@ -180,14 +181,17 @@ public class RobotContainer {
     Trigger driverStowed = driver.x();
     Trigger gunnerStowed = gunner.x();
 
-    gunnerStowed.onTrue(new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3));
+    gunnerStowed.onTrue(new ArmPowerCommandWithZero(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3));
     driverStowed.onTrue(
         Commands.runOnce(() -> driverStowBehavior().schedule(), new Subsystem[] {}));
 
     Trigger driverDefenseStowed = driver.b();
+    driverDefenseStowed.onTrue(
+        new ArmPowerCommandWithZero(Constants.HIGH_STOWED_ARM_POSITION, arm, 3));
 
     Trigger gunnerDefenseStowed = gunner.rightBumper();
-    gunnerDefenseStowed.onTrue(new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3));
+    gunnerDefenseStowed.onTrue(
+        new ArmPowerCommandWithZero(Constants.HIGH_STOWED_ARM_POSITION, arm, 3));
 
     Trigger zeroElevator = gunner.start();
     zeroElevator.onTrue(new ZeroElevator(arm));
@@ -202,7 +206,7 @@ public class RobotContainer {
 
     driverDefenseStowed
         .and(() -> gamePieceMode != GamePieceMode.SINGLE_SUBSTATION)
-        .onTrue(new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3));
+        .onTrue(new ArmPowerCommandWithZero(Constants.HIGH_STOWED_ARM_POSITION, arm, 3));
     driverDefenseStowed
         .and(() -> gamePieceMode == GamePieceMode.SINGLE_SUBSTATION)
         .onTrue(new ArmPowerCommand(Constants.SINGLE_SUBSTATION_CONE_POSITION, arm, 3));
@@ -212,10 +216,10 @@ public class RobotContainer {
 
     gunnerLowButton
         .and(() -> gamePieceMode.isCube())
-        .onTrue(new ArmPowerCommand(Constants.LOW_CUBE_ARM_POSITION, arm, 3));
+        .onTrue(new ArmPowerCommandWithZero(Constants.LOW_CUBE_ARM_POSITION, arm, 3));
     gunnerLowButton
         .and(() -> gamePieceMode.isCone())
-        .onTrue(new ArmPowerCommand(Constants.LOW_CONE_ARM_POSITION, arm, 3));
+        .onTrue(new ArmPowerCommandWithZero(Constants.LOW_CONE_ARM_POSITION, arm, 3));
     gunnerMidButton
         .and(() -> gamePieceMode.isCube())
         .onTrue(new ArmPowerCommand(Constants.MID_CUBE_ARM_POSITION, arm, 3));
@@ -230,7 +234,7 @@ public class RobotContainer {
         .onTrue(new ArmPowerCommand(Constants.HIGH_CONE_ARM_POSITION, arm, 3));
     gunnerHybridButton
         .and(() -> gamePieceMode.isCube())
-        .onTrue(new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3));
+        .onTrue(new ArmPowerCommandWithZero(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3));
     gunnerHybridButton
         .and(() -> gamePieceMode.isCone())
         .onTrue(new ArmPowerCommand(Constants.HYBRID_CONE_ARM_POSITION, arm, 3));
@@ -240,13 +244,12 @@ public class RobotContainer {
   }
 
   private Command driverStowBehavior() {
-    if (arm.getArmPosition().getHeight() == ArmHeight.STOWED
-        || arm.getArmPosition().getHeight() == ArmHeight.STOWED) {
+    if (arm.getArmPosition().getHeight().isStowed()) {
       ArmPosition targetPosition =
           ArmPosition.getArmPositionFromHeightAndType(ArmHeight.LOW, gamePieceMode);
       return new ArmPowerCommand(targetPosition, arm, 3);
     } else {
-      return new ArmPowerCommand(Constants.STOWED_ARM_POSITION, arm, 3);
+      return new ArmPowerCommandWithZero(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3);
     }
   }
 
