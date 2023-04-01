@@ -79,11 +79,13 @@ public class RobotContainer {
     DoubleSupplier pointingDriveInput =
         new DriveInput(driver::getRightY, driver::getRightX, driverConfig);
 
-    endAffector = new EndAffectorSubsystem(Constants.END_AFFECTOR_ID, Constants.END_AFFECTOR_KP);
-
     gamePieceMode = GamePieceMode.CONE;
     gamePieceModeSupplier = () -> gamePieceMode;
     gamePieceModeConsumer = (in) -> gamePieceMode = in;
+
+    endAffector =
+        new EndAffectorSubsystem(
+            Constants.END_AFFECTOR_ID, Constants.END_AFFECTOR_KP, gamePieceMode);
 
     colorStrip =
         new SignalingSubsystem(

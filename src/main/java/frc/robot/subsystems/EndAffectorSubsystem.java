@@ -10,11 +10,12 @@ public class EndAffectorSubsystem extends SubsystemBase {
   private final WPI_TalonFX motor;
   private GamePieceMode gamePieceMode;
 
-  public EndAffectorSubsystem(int ID, double kP) {
+  public EndAffectorSubsystem(int ID, double kP, GamePieceMode gamePieceMode) {
 
     motor = new WPI_TalonFX(ID);
     motor.configOpenloopRamp(0.0);
     motor.config_kP(0, kP);
+    this.gamePieceMode = gamePieceMode;
   }
 
   public void setGamePiece(final GamePieceMode gamePieceMode) {
