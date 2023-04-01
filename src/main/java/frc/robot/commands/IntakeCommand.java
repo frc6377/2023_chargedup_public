@@ -41,7 +41,7 @@ public class IntakeCommand extends CommandBase {
   @Override
   public void execute() {
     if (startIntakeTimer.hasElapsed(Constants.GAME_PIECE_DETECTION_WAIT)) {
-      if (Math.abs(subsystem.getVelocity()) < Constants.GAME_PIECE_DETECTION_VELOCITY) {
+      if (detectGamePiece()) {
         signalingSubsystem.hasGamePieceSignalStart();
       } else {
         signalingSubsystem.hasGamePieceSignalStop();
@@ -53,7 +53,7 @@ public class IntakeCommand extends CommandBase {
   public void end(boolean interrupted) {
     signalingSubsystem.hasGamePieceSignalStop();
     subsystem.idle();
-    if (Math.abs(subsystem.getVelocity()) < Constants.GAME_PIECE_DETECTION_VELOCITY) {
+    if (detectGamePiece()) {
       if (gamePieceModeSupplier.get() == GamePieceMode.SINGLE_SUBSTATION) {
         new SwitchSingleSubstationMode(
                 subsystem,
@@ -66,5 +66,8 @@ public class IntakeCommand extends CommandBase {
         armSubsystem.setTarget(Constants.STOWED_ARM_POSITION);
       }
     }
+  }
+  private boolean detectGamePiece() {
+    return Math.abs(subsystem.getVelocity()) < Constants.GAME_PIECE_DETECTION_VELOCITY;
   }
 }

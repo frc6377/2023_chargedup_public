@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.subsystems.EndAffectorSubsystem;
 import frc.robot.subsystems.arm.ArmHeight;
 import frc.robot.subsystems.arm.ArmPosition;
@@ -42,9 +43,7 @@ public class SwitchSingleSubstationMode extends CommandBase {
       endAffectorSubsystem.setGamePiece(GamePieceMode.SINGLE_SUBSTATION);
       colorSubsystem.setGamePiece(GamePieceMode.SINGLE_SUBSTATION);
     }
-    ArmHeight currentHeight = armSubsystem.getArmGoalPosition().getHeight();
-    armSubsystem.setTarget(
-        ArmPosition.getArmPositionFromHeightAndType(currentHeight, gamePieceModeSupplier.get()));
+    armSubsystem.setTarget(Constants.STOWED_ARM_POSITION);
   }
 
   public boolean isFinished() {
