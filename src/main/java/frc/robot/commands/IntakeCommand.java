@@ -51,22 +51,18 @@ public class IntakeCommand extends CommandBase {
 
   @Override
   public void end(boolean interrupted) {
-    signalingSubsystem.hasGamePieceSignalStop();
-    subsystem.idle();
     if (detectGamePiece()) {
       if (gamePieceModeSupplier.get() == GamePieceMode.SINGLE_SUBSTATION) {
         new SwitchSingleSubstationMode(
-                subsystem,
-                signalingSubsystem,
-                gamePieceModeConsumer,
-                gamePieceModeSupplier,
-                armSubsystem)
+                subsystem, signalingSubsystem, gamePieceModeConsumer, gamePieceModeSupplier)
             .initialize();
-      } else {
-        armSubsystem.setTarget(Constants.STOWED_ARM_POSITION);
       }
+      armSubsystem.setTarget(Constants.STOWED_ARM_POSITION);
     }
+    signalingSubsystem.hasGamePieceSignalStop();
+    subsystem.idle();
   }
+
   private boolean detectGamePiece() {
     return Math.abs(subsystem.getVelocity()) < Constants.GAME_PIECE_DETECTION_VELOCITY;
   }

@@ -1,11 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
 import frc.robot.subsystems.EndAffectorSubsystem;
-import frc.robot.subsystems.arm.ArmHeight;
-import frc.robot.subsystems.arm.ArmPosition;
-import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.color.GamePieceMode;
 import frc.robot.subsystems.color.SignalingSubsystem;
 import java.util.function.Consumer;
@@ -16,20 +12,17 @@ public class SwitchSingleSubstationMode extends CommandBase {
   private final SignalingSubsystem colorSubsystem;
   private final Consumer<GamePieceMode> gamePieceModeConsumer;
   private final Supplier<GamePieceMode> gamePieceModeSupplier;
-  private final ArmSubsystem armSubsystem;
 
   public SwitchSingleSubstationMode(
       EndAffectorSubsystem endAffectorSubsystem,
       SignalingSubsystem colorSubsystem,
       Consumer<GamePieceMode> gamePieceModeConsumer,
-      Supplier<GamePieceMode> gamePieceModeSupplier,
-      ArmSubsystem armSubsystem) {
+      Supplier<GamePieceMode> gamePieceModeSupplier) {
     this.endAffectorSubsystem = endAffectorSubsystem;
     this.colorSubsystem = colorSubsystem;
     addRequirements(endAffectorSubsystem, colorSubsystem);
     this.gamePieceModeConsumer = gamePieceModeConsumer;
     this.gamePieceModeSupplier = gamePieceModeSupplier;
-    this.armSubsystem = armSubsystem;
   }
 
   @Override
@@ -43,7 +36,6 @@ public class SwitchSingleSubstationMode extends CommandBase {
       endAffectorSubsystem.setGamePiece(GamePieceMode.SINGLE_SUBSTATION);
       colorSubsystem.setGamePiece(GamePieceMode.SINGLE_SUBSTATION);
     }
-    armSubsystem.setTarget(Constants.STOWED_ARM_POSITION);
   }
 
   public boolean isFinished() {
