@@ -7,6 +7,7 @@ import com.ctre.phoenix.led.CANdle.VBatOutputMode;
 import com.ctre.phoenix.led.CANdleConfiguration;
 import com.ctre.phoenix.led.RainbowAnimation;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.networktables.DeltaBoard;
@@ -30,6 +31,8 @@ public class SignalingSubsystem extends SubsystemBase {
 
   private GamePieceMode mode;
   private boolean hasGamePiece;
+  private Timer flashTimer = new Timer();
+  private boolean flashOn = true;
   private final Consumer<Double> driverRumbleConsumer;
 
   private final RainbowAnimation rainbowAnimation;
@@ -72,6 +75,7 @@ public class SignalingSubsystem extends SubsystemBase {
     else {
       writeLEDsGamePiece(mode.color());
     }
+    flashTimer.start();
   }
 
   public void startRainbowAnimation() {
@@ -88,6 +92,14 @@ public class SignalingSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     if (DriverStation.isDisabled()) updatePattern();
+    if (mode.shouldFlash()) {
+      if (flashTimer.get() > Constants.FLASHING_TIME) {
+        flashTimer.reset();
+        flashOn = !flashOn;
+        if (flashOn) writeLEDsGamePiece(mode.color());
+        else writeLEDsGamePiece(RGB.BLACK);
+      }
+    }
   }
 
   public void hasGamePieceSignalStart() {

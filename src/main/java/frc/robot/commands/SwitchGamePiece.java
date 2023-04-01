@@ -39,7 +39,6 @@ public class SwitchGamePiece extends CommandBase {
     endAffectorSubsystem.setGamePiece(goalMode);
     colorSubsystem.setGamePiece(goalMode);
     ArmHeight currentHeight = armSubsystem.getArmGoalPosition().getHeight();
-    System.out.println(currentHeight);
     armSubsystem.setTarget(ArmPosition.getArmPositionFromHeightAndType(currentHeight, goalMode));
   }
 

@@ -313,4 +313,5 @@ public final class Constants {
   public static final double GAME_PIECE_DETECTION_WAIT = 0.3;
   public static final double HAS_GAME_PIECE_SIGNAL_TIME = 1;
   public static final double RUMBLE_INTENSITY = 0.5;
+  public static final double FLASHING_TIME = 0.2;
 }

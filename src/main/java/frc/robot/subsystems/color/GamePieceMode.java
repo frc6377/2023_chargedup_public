@@ -7,9 +7,12 @@ public enum GamePieceMode {
 
   public RGB color() {
     if (this == CUBE) return RGB.PURPLE;
-    if (this == CONE) return RGB.YELLOW;
-    if (this == SINGLE_SUBSTATION) return RGB.GREEN;
+    if (this == CONE || this == SINGLE_SUBSTATION) return RGB.YELLOW;
     return RGB.WHITE;
+  }
+
+  public boolean shouldFlash() {
+    return this == SINGLE_SUBSTATION;
   }
 
   public boolean isCube() {
