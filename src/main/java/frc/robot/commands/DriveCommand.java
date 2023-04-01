@@ -47,17 +47,36 @@ public class DriveCommand extends CommandBase {
       case CLASSIC:
         drivetrainSubsystem.drive(classicDriving());
         break;
+      case STRAFE:
+        drivetrainSubsystem.drive(strafeDriving());
       default:
         break;
     }
   }
 
-  public void toggleDriveType() {
-    if (driveType == DriveType.CLASSIC) {
-      driveType = DriveType.ABSOLUTE_POINTING;
-    } else {
-      driveType = DriveType.CLASSIC;
-    }
+  public void setDriveType(DriveType newType) {
+    driveType = newType;
+  }
+
+  private ChassisSpeeds strafeDriving() {
+
+    double offset = Math.PI;
+
+    // When we stop lying to the robot undo this code
+    // if(DriverStation.getAlliance() == Alliance.Red){
+    //   offset = Math.PI;
+    // } else {
+    //   offset = 0;
+    // }
+
+    System.out.println(offset + "offset");
+
+    return ChassisSpeeds.fromFieldRelativeSpeeds(
+        0 * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND,
+        translationYSupplier.getAsDouble() * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND,
+        turnController.calculate(
+            fieldPositioningSystem.getCurrentRobotRotationXY().getRadians() + offset),
+        fieldPositioningSystem.getCurrentRobotRotationXY());
   }
 
   private ChassisSpeeds classicDriving() {
@@ -79,8 +98,9 @@ public class DriveCommand extends CommandBase {
         fieldPositioningSystem.getCurrentRobotRotationXY());
   }
 
-  private enum DriveType {
+  public enum DriveType {
     ABSOLUTE_POINTING,
-    CLASSIC
+    CLASSIC,
+    STRAFE
   }
 }

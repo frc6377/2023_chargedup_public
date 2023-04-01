@@ -77,7 +77,10 @@ public class RobotContainer {
     DoubleSupplier rotationSupplier =
         new DriveInput(driver::getLeftX, DriveInput.InputType.TRANSLATION, driverConfig, false);
     DoubleSupplier pointingDriveInput =
-        new DriveInput(driver::getRightY, driver::getRightX, driverConfig);
+        new DriveInput(
+            driver::getRightY,
+            driver::getRightX,
+            driverConfig); // TODO Make sure this isnt problamatic
 
     gamePieceMode = GamePieceMode.CONE;
     gamePieceModeSupplier = () -> gamePieceMode;
@@ -114,6 +117,7 @@ public class RobotContainer {
 
   private void configureBindings() {
     Trigger highGearButton = driver.rightBumper();
+    Trigger strafe = driver.a();
 
     DriverConfig driverConfig = new DriverConfig();
     DoubleSupplier xSupplier =
@@ -137,6 +141,16 @@ public class RobotContainer {
             turnSupplier,
             pointingDriveInput);
 
+    strafe.whileTrue(autoCommand.generateStrafeCommand());
+
+    // strafe.onTrue(SequentialCommandGroup(Commands.startEnd(()->
+    // driveCommand.setDriveType(DriveType.STRAFE),
+    // ()->driveCommand.setDriveType(DriveType.CLASSIC), new
+    // Subsystem[]{}),autoCommand.generateGridCommand(getBay()).until(this::isDriving)))
+
+    // strafe.whileTrue(Commands.startEnd(()-> driveCommand.setDriveType(DriveType.STRAFE),
+    // ()->driveCommand.setDriveType(DriveType.CLASSIC), new Subsystem[]{}));
+
     drivetrainSubsystem.setDefaultCommand(driveCommand);
 
     Trigger intakeButton = driver.leftTrigger(0.3);
@@ -153,7 +167,6 @@ public class RobotContainer {
             () -> arm.getArmGoalPosition().getHeight(),
             gamePieceModeSupplier));
 
-    Trigger driverGoButton = driver.a();
     Trigger driverResetFieldNorth = driver.start();
 
     driverResetFieldNorth.onTrue(
