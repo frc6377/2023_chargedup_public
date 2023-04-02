@@ -20,7 +20,6 @@ public class LeftTwoElement extends SequentialCommandGroup {
     Command unbind = new ArmPowerCommand(arm::getUnbindPosition, arm, 3);
     addCommands(
         new ScheduleCommand(unbind),
-        Commands.waitUntil(unbind::isFinished),
         new InstantCommand(
             () -> {
               endAffector.setCube();
@@ -29,15 +28,11 @@ public class LeftTwoElement extends SequentialCommandGroup {
             () -> {
               endAffector.intake();
             }),
-        new InstantCommand(()->System.out.println("YEET2")),
         new ScheduleCommand(
-            new ArmPowerCommand(Constants.LOW_CUBE_ARM_POSITION, arm, 3).withTimeout(0.5)),
-        new InstantCommand(()->System.out.println("YEET")),
-        factory.generateCommandFromFile("PickFirstElementBlue", true),
-        new InstantCommand(()->System.out.println("YEET-1")),
+            new ArmPowerCommand(Constants.LOW_CUBE_ARM_POSITION, arm, 3)).alongWith(
+        factory.generateCommandFromFile("PickFirstElementBlue", true)),
         new ScheduleCommand(
             new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3).withTimeout(0.5)),
-            new InstantCommand(()->System.out.println("YEET-2")),
         new ScheduleCommand(
             new WaitCommand(2)
                 .andThen(
