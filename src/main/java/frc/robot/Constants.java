@@ -166,8 +166,8 @@ public final class Constants {
 
   // Wrist
   public static final double WRIST_KP = 0.1;
-  public static final double WRIST_MAX_VELOCITY = 1.5 * 5000;
-  public static final double WRIST_MAX_ACCELLERATION = 1.5 * 5000;
+  public static final double WRIST_MAX_VELOCITY = 3 * 5000;
+  public static final double WRIST_MAX_ACCELLERATION = 3 * 5000;
   public static final double WRIST_MOMENT_OF_INERTIA = 0;
   public static final double WRIST_GEAR_RATIO = 1.0 / 41.67;
   public static final double WRIST_ROTATION_STOWED = 0;
