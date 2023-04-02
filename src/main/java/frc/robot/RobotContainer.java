@@ -254,8 +254,6 @@ public class RobotContainer {
         .and(() -> gamePieceMode.isCone())
         .onTrue(new ArmPowerCommand(Constants.HYBRID_CONE_ARM_POSITION, arm, 3));
 
-    Trigger gunnerLeftTrigger = gunner.leftTrigger();
-    gunnerLeftTrigger.onTrue(new AutoBalanceCommand(drivetrainSubsystem));
   }
 
   private Command driverStowBehavior() {
