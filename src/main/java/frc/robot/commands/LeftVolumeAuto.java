@@ -11,9 +11,7 @@ public class LeftVolumeAuto extends SequentialCommandGroup {
             factory.generateCommandFromFile("LeftVolumeSecondElement", false),
             factory.generateCommandFromFile("LeftVolumeScoreSecond", false),
             factory.generateCommandFromFile("LeftVolumeThirdElement", false),
-            factory.generateCommandFromFile("LeftVolumeScoreThird", false),
-            factory.generateCommandFromFile("LeftVolumeFourthElement", false),
-            factory.generateCommandFromFile("LeftVolumeScoreFourth", false)
+            factory.generateCommandFromFile("LeftVolumeScoreThird", false)
 
         );
     }
