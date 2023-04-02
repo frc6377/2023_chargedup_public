@@ -74,8 +74,8 @@ public class SwerveAutoFactory {
     Zone currentZone = getZone(currentPose.getY());
     Proximity currentProximity = getProx(currentPose.getX());
 
-    DeltaBoard.putString("proximity", currentProximity.name());
-    DeltaBoard.putString("zone", currentZone.name());
+    //DeltaBoard.putString("proximity", currentProximity.name());
+    //DeltaBoard.putString("zone", currentZone.name());
 
     // build our midpoints first
     switch (currentProximity) {

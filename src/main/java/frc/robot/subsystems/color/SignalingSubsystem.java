@@ -134,7 +134,7 @@ public class SignalingSubsystem extends SubsystemBase {
       return;
     }
 
-    DeltaBoard.putString("Disable Pattern", disablePattern.name());
+    //DeltaBoard.putString("Disable Pattern", disablePattern.name());
 
     switch (disablePattern) {
         // case BI_FLAG:

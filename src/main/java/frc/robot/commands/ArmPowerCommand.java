@@ -71,7 +71,7 @@ public class ArmPowerCommand extends CommandBase {
     double theta = armSubsystem.thetaFromPPC();
     double thetaRatio = (theta - initalPose.theta) / (targetPose.theta - initalPose.theta);
     double extensionDelta = targetPose.r - initalPose.r;
-    DeltaBoard.putNumber("Pow", computePow(extensionDelta));
+    //DeltaBoard.putNumber("Pow", computePow(extensionDelta));
     return Math.pow(thetaRatio, computePow(extensionDelta)) * extensionDelta + initalPose.r;
   }
 

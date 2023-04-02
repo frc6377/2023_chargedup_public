@@ -139,7 +139,7 @@ public class FieldPositioningSystem extends SubsystemBase {
     ypr[0] = getRobotXYPose().getRotation().getDegrees();
     yprPub.accept(ypr);
     yprOmegaPub.accept(yprVelocity);
-    DeltaBoard.putString("pose", currentRobotPose.getX() + " " + currentRobotPose.getY());
+    //DeltaBoard.putString("pose", currentRobotPose.getX() + " " + currentRobotPose.getY());
   }
 
   /**
