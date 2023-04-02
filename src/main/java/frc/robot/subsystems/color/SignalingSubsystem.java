@@ -176,7 +176,7 @@ public class SignalingSubsystem extends SubsystemBase {
   }
 
   private enum DisablePattern {
-    TRANS_FLAG,
+    // TRANS_FLAG,
     RAINBOW,
     FIRE_FLY;
 
