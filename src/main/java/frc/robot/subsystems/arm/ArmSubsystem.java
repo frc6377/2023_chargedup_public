@@ -96,7 +96,7 @@ public class ArmSubsystem extends SubsystemBase {
     shoulderPPC = new ProfiledPIDController(2, 0, 0, new TrapezoidProfile.Constraints(4, 4));
     elevatorPPC =
         new ProfiledPIDController(
-            0.002, 0, 0.000000015, new TrapezoidProfile.Constraints(2 * 19200, 2000));
+            0.002, 0, 0.000000015, new TrapezoidProfile.Constraints(2 * 19200, 2500));
 
     shoulderPPC.setTolerance(0.02);
     elevatorPPC.setTolerance(10);
@@ -217,7 +217,7 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   private double computeCenterOfMass() {
-    return (Math.abs(elevatorCANCoder.getAbsolutePosition() / 360) / 12 * 1.1175) + 0.4825;
+    return ((Math.abs(elevatorCANCoder.getPosition() / 360) / 12.77) * 0.62992) + 0.457;
   }
 
   public static double rotationArbitraryFeetForward(
@@ -281,7 +281,7 @@ public class ArmSubsystem extends SubsystemBase {
   private double computeElevatorFeedForward() {
     double theta = shoulderThetaFromCANCoder();
     double magicNumberThatMakesItWork = 0.5;
-    double mass = 4.15 - magicNumberThatMakesItWork;
+    double mass = 4.2 - magicNumberThatMakesItWork;
     double stallLoad = 22.929;
     return (mass * Math.sin(theta)) / stallLoad;
   }

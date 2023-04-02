@@ -196,7 +196,7 @@ public class RobotContainer {
     Trigger driverStowed = driver.x();
     Trigger gunnerStowed = gunner.x();
 
-    gunnerStowed.onTrue(new ArmPowerCommandWithZero(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3));
+    gunnerStowed.onTrue(new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3));
     driverStowed.onTrue(
         Commands.runOnce(() -> driverStowBehavior().schedule(), new Subsystem[] {}));
 
@@ -249,7 +249,7 @@ public class RobotContainer {
         .onTrue(new ArmPowerCommand(Constants.HIGH_CONE_ARM_POSITION, arm, 3));
     gunnerHybridButton
         .and(() -> gamePieceMode.isCube())
-        .onTrue(new ArmPowerCommandWithZero(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3));
+        .onTrue(new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3));
     gunnerHybridButton
         .and(() -> gamePieceMode.isCone())
         .onTrue(new ArmPowerCommand(Constants.HYBRID_CONE_ARM_POSITION, arm, 3));
@@ -264,7 +264,7 @@ public class RobotContainer {
           ArmPosition.getArmPositionFromHeightAndType(ArmHeight.LOW, gamePieceMode);
       return new ArmPowerCommand(targetPosition, arm, 3);
     } else {
-      return new ArmPowerCommandWithZero(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3);
+      return new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3);
     }
   }
 
