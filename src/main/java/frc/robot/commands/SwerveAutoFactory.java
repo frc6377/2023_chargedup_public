@@ -244,7 +244,7 @@ public class SwerveAutoFactory {
     PIDController thetaController = new PIDController(2, 0, 0);
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
-    PPSwerveControllerCommand command =
+    Command command =
         new PPSwerveControllerCommand(
             trajectory,
             sub::get,
@@ -260,10 +260,9 @@ public class SwerveAutoFactory {
         && isFirstPath) { // checks if we have a pose reseter and if we want to reset our pose. If
       // we
       // do we want to overwrite whatever the kalman filter has. Mostly for auton
-
-      poseReseter.accept(trajectory.getInitialHolonomicPose());
+      command = new InstantCommand(()->poseReseter.accept(trajectory.getInitialHolonomicPose())).andThen(command);
     }
-    drivetrainSubsystem.sendTrajectoryToNT(trajectory); // posts trajectory to dashboard
+    command = new InstantCommand(()->drivetrainSubsystem.sendTrajectoryToNT(trajectory)).andThen(command); // posts trajectory to dashboard
 
     // run the command and than stop the drivetrain. Just to make sure we arent moving at the end
     return command.andThen(
