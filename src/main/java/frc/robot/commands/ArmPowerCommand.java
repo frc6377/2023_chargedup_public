@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import java.util.function.Supplier;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.networktables.DeltaBoard;
@@ -11,16 +13,18 @@ public class ArmPowerCommand extends CommandBase {
 
   private PolarPoint initalPose;
   private double targetWristAngle;
-  private final PolarPoint targetPose;
+  private Supplier<ArmPosition> targetPositionSupplier;
+
+  private PolarPoint targetPose;
+
   private final ArmSubsystem armSubsystem;
-  private final ArmHeight targetHeight;
+  private ArmHeight targetHeight;
   private final double pow;
 
   public ArmPowerCommand(ArmPosition targetPosition, ArmSubsystem armSubsystem, double pow) {
-    this.targetPose =
-        new PolarPoint(
-            targetPosition.getArmRotation(),
-            MathUtil.clamp(targetPosition.getArmExtension(), 0, 13.8 * 360.0));
+    this.targetPose = new PolarPoint(
+        targetPosition.getArmRotation(),
+        MathUtil.clamp(targetPosition.getArmExtension(), 0, 13.8 * 360.0));
     this.targetWristAngle = targetPosition.getWristRotation();
     this.armSubsystem = armSubsystem;
     targetHeight = targetPosition.getHeight();
@@ -28,19 +32,33 @@ public class ArmPowerCommand extends CommandBase {
     addRequirements(armSubsystem);
   }
 
+  public ArmPowerCommand(Supplier<ArmPosition> targetPositionSupplier, ArmSubsystem armSubsystem, double pow) {
+    this.targetPositionSupplier = targetPositionSupplier;
+    this.armSubsystem = armSubsystem;
+    this.pow = pow;
+    addRequirements(armSubsystem);
+  }
+
   @Override
   public void initialize() {
-    initalPose =
-        new PolarPoint(
-            armSubsystem.shoulderThetaFromCANCoder(), armSubsystem.currentArmExtenstionMeters());
+    if (targetPose == null) {
+      ArmPosition targetPosition = targetPositionSupplier.get();
+      this.targetPose = new PolarPoint(
+          targetPosition.getArmRotation(),
+          MathUtil.clamp(targetPosition.getArmExtension(), 0, 13.8 * 360.0));
+      this.targetWristAngle = targetPosition.getWristRotation();
+      targetHeight = targetPosition.getHeight();
+    }
+
+    initalPose = new PolarPoint(
+        armSubsystem.shoulderThetaFromCANCoder(), armSubsystem.currentArmExtenstionMeters());
   }
 
   @Override
   public void execute() {
-    double armExtension =
-        (targetPose.theta != initalPose.theta)
-            ? computeExtension()
-            : targetPose.r; // math breaks if theta doesnt change
+    double armExtension = (targetPose.theta != initalPose.theta)
+        ? computeExtension()
+        : targetPose.r; // math breaks if theta doesnt change
     armSubsystem.setTarget(
         new ArmPosition(
             targetPose.theta,
@@ -54,9 +72,8 @@ public class ArmPowerCommand extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return armSubsystem.thetaFromPPC()
-        == targetPose
-            .theta; // once this is true the command has delivered its final setpoint and its job is
+    return armSubsystem.thetaFromPPC() == targetPose.theta; // once this is true the command has delivered its final
+                                                            // setpoint and its job is
     // done
   }
 
@@ -71,7 +88,7 @@ public class ArmPowerCommand extends CommandBase {
     double theta = armSubsystem.thetaFromPPC();
     double thetaRatio = (theta - initalPose.theta) / (targetPose.theta - initalPose.theta);
     double extensionDelta = targetPose.r - initalPose.r;
-    //DeltaBoard.putNumber("Pow", computePow(extensionDelta));
+    // DeltaBoard.putNumber("Pow", computePow(extensionDelta));
     return Math.pow(thetaRatio, computePow(extensionDelta)) * extensionDelta + initalPose.r;
   }
 

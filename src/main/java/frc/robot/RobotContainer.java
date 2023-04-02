@@ -18,7 +18,6 @@ import frc.config.RobotVersion;
 import frc.robot.commands.ArmManualCommand;
 import frc.robot.commands.ArmPowerCommand;
 import frc.robot.commands.ArmPowerCommandWithZero;
-import frc.robot.commands.AutoBalanceCommand;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.EndAffectorEjectCommand;
 import frc.robot.commands.IntakeCommand;
@@ -253,7 +252,6 @@ public class RobotContainer {
     gunnerHybridButton
         .and(() -> gamePieceMode.isCone())
         .onTrue(new ArmPowerCommand(Constants.HYBRID_CONE_ARM_POSITION, arm, 3));
-
   }
 
   private Command driverStowBehavior() {

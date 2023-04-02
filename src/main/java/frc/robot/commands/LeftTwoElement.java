@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -15,17 +17,27 @@ public class LeftTwoElement extends SequentialCommandGroup {
       SwerveAutoFactory factory,
       ArmSubsystem arm,
       EndAffectorSubsystem endAffector) {
+    Command unbind = new ArmPowerCommand(arm::getUnbindPosition, arm, 3);
     addCommands(
-        new ArmPowerCommand(arm.getUnbindPosition(), arm, 3),
-        new InstantCommand(() -> endAffector.setCube()),
-        new InstantCommand(() -> endAffector.intake()),
-        new WaitCommand(0.75),
+        new ScheduleCommand(unbind),
+        Commands.waitUntil(unbind::isFinished),
+        new InstantCommand(
+            () -> {
+              endAffector.setCube();
+            }),
+        new InstantCommand(
+            () -> {
+              endAffector.intake();
+            }),
+        new InstantCommand(()->System.out.println("YEET2")),
         new ScheduleCommand(
             new ArmPowerCommand(Constants.LOW_CUBE_ARM_POSITION, arm, 3).withTimeout(0.5)),
-        new WaitCommand(0.5),
+        new InstantCommand(()->System.out.println("YEET")),
         factory.generateCommandFromFile("PickFirstElementBlue", true),
+        new InstantCommand(()->System.out.println("YEET-1")),
         new ScheduleCommand(
             new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3).withTimeout(0.5)),
+            new InstantCommand(()->System.out.println("YEET-2")),
         new ScheduleCommand(
             new WaitCommand(2)
                 .andThen(

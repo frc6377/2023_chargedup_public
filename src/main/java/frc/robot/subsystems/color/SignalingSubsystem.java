@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.networktables.DeltaBoard;
 import frc.robot.subsystems.color.patterns.BIFlag;
 import frc.robot.subsystems.color.patterns.FireFlyPattern;
 import frc.robot.subsystems.color.patterns.PatternNode;
@@ -134,7 +133,7 @@ public class SignalingSubsystem extends SubsystemBase {
       return;
     }
 
-    //DeltaBoard.putString("Disable Pattern", disablePattern.name());
+    // DeltaBoard.putString("Disable Pattern", disablePattern.name());
 
     switch (disablePattern) {
         // case BI_FLAG:
