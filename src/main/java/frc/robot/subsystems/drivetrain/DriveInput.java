@@ -41,6 +41,7 @@ public class DriveInput implements DoubleSupplier {
 
   @Override
   public double getAsDouble() {
+
     if (type == InputType.ABSOLUTE_ROTATION) {
 
       if (Math.hypot(ySupplier.getAsDouble(), xSupplier.getAsDouble()) < DriverConfig.rotDeadband) {

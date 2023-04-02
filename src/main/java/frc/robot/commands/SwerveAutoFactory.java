@@ -61,6 +61,7 @@ public class SwerveAutoFactory {
 
     Rotation2d deliveryRotation = fieldPoses.getDeliveryRotation();
     Pose2d currentPose = sub.get();
+
     Translation2d firstTarget =
         targetPose; // this variable tracks the pose of the second control point in the trajectory
     // so that our first control point's heading will face it
@@ -204,6 +205,37 @@ public class SwerveAutoFactory {
     createFieldPoses();
     return generateCommandFromPoint(
         new Pose2d(fieldPoses.getDoubleSubstation(), fieldPoses.getDeliveryRotation()));
+  }
+
+  public Command generateStrafeCommand() {
+    createFieldPoses();
+
+    Pose2d endPoint = new Pose2d(fieldPoses.getBay(0).getX(), 0, fieldPoses.getDeliveryRotation());
+
+    ArrayList<PathPoint> points = new ArrayList<PathPoint>();
+    // Pose2d currentPose = sub.get();
+    Pose2d currentPose =
+        new Pose2d(fieldPoses.getDoubleSubstation().getX(), 0, fieldPoses.getSingleSubRotation());
+
+    points.add(
+        poseToPathPoint(
+            currentPose,
+            Math.hypot(
+                drivetrainSubsystem.getChassisSpeeds().vxMetersPerSecond,
+                drivetrainSubsystem.getChassisSpeeds().vyMetersPerSecond),
+            headingBetweenPoints(currentPose.getTranslation(), endPoint.getTranslation())));
+
+    points.add(
+        poseToPathPoint(
+            endPoint,
+            -1,
+            headingBetweenPoints(currentPose.getTranslation(), endPoint.getTranslation())
+                .rotateBy(new Rotation2d(Math.PI))));
+
+    PathConstraints constraints = new PathConstraints(5000, 1000);
+    PathPlannerTrajectory trajectory = PathPlanner.generatePath(constraints, points);
+
+    return generateControllerCommand(false, trajectory);
   }
 
   public SequentialCommandGroup generateControllerCommand(

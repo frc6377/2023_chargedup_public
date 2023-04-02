@@ -77,13 +77,18 @@ public class RobotContainer {
     DoubleSupplier rotationSupplier =
         new DriveInput(driver::getLeftX, DriveInput.InputType.TRANSLATION, driverConfig, false);
     DoubleSupplier pointingDriveInput =
-        new DriveInput(driver::getRightY, driver::getRightX, driverConfig);
-
-    endAffector = new EndAffectorSubsystem(Constants.END_AFFECTOR_ID, Constants.END_AFFECTOR_KP);
+        new DriveInput(
+            driver::getRightY,
+            driver::getRightX,
+            driverConfig); // TODO Make sure this isnt problamatic
 
     gamePieceMode = GamePieceMode.CONE;
     gamePieceModeSupplier = () -> gamePieceMode;
     gamePieceModeConsumer = (in) -> gamePieceMode = in;
+
+    endAffector =
+        new EndAffectorSubsystem(
+            Constants.END_AFFECTOR_ID, Constants.END_AFFECTOR_KP, gamePieceMode);
 
     colorStrip =
         new SignalingSubsystem(
@@ -112,6 +117,7 @@ public class RobotContainer {
 
   private void configureBindings() {
     Trigger highGearButton = driver.rightBumper();
+    Trigger strafe = driver.a();
 
     DriverConfig driverConfig = new DriverConfig();
     DoubleSupplier xSupplier =
@@ -135,6 +141,16 @@ public class RobotContainer {
             turnSupplier,
             pointingDriveInput);
 
+    strafe.whileTrue(autoCommand.generateStrafeCommand());
+
+    // strafe.onTrue(SequentialCommandGroup(Commands.startEnd(()->
+    // driveCommand.setDriveType(DriveType.STRAFE),
+    // ()->driveCommand.setDriveType(DriveType.CLASSIC), new
+    // Subsystem[]{}),autoCommand.generateGridCommand(getBay()).until(this::isDriving)))
+
+    // strafe.whileTrue(Commands.startEnd(()-> driveCommand.setDriveType(DriveType.STRAFE),
+    // ()->driveCommand.setDriveType(DriveType.CLASSIC), new Subsystem[]{}));
+
     drivetrainSubsystem.setDefaultCommand(driveCommand);
 
     Trigger intakeButton = driver.leftTrigger(0.3);
@@ -151,7 +167,6 @@ public class RobotContainer {
             () -> arm.getArmGoalPosition().getHeight(),
             gamePieceModeSupplier));
 
-    Trigger driverGoButton = driver.a();
     Trigger driverResetFieldNorth = driver.start();
 
     driverResetFieldNorth.onTrue(
@@ -181,7 +196,7 @@ public class RobotContainer {
     Trigger driverStowed = driver.x();
     Trigger gunnerStowed = gunner.x();
 
-    gunnerStowed.onTrue(new ArmPowerCommandWithZero(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3));
+    gunnerStowed.onTrue(new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3));
     driverStowed.onTrue(
         Commands.runOnce(() -> driverStowBehavior().schedule(), new Subsystem[] {}));
 
@@ -234,7 +249,7 @@ public class RobotContainer {
         .onTrue(new ArmPowerCommand(Constants.HIGH_CONE_ARM_POSITION, arm, 3));
     gunnerHybridButton
         .and(() -> gamePieceMode.isCube())
-        .onTrue(new ArmPowerCommandWithZero(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3));
+        .onTrue(new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3));
     gunnerHybridButton
         .and(() -> gamePieceMode.isCone())
         .onTrue(new ArmPowerCommand(Constants.HYBRID_CONE_ARM_POSITION, arm, 3));
@@ -249,7 +264,7 @@ public class RobotContainer {
           ArmPosition.getArmPositionFromHeightAndType(ArmHeight.LOW, gamePieceMode);
       return new ArmPowerCommand(targetPosition, arm, 3);
     } else {
-      return new ArmPowerCommandWithZero(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3);
+      return new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3);
     }
   }
 

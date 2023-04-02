@@ -166,8 +166,8 @@ public final class Constants {
 
   // Wrist
   public static final double WRIST_KP = 0.1;
-  public static final double WRIST_MAX_VELOCITY = 1.5 * 5000;
-  public static final double WRIST_MAX_ACCELLERATION = 1.5 * 5000;
+  public static final double WRIST_MAX_VELOCITY = 3 * 5000;
+  public static final double WRIST_MAX_ACCELLERATION = 3 * 5000;
   public static final double WRIST_MOMENT_OF_INERTIA = 0;
   public static final double WRIST_GEAR_RATIO = 1.0 / 41.67;
   public static final double WRIST_ROTATION_STOWED = 0;
@@ -263,10 +263,10 @@ public final class Constants {
   public static final double ARM_ALLOWED_ANGLE_ERROR = 0.001;
   public static final double ARM_ALLOWED_EXTENSION_ERROR = 0.0254;
   public static final int BREAK_VICTOR_ID = 7;
-  public static final double SHOULDER_CANCODER_OFFSET = 109.6;
+  public static final double SHOULDER_CANCODER_OFFSET = 105.996;
 
   public static final int WRIST_CANCODER_ID = 14;
-  public static final double WRIST_CANCODER_OFFSET = 105.205;
+  public static final double WRIST_CANCODER_OFFSET = 74.355;
 
   public static final ArmPosition ARM_MAX_POSITION =
       new ArmPosition(110, 360 * 13.8, 22002, ArmHeight.NOT_SPECIFIED);
@@ -286,18 +286,18 @@ public final class Constants {
   public static final ArmPosition MID_CUBE_ARM_POSITION =
       new ArmPosition(Math.toRadians(35), 360.0 * 5.95, -2358, ArmHeight.MID);
   public static final ArmPosition MID_CONE_ARM_POSITION =
-      new ArmPosition(Math.toRadians(42.75), 360.0 * 9.16, -21787, ArmHeight.MID);
+      new ArmPosition(Math.toRadians(44.75), 360.0 * 7.5, -21787, ArmHeight.MID);
 
   public static final ArmPosition HIGH_CUBE_ARM_POSITION =
       new ArmPosition(Math.toRadians(34.94), 360 * 10.35, 3498, ArmHeight.HIGH);
   public static final ArmPosition HIGH_CONE_ARM_POSITION =
-      new ArmPosition(Math.toRadians(47.5), 4800, -21000, ArmHeight.HIGH);
+      new ArmPosition(Math.toRadians(45.5), 4800, -21000, ArmHeight.HIGH);
   public static final ArmPosition SINGLE_SUBSTATION_CONE_POSITION =
       new ArmPosition(
           Math.toRadians(48.416748), 6.591797, -12481.000000, ArmHeight.SINGLE_SUBSTATION);
 
   public static final ArmPosition HYBRID_CUBE_ARM_POSITION =
-      new ArmPosition(Math.toRadians(-7.5), 0, 23001, ArmHeight.LOW);
+      new ArmPosition(Math.toRadians(-7.5), 360, 23001, ArmHeight.LOW);
 
   public static final ArmPosition HYBRID_CONE_ARM_POSITION =
       new ArmPosition(Math.toRadians(35), 360, -27000, ArmHeight.LOW);
