@@ -16,6 +16,7 @@ public class LeftTwoElement extends SequentialCommandGroup {
       ArmSubsystem arm,
       EndAffectorSubsystem endAffector) {
     addCommands(
+        new ArmPowerCommand(arm.getUnbindPosition(), arm, 3),
         new InstantCommand(() -> endAffector.setCube()),
         new InstantCommand(() -> endAffector.intake()),
         new WaitCommand(0.75),

@@ -355,4 +355,12 @@ public class ArmSubsystem extends SubsystemBase {
       return false;
     }
   }
+
+  public ArmPosition getUnbindPosition() {
+    return new ArmPosition(
+        shoulderThetaFromCANCoder() + 5,
+        extendEncoder.getPosition(),
+        wristMotor.getSelectedSensorPosition(),
+        ArmHeight.NOT_SPECIFIED);
+  }
 }

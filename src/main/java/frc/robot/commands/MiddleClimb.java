@@ -15,6 +15,7 @@ public class MiddleClimb extends SequentialCommandGroup {
       ArmSubsystem arm,
       EndAffectorSubsystem endAffector) {
     addCommands(
+      new ArmPowerCommand(arm.getUnbindPosition(), arm, 3),
         new WaitCommand(0.75),
         new ScheduleCommand(
             new ArmPowerCommand(Constants.LOW_CUBE_ARM_POSITION, arm, 3).withTimeout(0.5)),
