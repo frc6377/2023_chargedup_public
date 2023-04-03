@@ -15,6 +15,7 @@ import frc.robot.subsystems.color.patterns.BIFlag;
 import frc.robot.subsystems.color.patterns.FireFlyPattern;
 import frc.robot.subsystems.color.patterns.PatternNode;
 import frc.robot.subsystems.color.patterns.TransFlag;
+import java.util.ArrayList;
 import java.util.function.Consumer;
 
 public class SignalingSubsystem extends SubsystemBase {
@@ -181,8 +182,20 @@ public class SignalingSubsystem extends SubsystemBase {
     FIRE_FLY;
 
     public static DisablePattern getRandom() {
+      // Do not use due to special request
+      DisablePattern[] DNU = {DisablePattern.TRANS_FLAG};
       DisablePattern[] allPatterns = DisablePattern.values();
-      return allPatterns[(int) Math.floor(Math.random() * (allPatterns.length))];
+      ArrayList<DisablePattern> useable = new ArrayList<>();
+      for (DisablePattern p : allPatterns) {
+        boolean skip = false;
+        for (DisablePattern d : DNU) {
+          if (p == d) skip = true;
+        }
+        if (skip) continue;
+        useable.add(p);
+      }
+
+      return useable.get((int) Math.floor(Math.random() * (useable.size())));
     }
   }
 }
