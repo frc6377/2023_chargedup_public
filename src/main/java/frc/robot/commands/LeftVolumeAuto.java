@@ -16,7 +16,7 @@ public class LeftVolumeAuto extends SequentialCommandGroup {
             new InstantCommand(()-> endAffector.intake()),
             factory.generateCommandFromFile("LeftVolumeFirstElement", true).alongWith(new ArmPowerCommand(Constants.LOW_CUBE_ARM_POSITION, arm, 3)),
             new InstantCommand(()-> endAffector.idle()),
-            factory.generateCommandFromFile("LeftVolumeScoreFirst", false).alongWith(new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3)),
+            factory.generateCommandFromFile("LeftVolumeScoreFirst", false).alongWith(new ArmPowerCommand(Constants.MID_CUBE_ARM_POSITION, arm, 3)),
             new InstantCommand(()-> endAffector.fastOutake()),
             new WaitCommand(0.5),
             new InstantCommand(()-> endAffector.idle()),
@@ -24,7 +24,7 @@ public class LeftVolumeAuto extends SequentialCommandGroup {
             new InstantCommand(()-> endAffector.intake()),
             factory.generateCommandFromFile("LeftVolumeSecondElement", false).alongWith(new ArmPowerCommand(Constants.LOW_CUBE_ARM_POSITION, arm, 3)),
             new InstantCommand(()-> endAffector.idle()),
-            factory.generateCommandFromFile("LeftVolumeScoreSecond", false).alongWith(new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3)),
+            factory.generateCommandFromFile("LeftVolumeScoreSecond", false).alongWith(new ArmPowerCommand(Constants.MID_CUBE_ARM_POSITION, arm, 3)),
             new InstantCommand(()-> endAffector.fastOutake()),
             new WaitCommand(0.5),
             new InstantCommand(()-> endAffector.idle()),
@@ -32,11 +32,11 @@ public class LeftVolumeAuto extends SequentialCommandGroup {
             new InstantCommand(()-> endAffector.intake()),
             factory.generateCommandFromFile("LeftVolumeThirdElement", false).alongWith(new ArmPowerCommand(Constants.LOW_CUBE_ARM_POSITION, arm, 3)),
             new InstantCommand(()-> endAffector.idle()),
-            factory.generateCommandFromFile("LeftVolumeScoreThird", false).alongWith(new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3)),
+            factory.generateCommandFromFile("LeftVolumeScoreThird", false).alongWith(new ArmPowerCommand(Constants.MID_CUBE_ARM_POSITION, arm, 3)),
             new InstantCommand(()-> endAffector.fastOutake()),
             new WaitCommand(0.5),
             new InstantCommand(()-> endAffector.idle()),
-            factory.generateCommandFromFile("LeftVolumeBackup", false)
+            factory.generateCommandFromFile("LeftVolumeBackup", false).alongWith(new ArmPowerCommand(Constants.LOW_CUBE_ARM_POSITION, arm, 3))
 
 
         );
