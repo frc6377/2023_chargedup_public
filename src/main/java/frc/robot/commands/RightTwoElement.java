@@ -29,11 +29,11 @@ public class RightTwoElement extends SequentialCommandGroup {
                 }),
                 new WaitCommand(0.25),
                 new ArmPowerCommand(Constants.LOW_CUBE_ARM_POSITION, arm, 3).alongWith(
-            new WaitCommand(0.5).andThen(factory.generateCommandFromFile("PickFirstElementRight", true).andThen(new InstantCommand(() -> endAffector.idle())))),
+            new WaitCommand(0.5).andThen(factory.generateCommandFromFile("PickFirstElementRight", true, 3, 3).andThen(new InstantCommand(() -> endAffector.idle())))),
                 new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3)
                 .andThen(new WaitCommand(1)
                 .andThen(new ArmPowerCommand(Constants.HIGH_CUBE_ARM_POSITION, arm, 3)
-                )).alongWith(factory.generateCommandFromFile("ScoreFirstElementRight", false)),
+                )).alongWith(factory.generateCommandFromFile("ScoreFirstElementRight", false, 3, 3)),
         
             new WaitCommand(0.75),
             new InstantCommand(() -> endAffector.fastOutake()),

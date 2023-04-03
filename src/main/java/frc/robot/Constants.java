@@ -209,8 +209,8 @@ public final class Constants {
   public static final double FIELD_Y = 8.02;
 
   // otf pathing constants
-  public static final double AUTO_MAX_VELOCITY = 4.0;
-  public static final double AUTO_MAX_ACCELERATION = 3.0;
+  public static final double AUTO_MAX_VELOCITY = 2.0;
+  public static final double AUTO_MAX_ACCELERATION = 2.0;
 
   // relative distance from your alliance station wall or the left of the field depending on axis.
   // Gets converted into absolute coordinates in FieldPoses.java
