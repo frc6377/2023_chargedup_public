@@ -267,7 +267,7 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     // AutoRoutines should be used to add more auto routines that we'll execute.
-    return new LeftVolumeAuto(drivetrainSubsystem, autoCommand);
+    return new LeftVolumeAuto(drivetrainSubsystem, autoCommand, endAffector, arm);
    // return routineFactory.getAuto(autoChooser.getSelected());
   }
 
