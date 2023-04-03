@@ -13,6 +13,7 @@ public class RoutineFactory {
   private final OnlyPreload preloadOnly;
   private final RightTwoElement rightTwoElement;
   private final RightTwoElementNoClimb rightTwoElementNoClimb;
+  private final LeftVolumeAuto leftVolume;
 
   public RoutineFactory(
       ArmSubsystem arm,
@@ -25,6 +26,7 @@ public class RoutineFactory {
     middleClimb = new MiddleClimb(drive, factory, arm, endAffector);
     rightTwoElement = new RightTwoElement(drive, factory, arm, endAffector);
     rightTwoElementNoClimb = new RightTwoElementNoClimb(drive, factory, arm, endAffector);
+    leftVolume = new LeftVolumeAuto(drive, factory, endAffector, arm);
   }
 
   public Command getAuto(Routines routine) {
@@ -50,6 +52,9 @@ public class RoutineFactory {
 
       case RIGHT_2_ELEMENT_NOCLIMB:
         return rightTwoElementNoClimb;
+      
+      case LEFT_VOLUME:
+        return leftVolume;
 
       default:
         System.out.println("NO VALID AUTO FOUND! RUNNING NOTHING");
@@ -64,6 +69,7 @@ public class RoutineFactory {
     LEFT_2_ELEMENT_CLIMB,
     RIGHT_2_ELEMENT_CLIMB,
     LEFT_2_ELEMENT_NOCLIMB,
-    RIGHT_2_ELEMENT_NOCLIMB
+    RIGHT_2_ELEMENT_NOCLIMB,
+    LEFT_VOLUME
   }
 }
