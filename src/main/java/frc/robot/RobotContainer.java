@@ -21,6 +21,7 @@ import frc.robot.commands.ArmPowerCommandWithZero;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.EndAffectorEjectCommand;
 import frc.robot.commands.IntakeCommand;
+import frc.robot.commands.LeftVolumeAuto;
 import frc.robot.commands.RoutineFactory;
 import frc.robot.commands.RoutineFactory.Routines;
 import frc.robot.commands.SwerveAutoFactory;
@@ -266,8 +267,8 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     // AutoRoutines should be used to add more auto routines that we'll execute.
-
-    return routineFactory.getAuto(autoChooser.getSelected());
+    return new LeftVolumeAuto(drivetrainSubsystem, autoCommand);
+   // return routineFactory.getAuto(autoChooser.getSelected());
   }
 
   public int getBay() {
