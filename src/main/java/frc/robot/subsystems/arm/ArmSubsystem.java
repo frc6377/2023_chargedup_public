@@ -359,7 +359,6 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public ArmPosition getUnbindPosition() {
-    System.out.println("PRINT!!!!!");
     return new ArmPosition(
         shoulderThetaFromCANCoder() + Math.toRadians(5),
         extendEncoder.getPosition(),

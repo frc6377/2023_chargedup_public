@@ -48,7 +48,6 @@ public class SwerveAutoFactory {
   public SequentialCommandGroup generateCommandFromFile(
       String pathTofollow, boolean isFirstPath, double Velo, double accel) {
     createFieldPoses(); // create a field poses object if we dont have one already
-    System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
     PathPlannerTrajectory trajectory = PathPlanner.loadPath(pathTofollow, Velo, accel);
     return generateControllerCommand(isFirstPath, trajectory);
   }
