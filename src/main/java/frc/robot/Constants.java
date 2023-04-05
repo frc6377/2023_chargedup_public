@@ -297,7 +297,7 @@ public final class Constants {
           Math.toRadians(48.416748), 6.591797, -12481.000000, ArmHeight.SINGLE_SUBSTATION);
     //TODO: Figure out and put in a real value for this. Currently defaulted to stowed
   public static final ArmPosition DOUBLE_SUBSTATION_CONE_POSITION =
-        new ArmPosition(Math.toRadians(-7.5), 0, 8000, ArmHeight.DOUBLE_SUBSTATION);
+        new ArmPosition(Math.toRadians(60), 880, -13700, ArmHeight.DOUBLE_SUBSTATION);
 
   public static final ArmPosition HYBRID_CUBE_ARM_POSITION =
       new ArmPosition(Math.toRadians(-7.5), 0, 23001, ArmHeight.LOW);
