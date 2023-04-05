@@ -15,6 +15,7 @@ public class SwitchSingleSubstationMode extends CommandBase {
   private final Consumer<GamePieceMode> gamePieceModeConsumer;
   private final Supplier<GamePieceMode> gamePieceModeSupplier;
   private final ArmSubsystem armSubsystem;
+
   public SwitchSingleSubstationMode(
       EndAffectorSubsystem endAffectorSubsystem,
       SignalingSubsystem colorSubsystem,
