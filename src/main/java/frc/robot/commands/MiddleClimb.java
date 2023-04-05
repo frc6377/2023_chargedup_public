@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -15,15 +16,19 @@ public class MiddleClimb extends SequentialCommandGroup {
       ArmSubsystem arm,
       EndAffectorSubsystem endAffector) {
     addCommands(
-        new ArmPowerCommand(arm.getUnbindPosition(), arm, 3),
+      new InstantCommand(()-> endAffector.halt()),
+      new ArmPowerCommand(Constants.BACKWARDS_HIGH_CONE, arm, 3),
+      new WaitCommand(1),
+      new InstantCommand(
+          () -> {
+            endAffector.setCube();
+          }),
+      new InstantCommand(
+          () -> {
+            endAffector.intake();
+          }),
         new WaitCommand(0.75),
-        new ScheduleCommand(
-            new ArmPowerCommand(Constants.LOW_CUBE_ARM_POSITION, arm, 3).withTimeout(0.5)),
-        new WaitCommand(1),
-        new ScheduleCommand(
-            new ArmPowerCommand(Constants.STOWED_ARM_POSITION, arm, 3).withTimeout(0.5)),
-        new WaitCommand(1),
-        factory.generateCommandFromFile("ClimbMiddle", true),
+        factory.generateCommandFromFile("ClimbMiddle", true).alongWith(new WaitCommand(0.5).andThen(new ArmPowerCommand(Constants.STOWED_ARM_POSITION, arm, 3))),
         new AutoBalanceCommand(drive));
   }
 }
