@@ -184,8 +184,6 @@ public class RobotContainer {
     Trigger gunnerStowed = gunner.x();
 
     gunnerStowed.onTrue(new ArmPowerCommandWithZero(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3));
-    driverStowed.onTrue(
-        Commands.runOnce(() -> driverStowBehavior().schedule(), new Subsystem[] {}));
 
     Trigger driverDefenseStowed = driver.b();
     driverDefenseStowed.onTrue(
@@ -206,6 +204,12 @@ public class RobotContainer {
     Trigger gunnerRightY =
         new Trigger(() -> Math.abs(gunner.getRightY()) > Constants.ARM_MANUAL_OVERRIDE_DEADZONE);
 
+    driverStowed
+        .and(() -> gamePieceMode != GamePieceMode.SINGLE_SUBSTATION)
+        .onTrue(Commands.runOnce(() -> driverStowBehavior().schedule(), new Subsystem[] {}));
+    driverStowed
+        .and(() -> gamePieceMode == GamePieceMode.SINGLE_SUBSTATION)
+        .onTrue(new ArmPowerCommandWithZero(Constants.DOUBLE_SUBSTATION_CONE_POSITION, arm, 3));
     driverDefenseStowed
         .and(() -> gamePieceMode != GamePieceMode.SINGLE_SUBSTATION)
         .onTrue(new ArmPowerCommandWithZero(Constants.HIGH_STOWED_ARM_POSITION, arm, 3));
