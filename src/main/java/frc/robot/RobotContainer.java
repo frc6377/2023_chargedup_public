@@ -18,7 +18,6 @@ import frc.config.RobotVersion;
 import frc.robot.commands.ArmManualCommand;
 import frc.robot.commands.ArmPowerCommand;
 import frc.robot.commands.ArmPowerCommandWithZero;
-import frc.robot.commands.AutoBalanceCommand;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.EndAffectorEjectCommand;
 import frc.robot.commands.IntakeCommand;
@@ -253,9 +252,6 @@ public class RobotContainer {
     gunnerHybridButton
         .and(() -> gamePieceMode.isCone())
         .onTrue(new ArmPowerCommand(Constants.HYBRID_CONE_ARM_POSITION, arm, 3));
-
-    Trigger gunnerLeftTrigger = gunner.leftTrigger();
-    gunnerLeftTrigger.onTrue(new AutoBalanceCommand(drivetrainSubsystem));
   }
 
   private Command driverStowBehavior() {
@@ -270,7 +266,6 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     // AutoRoutines should be used to add more auto routines that we'll execute.
-
     return routineFactory.getAuto(autoChooser.getSelected());
   }
 
@@ -315,6 +310,7 @@ public class RobotContainer {
     autoChooser.addOption("right 2 element climb", Routines.RIGHT_2_ELEMENT_CLIMB);
     autoChooser.addOption("left 2 element no climb", Routines.LEFT_2_ELEMENT_NOCLIMB);
     autoChooser.addOption("right 2 element no climb", Routines.RIGHT_2_ELEMENT_NOCLIMB);
+    autoChooser.addOption("left volume", Routines.LEFT_VOLUME);
     SmartDashboard.putData(autoChooser);
   }
 

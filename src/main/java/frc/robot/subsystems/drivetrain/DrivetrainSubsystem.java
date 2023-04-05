@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.config.RobotVersion;
 import frc.robot.Constants;
-import frc.robot.networktables.DeltaBoard;
 import frc.robot.subsystems.drivetrain.config.PodConfig;
 
 public class DrivetrainSubsystem extends SubsystemBase {
@@ -257,10 +256,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
     }
 
     SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_VELOCITY_METERS_PER_SECOND);
-    DeltaBoard.putNumber(
-        "front left pod",
-        states[0].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE);
-
+    /*DeltaBoard.putNumber(
+            "front left pod",
+            states[0].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE);
+    */
     m_frontLeftModule.set(
         states[0].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE,
         states[0].angle.getRadians());

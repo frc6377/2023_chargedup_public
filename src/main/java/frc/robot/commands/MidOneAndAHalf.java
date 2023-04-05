@@ -8,8 +8,8 @@ import frc.robot.subsystems.EndAffectorSubsystem;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
 
-public class MiddleClimb extends SequentialCommandGroup {
-  public MiddleClimb(
+public class MidOneAndAHalf extends SequentialCommandGroup {
+  public MidOneAndAHalf(
       DrivetrainSubsystem drive,
       SwerveAutoFactory factory,
       ArmSubsystem arm,
@@ -20,17 +20,26 @@ public class MiddleClimb extends SequentialCommandGroup {
         new WaitCommand(1),
         new InstantCommand(
             () -> {
-              endAffector.setCube();
+              endAffector.setCone();
             }),
         new InstantCommand(
             () -> {
-              endAffector.intake();
+              endAffector.fastOutake();
             }),
-        new WaitCommand(0.75),
+        new WaitCommand(0.25),
         new InstantCommand(() -> endAffector.halt()),
         factory
-            .generateCommandFromFile("ClimbMiddle", true)
-            .alongWith((new ArmPowerCommand(Constants.STOWED_ARM_POSITION, arm, 3))),
+            .generateCommandFromFile("MobilityMiddle", true, 1, 1)
+            .alongWith(
+                new WaitCommand(0.5)
+                    .andThen(new ArmPowerCommand(Constants.STOWED_ARM_POSITION, arm, 3))
+                    .andThen(new WaitCommand(2))
+                    .andThen(
+                        new ArmPowerCommand(Constants.LOW_CONE_ARM_POSITION, arm, 3)
+                            .alongWith(new InstantCommand(() -> endAffector.intake())))),
+        new InstantCommand(() -> endAffector.idle()),
+        new ArmPowerCommand(Constants.STOWED_ARM_POSITION, arm, 3),
+        factory.generateCommandFromFile("MobilityBalance", false),
         new AutoBalanceCommand(drive));
   }
 }

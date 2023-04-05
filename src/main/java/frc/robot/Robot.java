@@ -45,7 +45,6 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     m_robotContainer.updateLEDs();
-    m_robotContainer.unbindShoulder();
 
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
