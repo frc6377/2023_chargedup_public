@@ -180,7 +180,7 @@ public class RobotContainer {
     Trigger driverToggleSingleSubstation = driver.y();
     driverToggleSingleSubstation.onTrue(
         new SwitchSingleSubstationMode(
-            endAffector, colorStrip, gamePieceModeConsumer, gamePieceModeSupplier));
+            endAffector, colorStrip, gamePieceModeConsumer, gamePieceModeSupplier, arm));
 
     Trigger driverStowed = driver.x();
     Trigger gunnerStowed = gunner.x();

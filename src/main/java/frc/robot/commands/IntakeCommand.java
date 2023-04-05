@@ -54,7 +54,7 @@ public class IntakeCommand extends CommandBase {
     if (detectGamePiece()) {
       if (gamePieceModeSupplier.get() == GamePieceMode.SINGLE_SUBSTATION) {
         new SwitchSingleSubstationMode(
-                subsystem, signalingSubsystem, gamePieceModeConsumer, gamePieceModeSupplier)
+                subsystem, signalingSubsystem, gamePieceModeConsumer, gamePieceModeSupplier, armSubsystem)
             .initialize();
       }
       armSubsystem.setTarget(Constants.STOWED_ARM_POSITION);
