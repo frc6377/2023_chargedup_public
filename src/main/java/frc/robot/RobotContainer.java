@@ -209,7 +209,7 @@ public class RobotContainer {
         .onTrue(Commands.runOnce(() -> driverStowBehavior().schedule(), new Subsystem[] {}));
     driverStowed
         .and(() -> gamePieceMode == GamePieceMode.SINGLE_SUBSTATION)
-        .onTrue(new ArmPowerCommandWithZero(Constants.DOUBLE_SUBSTATION_CONE_POSITION, arm, 3));
+        .onTrue(new ArmPowerCommand(Constants.DOUBLE_SUBSTATION_CONE_POSITION, arm, 3));
     driverDefenseStowed
         .and(() -> gamePieceMode != GamePieceMode.SINGLE_SUBSTATION)
         .onTrue(new ArmPowerCommandWithZero(Constants.HIGH_STOWED_ARM_POSITION, arm, 3));
