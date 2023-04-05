@@ -302,8 +302,8 @@ public final class Constants {
   public static final ArmPosition HYBRID_CONE_ARM_POSITION =
       new ArmPosition(Math.toRadians(35), 360, -27000, ArmHeight.LOW);
 
-    public static final ArmPosition BACKWARDS_HIGH_CONE = 
-        new ArmPosition(Math.toRadians(125), 8.2*360, 16000, ArmHeight.NOT_SPECIFIED);
+  public static final ArmPosition BACKWARDS_HIGH_CONE =
+      new ArmPosition(Math.toRadians(125), 8.2 * 360, 16000, ArmHeight.NOT_SPECIFIED);
 
   // A value between 0 and 1.
   public static final double RAINBOW_ANIMATION_SPEED = 0.5;

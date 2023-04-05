@@ -45,11 +45,11 @@ public class SwerveAutoFactory {
     return generateCommandFromFile(pathTofollow, isFirstPath, maxVelocity, maxAcceleration);
   }
 
-  public SequentialCommandGroup generateCommandFromFile(String pathTofollow, boolean isFirstPath, double Velo, double accel) {
+  public SequentialCommandGroup generateCommandFromFile(
+      String pathTofollow, boolean isFirstPath, double Velo, double accel) {
     createFieldPoses(); // create a field poses object if we dont have one already
     System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-    PathPlannerTrajectory trajectory =
-        PathPlanner.loadPath(pathTofollow, Velo, accel);
+    PathPlannerTrajectory trajectory = PathPlanner.loadPath(pathTofollow, Velo, accel);
     return generateControllerCommand(isFirstPath, trajectory);
   }
 
@@ -264,16 +264,20 @@ public class SwerveAutoFactory {
       // we
       // do we want to overwrite whatever the kalman filter has. Mostly for auton
       command =
-          new InstantCommand(() -> {System.out.println("Reset POSE!!"); poseReseter.accept(trajectory.getInitialHolonomicPose());})
+          new InstantCommand(
+                  () -> {
+                    System.out.println("Reset POSE!!");
+                    poseReseter.accept(trajectory.getInitialHolonomicPose());
+                  })
               .andThen(command);
     }
     command =
         new InstantCommand(() -> drivetrainSubsystem.sendTrajectoryToNT(trajectory))
             .andThen(command); // posts trajectory to dashboard
     command =
-      new InstantCommand(() -> System.out.println("starting path----------------------------------"))
-          .andThen(command);
-    
+        new InstantCommand(
+                () -> System.out.println("starting path----------------------------------"))
+            .andThen(command);
 
     // run the command and than stop the drivetrain. Just to make sure we arent moving at the end
     return command.andThen(

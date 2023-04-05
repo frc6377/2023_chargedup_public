@@ -52,7 +52,7 @@ public class RoutineFactory {
 
       case RIGHT_2_ELEMENT_NOCLIMB:
         return rightTwoElementNoClimb;
-      
+
       case LEFT_VOLUME:
         return leftVolume;
 
