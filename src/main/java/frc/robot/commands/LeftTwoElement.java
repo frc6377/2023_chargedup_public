@@ -34,17 +34,17 @@ public class LeftTwoElement extends SequentialCommandGroup {
             }),
             new WaitCommand(0.25),
             new ArmPowerCommand(Constants.LOW_CUBE_ARM_POSITION, arm, 3).alongWith(
-        new WaitCommand(0.5).andThen(factory.generateCommandFromFile("PickFirstElementBlue", true).andThen(new InstantCommand(() -> endAffector.idle())))),
+        new WaitCommand(0.5).andThen(factory.generateCommandFromFile("PickFirstElementBlue", true, 3, 2.5).andThen(new InstantCommand(() -> endAffector.idle())))),
             new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3)
             .andThen(new WaitCommand(1)
             .andThen(new ArmPowerCommand(Constants.HIGH_CUBE_ARM_POSITION, arm, 3)
-            )).alongWith(factory.generateCommandFromFile("ScoreFirstElementBlue", false)),
+            )).alongWith(factory.generateCommandFromFile("ScoreFirstElementBlue", false, 3, 2)),
     
         new WaitCommand(0.75),
         new InstantCommand(() -> endAffector.fastOutake()),
         new WaitCommand(0.5),
         new InstantCommand(() -> endAffector.idle()),
-        factory.generateCommandFromFile("ClimbBlue", false).alongWith(new WaitCommand(0.5).andThen(new ArmPowerCommand(Constants.STOWED_ARM_POSITION, arm, 3))),
+        factory.generateCommandFromFile("ClimbBlue", false, 3, 3).alongWith(new WaitCommand(0.5).andThen(new ArmPowerCommand(Constants.STOWED_ARM_POSITION, arm, 3))),
         new AutoBalanceCommand(drive));
   }
 }

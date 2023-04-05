@@ -28,7 +28,8 @@ public class MiddleClimb extends SequentialCommandGroup {
             endAffector.intake();
           }),
         new WaitCommand(0.75),
-        factory.generateCommandFromFile("ClimbMiddle", true).alongWith(new WaitCommand(0.5).andThen(new ArmPowerCommand(Constants.STOWED_ARM_POSITION, arm, 3))),
+        new InstantCommand(()-> endAffector.halt()),
+        factory.generateCommandFromFile("ClimbMiddle", true).alongWith((new ArmPowerCommand(Constants.STOWED_ARM_POSITION, arm, 3))),
         new AutoBalanceCommand(drive));
   }
 }
