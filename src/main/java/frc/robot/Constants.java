@@ -146,7 +146,7 @@ public final class Constants {
   public static final double ARM_WEIGHT_KG = 5.4;
   public static final double ARM_ANGLE_AT_REST = Math.toRadians(9.3);
 
-  public static final double END_AFFECTOR_INTAKE_SPEED = 0.9;
+  public static final double END_AFFECTOR_INTAKE_SPEED = 1;
   public static final double END_AFFECTOR_OUTTAKE_SPEED = 0.3;
   public static final double END_AFFECTOR_SLOW_OUTTAKE_SPEED = 0.075;
   public static final double END_AFFECTOR_IDLE_SPEED = 0.1;
@@ -266,9 +266,8 @@ public final class Constants {
   public static final double SHOULDER_CANCODER_OFFSET = 105.996;
 
   public static final int WRIST_CANCODER_ID = 14;
-  public static final double WRIST_CANCODER_OFFSET = 71.719;
-
-  public static final ArmPosition ARM_MAX_POSITION =
+  public static final double WRIST_CANCODER_OFFSET = 51.328;
+public static final ArmPosition ARM_MAX_POSITION =
       new ArmPosition(110, 360 * 13.8, 22002, ArmHeight.NOT_SPECIFIED);
   public static final ArmPosition ARM_MIN_POSITION =
       new ArmPosition(-6, 0, -21788, ArmHeight.NOT_SPECIFIED);
@@ -291,6 +290,8 @@ public final class Constants {
   public static final ArmPosition HIGH_CUBE_ARM_POSITION =
       new ArmPosition(Math.toRadians(34.94), 360 * 10.35, 3498, ArmHeight.HIGH);
   public static final ArmPosition HIGH_CONE_ARM_POSITION =
+      new ArmPosition(Math.toRadians(45.5), 4600, -21000, ArmHeight.HIGH);
+      public static final ArmPosition HIGHER_CONE_ARM_POSITION =
       new ArmPosition(Math.toRadians(45.5), 4800, -21000, ArmHeight.HIGH);
   public static final ArmPosition SINGLE_SUBSTATION_CONE_POSITION =
       new ArmPosition(
@@ -304,6 +305,9 @@ public final class Constants {
 
   public static final ArmPosition BACKWARDS_HIGH_CONE =
       new ArmPosition(Math.toRadians(125), 8.2 * 360, 16000, ArmHeight.NOT_SPECIFIED);
+      
+  public static final ArmPosition SELF_RIGHT = 
+      new ArmPosition(Math.toRadians(125), 0, 0, ArmHeight.HIGH);
 
   // A value between 0 and 1.
   public static final double RAINBOW_ANIMATION_SPEED = 0.5;
