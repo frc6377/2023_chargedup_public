@@ -1,8 +1,5 @@
 package frc.robot.commands;
 
-import java.time.Instant;
-
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -11,8 +8,8 @@ import frc.robot.subsystems.EndAffectorSubsystem;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
 
-public class LeftThreeElement extends SequentialCommandGroup {
-  public LeftThreeElement(
+public class RightThreeElement extends SequentialCommandGroup {
+  public RightThreeElement(
       DrivetrainSubsystem drive,
       SwerveAutoFactory factory,
       ArmSubsystem arm,
@@ -35,20 +32,20 @@ public class LeftThreeElement extends SequentialCommandGroup {
                 new WaitCommand(0.5)
                     .andThen(
                         factory
-                            .generateCommandFromFile("PickFirstElementBlue", true, 3, 2.5)
+                            .generateCommandFromFile("PickFirstElementRight", true, 3, 2.5)
                             .andThen(new InstantCommand(() -> endAffector.idle())))),
         new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3)
             .andThen(
                 new WaitCommand(1)
                     .andThen(new ArmPowerCommand(Constants.HIGH_CUBE_ARM_POSITION, arm, 3)))
-            .alongWith(factory.generateCommandFromFile("ScoreFirstElementBlue", false, 3, 2)),
+            .alongWith(factory.generateCommandFromFile("ScoreFirstElementRight", false, 3, 2.5)),
         new WaitCommand(0.25),
         new InstantCommand(() -> endAffector.fastOutake()),
         new WaitCommand(0.25),
         new InstantCommand(() -> endAffector.halt()),
         new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3)
             .alongWith(new WaitCommand(0.25)
-                .andThen(factory.generateCommandFromFile("PickSecondElementBlue", true, 3, 2.5))) //yes this should be true
+                .andThen(factory.generateCommandFromFile("PickSecondElementRight", true, 3, 2.5))) //yes this should be true
             .alongWith(new WaitCommand(2)
                 .andThen(new ArmPowerCommand(Constants.LOW_CUBE_ARM_POSITION, arm, 3)))
             .alongWith(new WaitCommand(0.25)
@@ -56,7 +53,7 @@ public class LeftThreeElement extends SequentialCommandGroup {
         new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3)
             .andThen(new WaitCommand(2)
                 .andThen(new ArmPowerCommand(Constants.MID_CUBE_ARM_POSITION, arm, 3)))
-            .alongWith(factory.generateCommandFromFile("ScoreSecondElementBlue", false, 3, 2)),
+            .alongWith(factory.generateCommandFromFile("ScoreSecondElementRight", false, 3, 2)),
             new WaitCommand(0.25),
             new InstantCommand(()-> endAffector.fastOutake()),
             new WaitCommand(0.25),
