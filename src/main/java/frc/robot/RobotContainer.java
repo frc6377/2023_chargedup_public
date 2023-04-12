@@ -155,7 +155,9 @@ public class RobotContainer {
     Trigger intakeButton = driver.leftTrigger(0.3);
     Trigger shootButton = driver.rightTrigger(0.3);
 
-    intakeButton.whileTrue(new IntakeCommand(endAffector, colorStrip));
+    intakeButton.whileTrue(
+        new IntakeCommand(
+            endAffector, colorStrip, gamePieceModeConsumer, gamePieceModeSupplier, arm));
 
     DoubleSupplier shootSupplier = driver::getRightTriggerAxis;
 
