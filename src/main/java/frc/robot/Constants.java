@@ -146,7 +146,7 @@ public final class Constants {
   public static final double ARM_WEIGHT_KG = 5.4;
   public static final double ARM_ANGLE_AT_REST = Math.toRadians(9.3);
 
-  public static final double END_AFFECTOR_INTAKE_SPEED = 0.9;
+  public static final double END_AFFECTOR_INTAKE_SPEED = 1;
   public static final double END_AFFECTOR_OUTTAKE_SPEED = 0.3;
   public static final double END_AFFECTOR_SLOW_OUTTAKE_SPEED = 0.075;
   public static final double END_AFFECTOR_IDLE_SPEED = 0.1;
@@ -166,8 +166,8 @@ public final class Constants {
 
   // Wrist
   public static final double WRIST_KP = 0.1;
-  public static final double WRIST_MAX_VELOCITY = 1.5 * 5000;
-  public static final double WRIST_MAX_ACCELLERATION = 1.5 * 5000;
+  public static final double WRIST_MAX_VELOCITY = 3 * 5000;
+  public static final double WRIST_MAX_ACCELLERATION = 3 * 5000;
   public static final double WRIST_MOMENT_OF_INERTIA = 0;
   public static final double WRIST_GEAR_RATIO = 1.0 / 41.67;
   public static final double WRIST_ROTATION_STOWED = 0;
@@ -209,7 +209,7 @@ public final class Constants {
   public static final double FIELD_Y = 8.02;
 
   // otf pathing constants
-  public static final double AUTO_MAX_VELOCITY = 4.0;
+  public static final double AUTO_MAX_VELOCITY = 2.0;
   public static final double AUTO_MAX_ACCELERATION = 2.0;
 
   // relative distance from your alliance station wall or the left of the field depending on axis.
@@ -263,12 +263,11 @@ public final class Constants {
   public static final double ARM_ALLOWED_ANGLE_ERROR = 0.001;
   public static final double ARM_ALLOWED_EXTENSION_ERROR = 0.0254;
   public static final int BREAK_VICTOR_ID = 7;
-  public static final double SHOULDER_CANCODER_OFFSET = 109.6;
+  public static final double SHOULDER_CANCODER_OFFSET = 105.996;
 
   public static final int WRIST_CANCODER_ID = 14;
-  public static final double WRIST_CANCODER_OFFSET = 105.205;
-
-  public static final ArmPosition ARM_MAX_POSITION =
+  public static final double WRIST_CANCODER_OFFSET = 51.328;
+public static final ArmPosition ARM_MAX_POSITION =
       new ArmPosition(110, 360 * 13.8, 22002, ArmHeight.NOT_SPECIFIED);
   public static final ArmPosition ARM_MIN_POSITION =
       new ArmPosition(-6, 0, -21788, ArmHeight.NOT_SPECIFIED);
@@ -286,12 +285,14 @@ public final class Constants {
   public static final ArmPosition MID_CUBE_ARM_POSITION =
       new ArmPosition(Math.toRadians(35), 360.0 * 5.95, -2358, ArmHeight.MID);
   public static final ArmPosition MID_CONE_ARM_POSITION =
-      new ArmPosition(Math.toRadians(42.75), 360.0 * 9.16, -21787, ArmHeight.MID);
+      new ArmPosition(Math.toRadians(44.75), 360.0 * 7.5, -21787, ArmHeight.MID);
 
   public static final ArmPosition HIGH_CUBE_ARM_POSITION =
       new ArmPosition(Math.toRadians(34.94), 360 * 10.35, 3498, ArmHeight.HIGH);
   public static final ArmPosition HIGH_CONE_ARM_POSITION =
-      new ArmPosition(Math.toRadians(47.5), 4800, -21000, ArmHeight.HIGH);
+      new ArmPosition(Math.toRadians(45.5), 4600, -21000, ArmHeight.HIGH);
+      public static final ArmPosition HIGHER_CONE_ARM_POSITION =
+      new ArmPosition(Math.toRadians(45.5), 4800, -21000, ArmHeight.HIGH);
   public static final ArmPosition SINGLE_SUBSTATION_CONE_POSITION =
       new ArmPosition(
           Math.toRadians(48.416748), 6.591797, -12481.000000, ArmHeight.SINGLE_SUBSTATION);
@@ -299,10 +300,16 @@ public final class Constants {
         new ArmPosition(Math.toRadians(60), 880, -21000, ArmHeight.DOUBLE_SUBSTATION);
 
   public static final ArmPosition HYBRID_CUBE_ARM_POSITION =
-      new ArmPosition(Math.toRadians(-7.5), 0, 23001, ArmHeight.LOW);
+      new ArmPosition(Math.toRadians(-7.5), 360, 23001, ArmHeight.LOW);
 
   public static final ArmPosition HYBRID_CONE_ARM_POSITION =
       new ArmPosition(Math.toRadians(35), 360, -27000, ArmHeight.LOW);
+
+  public static final ArmPosition BACKWARDS_HIGH_CONE =
+      new ArmPosition(Math.toRadians(125), 8.2 * 360, 16000, ArmHeight.NOT_SPECIFIED);
+      
+  public static final ArmPosition SELF_RIGHT = 
+      new ArmPosition(Math.toRadians(125), 0, 0, ArmHeight.HIGH);
 
   // A value between 0 and 1.
   public static final double RAINBOW_ANIMATION_SPEED = 0.5;
@@ -313,7 +320,6 @@ public final class Constants {
 
   public static final int GAME_PIECE_DETECTION_VELOCITY = 5;
   public static final double GAME_PIECE_DETECTION_WAIT = 0.3;
-  public static final double HAS_GAME_PIECE_SIGNAL_TIME = 1;
   public static final double RUMBLE_INTENSITY = 0.5;
   public static final double FLASHING_TIME = 0.2;
 }

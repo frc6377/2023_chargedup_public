@@ -96,7 +96,7 @@ public class ArmSubsystem extends SubsystemBase {
     shoulderPPC = new ProfiledPIDController(2, 0, 0, new TrapezoidProfile.Constraints(4, 4));
     elevatorPPC =
         new ProfiledPIDController(
-            0.002, 0, 0.000000015, new TrapezoidProfile.Constraints(2 * 19200, 2000));
+            0.002, 0, 0.000000015, new TrapezoidProfile.Constraints(2 * 19200, 2500));
 
     shoulderPPC.setTolerance(0.02);
     elevatorPPC.setTolerance(10);
@@ -152,18 +152,20 @@ public class ArmSubsystem extends SubsystemBase {
     double shoulderOutput;
     shoulderOutput = computeShoulderOutput();
 
-    DeltaBoard.putNumber("Shoulder Output", shoulderOutput);
+    // DeltaBoard.putNumber("Shoulder Output", shoulderOutput);
     leftShoulder.set(shoulderOutput);
-    DeltaBoard.putNumber("Reported Shoulder Output", rightShoulder.get());
+    // DeltaBoard.putNumber("Reported Shoulder Output", rightShoulder.get());
 
-    DeltaBoard.putNumber("arb ffw", computeShoulderArbitraryFeedForward());
+    // DeltaBoard.putNumber("arb ffw", computeShoulderArbitraryFeedForward());
     DeltaBoard.putNumber("Arm Extension (encoder pos)", elevatorCANCoder.getPosition());
-    DeltaBoard.putNumber("elevator setpoint raw", armPosition.armExtension);
-    DeltaBoard.putNumber("Elevator ffw", computeElevatorFeedForward());
+    // DeltaBoard.putNumber("elevator setpoint raw", armPosition.armExtension);
+    // DeltaBoard.putNumber("Elevator ffw", computeElevatorFeedForward());
 
     DeltaBoard.putNumber("Wrist Position (Ticks)", wristMotor.getSelectedSensorPosition());
     DeltaBoard.putNumber("shoulder angle (degrees)", Math.toDegrees(shoulderThetaFromCANCoder()));
-    DeltaBoard.putNumber("Elevator Target (meters)", currentArmExtenstionMeters());
+    // DeltaBoard.putNumber("Elevator Target (meters)", currentArmExtenstionMeters());
+
+    DeltaBoard.putNumber("Elevator Temp C", extendMotor.getMotorTemperature());
   }
 
   public void setElevatorPercent(double elevatorPercentOutput) {
@@ -185,7 +187,7 @@ public class ArmSubsystem extends SubsystemBase {
     shoulderPPC.setGoal(this.armPosition.armRotation);
     elevatorPPC.setGoal(this.armPosition.armExtension);
     wristMotor.set(ControlMode.MotionMagic, this.armPosition.wristRotation);
-    DeltaBoard.putNumber("Shoulder Target", armPosition.armRotation);
+    // DeltaBoard.putNumber("Shoulder Target", armPosition.armRotation);
   }
 
   /**
@@ -210,12 +212,12 @@ public class ArmSubsystem extends SubsystemBase {
     double numMotors = 2;
     double torque = Math.cos(theta) * 9.81 * mass * centerOfMass;
     double out = torque / (Constants.STALLED_TORQUE * 0.85 * gearRatio * numMotors);
-    DeltaBoard.putNumber("shoulder arb ffw", out);
+    // DeltaBoard.putNumber("shoulder arb ffw", out);
     return out;
   }
 
   private double computeCenterOfMass() {
-    return (Math.abs(elevatorCANCoder.getAbsolutePosition() / 360) / 12 * 1.1175) + 0.4825;
+    return ((Math.abs(elevatorCANCoder.getPosition() / 360) / 12.77) * 0.62992) + 0.457;
   }
 
   public static double rotationArbitraryFeetForward(
@@ -237,7 +239,7 @@ public class ArmSubsystem extends SubsystemBase {
     double rawPos = shoulderCANCoder.getPosition();
     DeltaBoard.putNumber("raw CANcoder", rawPos);
     double theta = Math.toRadians(rawPos * (6.0 / 16.0));
-    DeltaBoard.putNumber("shoulder theta", theta);
+    // DeltaBoard.putNumber("shoulder theta", theta);
     return theta;
   }
 
@@ -263,7 +265,7 @@ public class ArmSubsystem extends SubsystemBase {
   private double computeElevatorOutput() {
     double output =
         elevatorPPC.calculate(elevatorCANCoder.getPosition()) + computeElevatorFeedForward();
-    DeltaBoard.putNumber("elevator output", output);
+    // DeltaBoard.putNumber("elevator output", output);
     return output;
   }
 
@@ -279,7 +281,7 @@ public class ArmSubsystem extends SubsystemBase {
   private double computeElevatorFeedForward() {
     double theta = shoulderThetaFromCANCoder();
     double magicNumberThatMakesItWork = 0.5;
-    double mass = 4.15 - magicNumberThatMakesItWork;
+    double mass = 4.2 - magicNumberThatMakesItWork;
     double stallLoad = 22.929;
     return (mass * Math.sin(theta)) / stallLoad;
   }
@@ -354,5 +356,13 @@ public class ArmSubsystem extends SubsystemBase {
       System.out.println("zero rejected! PPC goal not zero!");
       return false;
     }
+  }
+
+  public ArmPosition getUnbindPosition() {
+    return new ArmPosition(
+        shoulderThetaFromCANCoder() + Math.toRadians(5),
+        extendEncoder.getPosition(),
+        wristMotor.getSelectedSensorPosition(),
+        ArmHeight.NOT_SPECIFIED);
   }
 }

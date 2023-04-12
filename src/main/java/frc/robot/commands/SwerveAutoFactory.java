@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
 import frc.robot.FieldPoses;
-import frc.robot.networktables.DeltaBoard;
 import frc.robot.networktables.Pose2DSubscriber;
 import frc.robot.networktables.Topics;
 import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
@@ -43,10 +42,13 @@ public class SwerveAutoFactory {
   // loads a trajectory from file and hands it to the command generator
   public SequentialCommandGroup generateCommandFromFile(String pathTofollow, boolean isFirstPath) {
 
-    createFieldPoses(); // create a field poses object if we dont have one already
+    return generateCommandFromFile(pathTofollow, isFirstPath, maxVelocity, maxAcceleration);
+  }
 
-    PathPlannerTrajectory trajectory =
-        PathPlanner.loadPath(pathTofollow, maxVelocity, maxAcceleration);
+  public SequentialCommandGroup generateCommandFromFile(
+      String pathTofollow, boolean isFirstPath, double Velo, double accel) {
+    createFieldPoses(); // create a field poses object if we dont have one already
+    PathPlannerTrajectory trajectory = PathPlanner.loadPath(pathTofollow, Velo, accel);
     return generateControllerCommand(isFirstPath, trajectory);
   }
 
@@ -61,6 +63,7 @@ public class SwerveAutoFactory {
 
     Rotation2d deliveryRotation = fieldPoses.getDeliveryRotation();
     Pose2d currentPose = sub.get();
+
     Translation2d firstTarget =
         targetPose; // this variable tracks the pose of the second control point in the trajectory
     // so that our first control point's heading will face it
@@ -73,8 +76,8 @@ public class SwerveAutoFactory {
     Zone currentZone = getZone(currentPose.getY());
     Proximity currentProximity = getProx(currentPose.getX());
 
-    DeltaBoard.putString("proximity", currentProximity.name());
-    DeltaBoard.putString("zone", currentZone.name());
+    // DeltaBoard.putString("proximity", currentProximity.name());
+    // DeltaBoard.putString("zone", currentZone.name());
 
     // build our midpoints first
     switch (currentProximity) {
@@ -206,13 +209,44 @@ public class SwerveAutoFactory {
         new Pose2d(fieldPoses.getDoubleSubstation(), fieldPoses.getDeliveryRotation()));
   }
 
+  public Command generateStrafeCommand() {
+    createFieldPoses();
+
+    Pose2d endPoint = new Pose2d(fieldPoses.getBay(0).getX(), 0, fieldPoses.getDeliveryRotation());
+
+    ArrayList<PathPoint> points = new ArrayList<PathPoint>();
+    // Pose2d currentPose = sub.get();
+    Pose2d currentPose =
+        new Pose2d(fieldPoses.getDoubleSubstation().getX(), 0, fieldPoses.getSingleSubRotation());
+
+    points.add(
+        poseToPathPoint(
+            currentPose,
+            Math.hypot(
+                drivetrainSubsystem.getChassisSpeeds().vxMetersPerSecond,
+                drivetrainSubsystem.getChassisSpeeds().vyMetersPerSecond),
+            headingBetweenPoints(currentPose.getTranslation(), endPoint.getTranslation())));
+
+    points.add(
+        poseToPathPoint(
+            endPoint,
+            -1,
+            headingBetweenPoints(currentPose.getTranslation(), endPoint.getTranslation())
+                .rotateBy(new Rotation2d(Math.PI))));
+
+    PathConstraints constraints = new PathConstraints(5000, 1000);
+    PathPlannerTrajectory trajectory = PathPlanner.generatePath(constraints, points);
+
+    return generateControllerCommand(false, trajectory);
+  }
+
   public SequentialCommandGroup generateControllerCommand(
       boolean isFirstPath, PathPlannerTrajectory trajectory) {
 
     PIDController thetaController = new PIDController(2, 0, 0);
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
-    PPSwerveControllerCommand command =
+    Command command =
         new PPSwerveControllerCommand(
             trajectory,
             sub::get,
@@ -228,10 +262,21 @@ public class SwerveAutoFactory {
         && isFirstPath) { // checks if we have a pose reseter and if we want to reset our pose. If
       // we
       // do we want to overwrite whatever the kalman filter has. Mostly for auton
-
-      poseReseter.accept(trajectory.getInitialHolonomicPose());
+      command =
+          new InstantCommand(
+                  () -> {
+                    System.out.println("Reset POSE!!");
+                    poseReseter.accept(trajectory.getInitialHolonomicPose());
+                  })
+              .andThen(command);
     }
-    drivetrainSubsystem.sendTrajectoryToNT(trajectory); // posts trajectory to dashboard
+    command =
+        new InstantCommand(() -> drivetrainSubsystem.sendTrajectoryToNT(trajectory))
+            .andThen(command); // posts trajectory to dashboard
+    command =
+        new InstantCommand(
+                () -> System.out.println("starting path----------------------------------"))
+            .andThen(command);
 
     // run the command and than stop the drivetrain. Just to make sure we arent moving at the end
     return command.andThen(
