@@ -19,7 +19,7 @@ public class LeftThreeElement extends SequentialCommandGroup {
       EndAffectorSubsystem endAffector) {
     addCommands(
         new InstantCommand(() -> endAffector.halt()),
-        new ArmPowerCommand(Constants.BACKWARDS_HIGH_CONE, arm, 3),
+        new ArmPowerCommand(Constants.BACKWARDS_MID_CONE, arm, 3),
         new WaitCommand(0.25),
         new InstantCommand(
             () -> {
