@@ -7,7 +7,7 @@ import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
 
 public class RoutineFactory {
-  private final LeftTwoElement leftTwoElement;
+  private final LeftThreeElement leftTwoElement;
   private final LeftTwoElementNoClimb leftTwoElementNoClimb;
   private final MiddleClimb middleClimb;
   private final OnlyPreload preloadOnly;
@@ -21,7 +21,7 @@ public class RoutineFactory {
       DrivetrainSubsystem drive,
       SwerveAutoFactory factory) {
     preloadOnly = new OnlyPreload(arm);
-    leftTwoElement = new LeftTwoElement(drive, factory, arm, endAffector);
+    leftTwoElement = new LeftThreeElement(drive, factory, arm, endAffector);
     leftTwoElementNoClimb = new LeftTwoElementNoClimb(drive, factory, arm, endAffector);
     middleClimb = new MiddleClimb(drive, factory, arm, endAffector);
     rightTwoElement = new RightTwoElement(drive, factory, arm, endAffector);

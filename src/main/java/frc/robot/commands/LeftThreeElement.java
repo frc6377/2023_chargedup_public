@@ -39,25 +39,25 @@ public class LeftThreeElement extends SequentialCommandGroup {
                             .andThen(new InstantCommand(() -> endAffector.idle())))),
         new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3)
             .andThen(
-                new WaitCommand(1)
+                new WaitCommand(0.75)
                     .andThen(new ArmPowerCommand(Constants.HIGH_CUBE_ARM_POSITION, arm, 3)))
-            .alongWith(factory.generateCommandFromFile("ScoreFirstElementBlue", false, 3, 2)),
-        new WaitCommand(0.25),
+            .alongWith(factory.generateCommandFromFile("ScoreFirstElementBlue", false, 3, 2.5)),
+        new WaitCommand(0.0),
         new InstantCommand(() -> endAffector.fastOutake()),
         new WaitCommand(0.25),
         new InstantCommand(() -> endAffector.halt()),
-        new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3)
-            .alongWith(new WaitCommand(0.25)
+        new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3).andThen(new WaitCommand(0.25)
+        .andThen(new ArmPowerCommand(Constants.LOW_CUBE_ARM_POSITION, arm, 3)))
+            .alongWith(new WaitCommand(0.0)
                 .andThen(factory.generateCommandFromFile("PickSecondElementBlue", true, 3, 2.5))) //yes this should be true
-            .alongWith(new WaitCommand(2)
-                .andThen(new ArmPowerCommand(Constants.LOW_CUBE_ARM_POSITION, arm, 3)))
+            
             .alongWith(new WaitCommand(0.25)
                 .andThen(new InstantCommand(()-> endAffector.intake()))),
         new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3)
-            .andThen(new WaitCommand(2)
+            .andThen(new WaitCommand(0.5).andThen(new InstantCommand(()-> endAffector.idle()))
                 .andThen(new ArmPowerCommand(Constants.MID_CUBE_ARM_POSITION, arm, 3)))
-            .alongWith(factory.generateCommandFromFile("ScoreSecondElementBlue", false, 3, 2)),
-            new WaitCommand(0.25),
+            .alongWith(factory.generateCommandFromFile("ScoreSecondElementBlue", false, 3, 2.5)),
+            new WaitCommand(0.0),
             new InstantCommand(()-> endAffector.fastOutake()),
             new WaitCommand(0.25),
             new InstantCommand(()-> endAffector.halt()),
