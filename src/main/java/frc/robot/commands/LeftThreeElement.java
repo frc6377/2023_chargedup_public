@@ -41,12 +41,12 @@ public class LeftThreeElement extends SequentialCommandGroup {
             .andThen(
                 new WaitCommand(0.75)
                     .andThen(new ArmPowerCommand(Constants.HIGH_CUBE_ARM_POSITION, arm, 3)))
-            .alongWith(factory.generateCommandFromFile("ScoreFirstElementBlue", false, 4, 3)),
+            .alongWith(factory.generateCommandFromFile("ScoreFirstElementBlue", false, 4, 2.9)),
         new WaitCommand(0.0),
         new InstantCommand(() -> endAffector.fastOutake()),
         new WaitCommand(0.25),
         new InstantCommand(() -> endAffector.halt()),
-        new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3).andThen(new WaitCommand(0.25)
+        new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3).andThen(new WaitCommand(0.0)
         .andThen(new ArmPowerCommand(Constants.LOW_CUBE_ARM_POSITION, arm, 3)))
             .alongWith(new WaitCommand(0.0)
                 .andThen(factory.generateCommandFromFile("PickSecondElementBlue", true, 3, 2.5))) //yes this should be true
@@ -57,7 +57,7 @@ public class LeftThreeElement extends SequentialCommandGroup {
             .andThen(new WaitCommand(0.5).andThen(new InstantCommand(()-> endAffector.idle()))
                 .andThen(new ArmPowerCommand(Constants.MID_CUBE_ARM_POSITION, arm, 3)).andThen(new InstantCommand(()-> endAffector.fastOutake())))
             .alongWith(factory.generateCommandFromFile("ScoreSecondElementBlue", false, 3, 3)),
-            new WaitCommand(0.25),
+            new WaitCommand(0.1),
             new InstantCommand(()-> endAffector.halt()),
             new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3));
   }
