@@ -35,13 +35,13 @@ public class LeftThreeElement extends SequentialCommandGroup {
                 new WaitCommand(0.5)
                     .andThen(
                         factory
-                            .generateCommandFromFile("PickFirstElementBlue", true, 3, 2.5)
+                            .generateCommandFromFile("PickFirstElementBlue", true, 4, 2.5)
                             .andThen(new InstantCommand(() -> endAffector.idle())))),
         new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3)
             .andThen(
                 new WaitCommand(0.75)
                     .andThen(new ArmPowerCommand(Constants.HIGH_CUBE_ARM_POSITION, arm, 3)))
-            .alongWith(factory.generateCommandFromFile("ScoreFirstElementBlue", false, 3, 2.5)),
+            .alongWith(factory.generateCommandFromFile("ScoreFirstElementBlue", false, 4, 2.5)),
         new WaitCommand(0.0),
         new InstantCommand(() -> endAffector.fastOutake()),
         new WaitCommand(0.25),
@@ -55,10 +55,8 @@ public class LeftThreeElement extends SequentialCommandGroup {
                 .andThen(new InstantCommand(()-> endAffector.intake()))),
         new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3)
             .andThen(new WaitCommand(0.5).andThen(new InstantCommand(()-> endAffector.idle()))
-                .andThen(new ArmPowerCommand(Constants.MID_CUBE_ARM_POSITION, arm, 3)))
+                .andThen(new ArmPowerCommand(Constants.MID_CUBE_ARM_POSITION, arm, 3)).andThen(new InstantCommand(()-> endAffector.fastOutake())))
             .alongWith(factory.generateCommandFromFile("ScoreSecondElementBlue", false, 3, 2.5)),
-            new WaitCommand(0.0),
-            new InstantCommand(()-> endAffector.fastOutake()),
             new WaitCommand(0.25),
             new InstantCommand(()-> endAffector.halt()),
             new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3));
