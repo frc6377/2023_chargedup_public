@@ -39,10 +39,9 @@ public class LeftThreeElement extends SequentialCommandGroup {
                             .andThen(new InstantCommand(() -> endAffector.idle())))),
         new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3)
             .andThen(
-                new WaitCommand(0.75)
+                new WaitCommand(0.5)
                     .andThen(new ArmPowerCommand(Constants.HIGH_CUBE_ARM_POSITION, arm, 3)))
             .alongWith(factory.generateCommandFromFile("ScoreFirstElementBlue", false, 4, 2.9)),
-        new WaitCommand(0.0),
         new InstantCommand(() -> endAffector.fastOutake()),
         new WaitCommand(0.25),
         new InstantCommand(() -> endAffector.halt()),
@@ -58,7 +57,6 @@ public class LeftThreeElement extends SequentialCommandGroup {
                 .andThen(new ArmPowerCommand(Constants.MID_CUBE_ARM_POSITION, arm, 3)).andThen(new InstantCommand(()-> endAffector.fastOutake())))
             .alongWith(factory.generateCommandFromFile("ScoreSecondElementBlue", false, 3, 3)),
             new WaitCommand(0.1),
-            new InstantCommand(()-> endAffector.halt()),
-            new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3));
+            factory.generateCommandFromFile("BackupBlue", false).alongWith(new InstantCommand(()-> endAffector.halt())).alongWith(new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3)));
   }
 }
