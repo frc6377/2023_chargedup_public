@@ -53,8 +53,8 @@ public class LeftThreeElement extends SequentialCommandGroup {
             .alongWith(new WaitCommand(0.25)
                 .andThen(new InstantCommand(()-> endAffector.intake()))),
         new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3)
-            .andThen(new WaitCommand(0.5).andThen(new InstantCommand(()-> endAffector.idle()))
-                .andThen(new ArmPowerCommand(Constants.MID_CUBE_ARM_POSITION, arm, 3)).andThen(new InstantCommand(()-> endAffector.fastOutake())))
+            .andThen(new WaitCommand(0.25).andThen(new InstantCommand(()-> endAffector.idle()))
+                .andThen(new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3)).andThen(new InstantCommand(()-> endAffector.fastOutake())))
             .alongWith(factory.generateCommandFromFile("ScoreSecondElementBlue", false, 3, 3)),
             new WaitCommand(0.1),
             factory.generateCommandFromFile("BackupBlue", false).alongWith(new InstantCommand(()-> endAffector.halt())).alongWith(new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3)));
