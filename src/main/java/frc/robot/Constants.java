@@ -307,7 +307,7 @@ public static final ArmPosition ARM_MAX_POSITION =
       new ArmPosition(Math.toRadians(125), 8.2 * 360, 16000, ArmHeight.NOT_SPECIFIED);
 
   public static final ArmPosition BACKWARDS_MID_CONE = 
-      new ArmPosition(Math.toRadians(115), 0, 18000, ArmHeight.NOT_SPECIFIED);
+      new ArmPosition(Math.toRadians(111), 100, 14900, ArmHeight.NOT_SPECIFIED);
       
   public static final ArmPosition SELF_RIGHT = 
       new ArmPosition(Math.toRadians(125), 0, 0, ArmHeight.HIGH);
