@@ -35,7 +35,7 @@ public class EndAffectorSubsystem extends SubsystemBase {
   }
 
   public void fastOutake() {
-    motor.set(-Constants.END_AFFECTOR_OUTTAKE_SPEED * ((gamePieceMode.isCube()) ? -1 : 30));
+    motor.set(-Constants.END_AFFECTOR_OUTTAKE_SPEED * ((gamePieceMode.isCube()) ? -300 : 30));
   }
 
   public double getIntakePosition() {

@@ -308,6 +308,9 @@ public static final ArmPosition ARM_MAX_POSITION =
 
   public static final ArmPosition BACKWARDS_MID_CONE = 
       new ArmPosition(Math.toRadians(111), 300, 15900, ArmHeight.NOT_SPECIFIED);
+
+  public static final ArmPosition AUTON_SAFECHUCK =
+      new ArmPosition(Math.toRadians(20), 0, 17000, ArmHeight.NOT_SPECIFIED);
       
   public static final ArmPosition SELF_RIGHT = 
       new ArmPosition(Math.toRadians(125), 0, 0, ArmHeight.HIGH);
