@@ -31,11 +31,11 @@ public class EndAffectorSubsystem extends SubsystemBase {
   }
 
   public void intake() {
-    // motor.set(Constants.END_AFFECTOR_INTAKE_SPEED * ((gamePieceMode.isCube()) ? -1 : 1));
+    motor.set(Constants.END_AFFECTOR_INTAKE_SPEED * ((gamePieceMode.isCube()) ? -1 : 1));
   }
 
   public void fastOutake() {
-    // motor.set(-Constants.END_AFFECTOR_OUTTAKE_SPEED * ((gamePieceMode.isCube()) ? -1 : 30));
+    motor.set(-Constants.END_AFFECTOR_OUTTAKE_SPEED * ((gamePieceMode.isCube()) ? -1 : 30));
   }
 
   public double getIntakePosition() {
@@ -43,11 +43,11 @@ public class EndAffectorSubsystem extends SubsystemBase {
   }
 
   public void partialEject(double target) {
-    // motor.set(ControlMode.Position, target);
+    motor.set(ControlMode.Position, target);
   }
 
   public void slowOutake() {
-    // motor.set(-Constants.END_AFFECTOR_SLOW_OUTTAKE_SPEED * ((gamePieceMode.isCube()) ? -1 : 300));
+    motor.set(-Constants.END_AFFECTOR_SLOW_OUTTAKE_SPEED * ((gamePieceMode.isCube()) ? -1 : 300));
   }
 
   public void halt() {
@@ -55,7 +55,7 @@ public class EndAffectorSubsystem extends SubsystemBase {
   }
 
   public void idle() {
-    // motor.set(Constants.END_AFFECTOR_IDLE_SPEED * ((gamePieceMode.isCube()) ? -1 : 1));
+    motor.set(Constants.END_AFFECTOR_IDLE_SPEED * ((gamePieceMode.isCube()) ? -1 : 1));
   }
 
   public double getVelocity() {
