@@ -3,6 +3,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.commands.autos.LeftThreeElement;
+import frc.robot.commands.autos.LeftTwoElement;
 import frc.robot.commands.autos.LeftTwoElementNoClimb;
 import frc.robot.commands.autos.LeftVolumeAuto;
 import frc.robot.commands.autos.MiddleClimb;
@@ -14,7 +15,7 @@ import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
 
 public class RoutineFactory {
-  private final LeftThreeElement leftTwoElement;
+  private final LeftTwoElement leftTwoElement;
   private final LeftTwoElementNoClimb leftTwoElementNoClimb;
   private final MiddleClimb middleClimb;
   private final OnlyPreload preloadOnly;
@@ -22,6 +23,7 @@ public class RoutineFactory {
   private final RightTwoElementNoClimb rightTwoElementNoClimb;
   private final LeftVolumeAuto leftVolume;
   private final RightThreeElement rightThreeElement;
+  private final LeftThreeElement leftThreeElement;
 
   public RoutineFactory(
       ArmSubsystem arm,
@@ -29,13 +31,14 @@ public class RoutineFactory {
       DrivetrainSubsystem drive,
       SwerveAutoFactory factory) {
     preloadOnly = new OnlyPreload(arm);
-    leftTwoElement = new LeftThreeElement(drive, factory, arm, endAffector);
+    leftTwoElement = new LeftTwoElement(drive, factory, arm, endAffector);
     leftTwoElementNoClimb = new LeftTwoElementNoClimb(drive, factory, arm, endAffector);
     middleClimb = new MiddleClimb(drive, factory, arm, endAffector);
     rightTwoElement = new RightTwoElement(drive, factory, arm, endAffector);
     rightTwoElementNoClimb = new RightTwoElementNoClimb(drive, factory, arm, endAffector);
     leftVolume = new LeftVolumeAuto(drive, factory, endAffector, arm);
     rightThreeElement = new RightThreeElement(drive, factory, arm, endAffector);
+    leftThreeElement = new LeftThreeElement(drive, factory, arm, endAffector);
   }
 
   public Command getAuto(Routines routine) {
@@ -67,6 +70,10 @@ public class RoutineFactory {
 
       case LEFT_VOLUME:
         return leftVolume;
+      
+        
+      case LEFT_3_ELEMENT_NOCLIMB:
+        return leftThreeElement;
 
       default:
         System.out.println("NO VALID AUTO FOUND! RUNNING NOTHING");
@@ -83,6 +90,7 @@ public class RoutineFactory {
     LEFT_2_ELEMENT_NOCLIMB,
     RIGHT_2_ELEMENT_NOCLIMB,
     LEFT_VOLUME, 
-    RIGHT_3_ELEMENT_NOCLIMB
+    RIGHT_3_ELEMENT_NOCLIMB,
+    LEFT_3_ELEMENT_NOCLIMB
   }
 }

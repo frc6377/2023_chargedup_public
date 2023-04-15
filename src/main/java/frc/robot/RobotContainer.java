@@ -315,6 +315,7 @@ public class RobotContainer {
     autoChooser.addOption("right 2 element no climb", Routines.RIGHT_2_ELEMENT_NOCLIMB);
     autoChooser.addOption("right 3 element no climb", Routines.RIGHT_3_ELEMENT_NOCLIMB);
     autoChooser.addOption("left volume", Routines.LEFT_VOLUME);
+    autoChooser.addOption("left 3 element no climb", Routines.LEFT_3_ELEMENT_NOCLIMB);
     SmartDashboard.putData(autoChooser);
   }
 
