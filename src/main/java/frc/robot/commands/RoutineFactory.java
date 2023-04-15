@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.commands.autos.BumpSideThreeElementLeft;
 import frc.robot.commands.autos.LeftThreeElement;
 import frc.robot.commands.autos.LeftTwoElement;
 import frc.robot.commands.autos.LeftTwoElementNoClimb;
@@ -15,7 +16,7 @@ import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
 
 public class RoutineFactory {
-  private final LeftTwoElement leftTwoElement;
+  private final BumpSideThreeElementLeft leftTwoElement;
   private final LeftTwoElementNoClimb leftTwoElementNoClimb;
   private final MiddleClimb middleClimb;
   private final OnlyPreload preloadOnly;
@@ -31,7 +32,7 @@ public class RoutineFactory {
       DrivetrainSubsystem drive,
       SwerveAutoFactory factory) {
     preloadOnly = new OnlyPreload(arm);
-    leftTwoElement = new LeftTwoElement(drive, factory, arm, endAffector);
+    leftTwoElement = new BumpSideThreeElementLeft(drive, factory, arm, endAffector);
     leftTwoElementNoClimb = new LeftTwoElementNoClimb(drive, factory, arm, endAffector);
     middleClimb = new MiddleClimb(drive, factory, arm, endAffector);
     rightTwoElement = new RightTwoElement(drive, factory, arm, endAffector);

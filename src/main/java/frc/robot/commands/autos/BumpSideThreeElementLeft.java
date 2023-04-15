@@ -34,7 +34,9 @@ public class BumpSideThreeElementLeft extends SequentialCommandGroup {
                 new WaitCommand(0.5)
                     .andThen(
                         factory
-                            .generateCommandFromFile("PickFirstElementBlue", true, 4, 3)
+                            .generateCommandFromFile("PickFirstElementBumpsideBlue", true, 4, 3)
+                            .andThen(factory.generateCommandFromFile("BumpsideBlueBump", false, 1, 1))
+                            .andThen(factory.generateCommandFromFile("BumpsideBlueMoreFirst", false, 4, 3))
                             .andThen(new InstantCommand(() -> endAffector.idle())))),
         new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3)
             .andThen(

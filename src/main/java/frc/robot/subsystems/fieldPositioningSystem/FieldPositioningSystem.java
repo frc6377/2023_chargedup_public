@@ -35,7 +35,7 @@ public class FieldPositioningSystem extends SubsystemBase {
 
   private Pose2d currentRobotPose;
   private Pigeon2 inertialMeasurementUnit;
-  private boolean camerasEnabled = false;
+  private boolean camerasEnabled = true;
   private Supplier<SwerveModuleState[]> swerveOdomSupplier;
   private SwerveDrivePoseEstimator swerveDriveOdometry;
   private CameraInterperter[] cameras;
@@ -52,7 +52,7 @@ public class FieldPositioningSystem extends SubsystemBase {
   }
 
   public FieldPositioningSystem() {
-    SmartDashboard.putBoolean("Use Rejection", false);
+    SmartDashboard.putBoolean("Use Rejection", true);
     final String aprilTagFileLocation =
         Filesystem.getDeployDirectory().getAbsolutePath() + "/2023-Apriltaglocation.json";
     try {
@@ -268,7 +268,7 @@ public class FieldPositioningSystem extends SubsystemBase {
       initalPose = initalPose.plus(estimatedPoses.get(i).times(confidence.get(i)));
       sum += confidence.get(i);
     }
-    Pose2d estiamtedPose = new Pose2d(initalPose.div(sum), getCurrentRobotRotationXY());
+    Pose2d estiamtedPose = new Pose2d(initalPose.div(sum), swerveDriveOdometry.getEstimatedPosition().getRotation());
     swerveDriveOdometry.addVisionMeasurement(estiamtedPose, averageRecordTime);
   }
 

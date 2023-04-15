@@ -130,6 +130,7 @@ public class RobotContainer {
     DoubleSupplier gunnerLeftYSupplier = gunner::getLeftY;
     DoubleSupplier gunnerRightYSupplier = gunner::getRightY;
     Trigger gunnerHybridButton = gunner.rightBumper();
+    Trigger driverFunnyButton = driver.povUp();
 
     DriveCommand driveCommand =
         new DriveCommand(
@@ -154,6 +155,7 @@ public class RobotContainer {
 
     Trigger intakeButton = driver.leftTrigger(0.3);
     Trigger shootButton = driver.rightTrigger(0.3);
+
 
     intakeButton.whileTrue(new IntakeCommand(endAffector, colorStrip));
 
