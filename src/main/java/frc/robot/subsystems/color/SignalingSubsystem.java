@@ -31,7 +31,8 @@ public class SignalingSubsystem extends SubsystemBase {
 
   private GamePieceMode mode;
   private boolean hasGamePiece;
-  private Timer flashTimer = new Timer();
+  private final Timer flashTimer = new Timer();
+  private final Timer gamePieceSignalingTimer = new Timer();
   private boolean flashOn = true;
   private final Consumer<Double> driverRumbleConsumer;
 
@@ -39,7 +40,6 @@ public class SignalingSubsystem extends SubsystemBase {
 
   public SignalingSubsystem(
       int gamePieceID, final GamePieceMode gamePieceMode, Consumer<Double> driverRumbleConsumer) {
-
     this.mode = gamePieceMode;
     this.driverRumbleConsumer = driverRumbleConsumer;
 
@@ -92,13 +92,19 @@ public class SignalingSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     if (DriverStation.isDisabled()) updatePattern();
-    if (mode.shouldFlash()) {
-      if (flashTimer.get() > Constants.FLASHING_TIME) {
+    else if (mode.shouldFlash()) {
+      if (flashTimer.hasElapsed(Constants.FLASHING_TIME)) {
         flashTimer.reset();
         flashOn = !flashOn;
         if (flashOn) writeLEDsGamePiece(mode.color());
         else writeLEDsGamePiece(RGB.BLACK);
       }
+    }
+    if (!hasGamePiece && gamePieceSignalingTimer.hasElapsed(Constants.GAME_PIECE_SIGNALING_TIME)) {
+      driverRumbleConsumer.accept(0.0);
+      updateLEDs();
+      gamePieceSignalingTimer.reset();
+      gamePieceSignalingTimer.stop();
     }
   }
 
@@ -110,8 +116,8 @@ public class SignalingSubsystem extends SubsystemBase {
 
   public void hasGamePieceSignalStop() {
     hasGamePiece = false;
-    driverRumbleConsumer.accept(0.0);
-    updateLEDs();
+    gamePieceSignalingTimer.reset();
+    gamePieceSignalingTimer.start();
   }
 
   private void clearLEDsGamePiece() {

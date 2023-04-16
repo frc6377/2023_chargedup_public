@@ -291,11 +291,13 @@ public static final ArmPosition ARM_MAX_POSITION =
       new ArmPosition(Math.toRadians(34.94), 360 * 10.35, 3498, ArmHeight.HIGH);
   public static final ArmPosition HIGH_CONE_ARM_POSITION =
       new ArmPosition(Math.toRadians(45.5), 4600, -21000, ArmHeight.HIGH);
-      public static final ArmPosition HIGHER_CONE_ARM_POSITION =
+  public static final ArmPosition HIGHER_CONE_ARM_POSITION =
       new ArmPosition(Math.toRadians(45.5), 4800, -21000, ArmHeight.HIGH);
   public static final ArmPosition SINGLE_SUBSTATION_CONE_POSITION =
       new ArmPosition(
           Math.toRadians(48.416748), 6.591797, -12481.000000, ArmHeight.SINGLE_SUBSTATION);
+  public static final ArmPosition DOUBLE_SUBSTATION_CONE_POSITION =
+      new ArmPosition(Math.toRadians(60), 880, -21000, ArmHeight.DOUBLE_SUBSTATION);
 
   public static final ArmPosition HYBRID_CUBE_ARM_POSITION =
       new ArmPosition(Math.toRadians(-7.5), 360, 23001, ArmHeight.LOW);
@@ -322,9 +324,9 @@ public static final ArmPosition ARM_MAX_POSITION =
   public static final int ELEVATOR_ZERO_AMPRAGE = 20;
   public static final double ELEVATOR_ZEROING_TIME_SECONDS = 0.2;
 
-  public static final int GAME_PIECE_DETECTION_VELOCITY = 5;
-  public static final double GAME_PIECE_DETECTION_WAIT = 0.3;
-  public static final double HAS_GAME_PIECE_SIGNAL_TIME = 1;
-  public static final double RUMBLE_INTENSITY = 0.5;
+  public static final int GAME_PIECE_DETECTION_VELOCITY = 500;
+  public static final double GAME_PIECE_DETECTION_WAIT = 0.1;
+  public static final double RUMBLE_INTENSITY = 0.75;
+  public static final double GAME_PIECE_SIGNALING_TIME = 0.5;
   public static final double FLASHING_TIME = 0.2;
 }
