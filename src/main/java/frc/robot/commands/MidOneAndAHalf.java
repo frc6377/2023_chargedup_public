@@ -35,11 +35,11 @@ public class MidOneAndAHalf extends SequentialCommandGroup {
                 new WaitCommand(0.5)
                     .andThen(factory
                     .generateCommandFromFile("MobilityMiddle", true, 1, 1))
-                    .andThen(new WaitCommand(0.5))
+                  
                     ),
         new InstantCommand(() -> endAffector.idle()),
-        new ArmPowerCommand(Constants.STOWED_ARM_POSITION, arm, 3),
-        factory.generateCommandFromFile("MobilityBalance", false),
+        new ArmPowerCommand(Constants.STOWED_ARM_POSITION, arm, 3).alongWith(
+        factory.generateCommandFromFile("MobilityBalance", false)),
         new AutoBalanceCommand(drive));
   }
 }
