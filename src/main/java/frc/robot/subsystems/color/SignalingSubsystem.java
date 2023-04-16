@@ -92,8 +92,8 @@ public class SignalingSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     if (DriverStation.isDisabled()) updatePattern();
-    if (mode.shouldFlash()) {
-      if (flashTimer.get() > Constants.FLASHING_TIME) {
+    else if (mode.shouldFlash()) {
+      if (flashTimer.hasElapsed(Constants.FLASHING_TIME)) {
         flashTimer.reset();
         flashOn = !flashOn;
         if (flashOn) writeLEDsGamePiece(mode.color());
