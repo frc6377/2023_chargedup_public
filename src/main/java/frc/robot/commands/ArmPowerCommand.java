@@ -50,7 +50,7 @@ public class ArmPowerCommand extends CommandBase {
       this.targetWristAngle = targetPosition.getWristRotation();
       targetHeight = targetPosition.getHeight();
     }
-    
+
     initalPose =
         new PolarPoint(
             armSubsystem.shoulderThetaFromCANCoder(), armSubsystem.currentArmExtenstionMeters());

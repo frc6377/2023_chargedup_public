@@ -41,7 +41,7 @@ public class SwitchSingleSubstationMode extends CommandBase {
       endAffectorSubsystem.setGamePiece(GamePieceMode.SINGLE_SUBSTATION);
       colorSubsystem.setGamePiece(GamePieceMode.SINGLE_SUBSTATION);
     }
-    armSubsystem.setTarget(Constants.STOWED_ARM_POSITION);
+    armSubsystem.setTarget(Constants.HYBRID_CUBE_ARM_POSITION);
   }
 
   public boolean isFinished() {

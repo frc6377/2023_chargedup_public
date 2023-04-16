@@ -155,9 +155,7 @@ public class RobotContainer {
     Trigger intakeButton = driver.leftTrigger(0.3);
     Trigger shootButton = driver.rightTrigger(0.3);
 
-    intakeButton.whileTrue(
-        new IntakeCommand(
-            endAffector, colorStrip, gamePieceModeConsumer, gamePieceModeSupplier, arm));
+    intakeButton.whileTrue(new IntakeCommand(endAffector, colorStrip, arm));
 
     DoubleSupplier shootSupplier = driver::getRightTriggerAxis;
 
@@ -196,8 +194,6 @@ public class RobotContainer {
 
     Trigger driverStowed = driver.x();
     Trigger gunnerStowed = gunner.x();
-
-
 
     gunnerStowed.onTrue(new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3));
     driverStowed.onTrue(
@@ -240,7 +236,9 @@ public class RobotContainer {
         .or(gunnerRightY)
         .onTrue(new ArmManualCommand(gunnerLeftYSupplier, gunnerRightYSupplier, arm));
 
-    gunnerSelfRight1.and(gunnerSelfRight2).onTrue(new ArmPowerCommand(Constants.SELF_RIGHT, arm, 3));
+    gunnerSelfRight1
+        .and(gunnerSelfRight2)
+        .onTrue(new ArmPowerCommand(Constants.SELF_RIGHT, arm, 3));
     gunnerLowButton
         .and(() -> gamePieceMode.isCube())
         .onTrue(new ArmPowerCommandWithZero(Constants.LOW_CUBE_ARM_POSITION, arm, 3));
@@ -258,7 +256,10 @@ public class RobotContainer {
         .onTrue(new ArmPowerCommand(Constants.HIGH_CUBE_ARM_POSITION, arm, 3));
     gunnerHighButton
         .and(() -> gamePieceMode.isCone())
-        .onTrue(new ArmPowerCommand(Constants.HIGH_CONE_ARM_POSITION, arm, 3).andThen(new InstantCommand(() -> arm.setTarget(Constants.HIGHER_CONE_ARM_POSITION))));
+        .onTrue(
+            new ArmPowerCommand(Constants.HIGH_CONE_ARM_POSITION, arm, 3)
+                .andThen(
+                    new InstantCommand(() -> arm.setTarget(Constants.HIGHER_CONE_ARM_POSITION))));
     gunnerHybridButton
         .and(() -> gamePieceMode.isCube())
         .onTrue(new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3));
