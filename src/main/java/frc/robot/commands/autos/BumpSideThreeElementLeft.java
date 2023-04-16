@@ -38,7 +38,7 @@ public class BumpSideThreeElementLeft extends SequentialCommandGroup {
                             .andThen(new WaitCommand(0.25)))),
                             new InstantCommand(() -> endAffector.idle()),
         new ArmPowerCommand(Constants.AUTON_SAFECHUCK, arm, 3)
-            .alongWith(factory.generateCommandFromFile("BumpSideBlueBowlFirst", false, 4, 2.5)).alongWith(new WaitCommand(1.5).andThen(new InstantCommand(() -> endAffector.fastOutake()))),
+            .alongWith(factory.generateCommandFromFile("BumpSideBlueBowlFirst", false, 4, 2.5)).alongWith(new WaitCommand(1.2).andThen(new InstantCommand(() -> endAffector.fastOutake()))),
         
         new WaitCommand(0.25),
         new InstantCommand(() -> endAffector.halt()),
