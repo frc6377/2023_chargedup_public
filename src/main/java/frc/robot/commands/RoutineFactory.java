@@ -3,6 +3,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.commands.autos.BumpSideThreeElementLeft;
+import frc.robot.commands.autos.BumpSideThreeElementRight;
 import frc.robot.commands.autos.LeftThreeElement;
 import frc.robot.commands.autos.LeftTwoElement;
 import frc.robot.commands.autos.LeftTwoElementNoClimb;
@@ -27,6 +28,7 @@ public class RoutineFactory {
   private final LeftThreeElement leftThreeElement;
   private final BumpSideThreeElementLeft leftBumpsideThreeElement;
   private final MidOneAndAHalf midOnePlusGrab;
+  private final BumpSideThreeElementRight rightBumpsideThreeElement;
 
   public RoutineFactory(
       ArmSubsystem arm,
@@ -44,6 +46,7 @@ public class RoutineFactory {
     leftThreeElement = new LeftThreeElement(drive, factory, arm, endAffector);
     leftBumpsideThreeElement = new BumpSideThreeElementLeft(drive, factory, arm, endAffector);
     midOnePlusGrab = new MidOneAndAHalf(drive, factory, arm, endAffector);
+    rightBumpsideThreeElement = new BumpSideThreeElementRight(drive, factory, arm, endAffector);
   }
 
   public Command getAuto(Routines routine) {
@@ -86,6 +89,9 @@ public class RoutineFactory {
       case MID_1_AND_GRAB:
         return midOnePlusGrab;
 
+      case RIGHT_BUMPSIDE_3_ELEMENT:
+        return rightBumpsideThreeElement;
+
       default:
         System.out.println("NO VALID AUTO FOUND! RUNNING NOTHING");
         return new InstantCommand();
@@ -104,6 +110,7 @@ public class RoutineFactory {
     RIGHT_3_ELEMENT_NOCLIMB,
     LEFT_3_ELEMENT_NOCLIMB,
     LEFT_BUMPSIDE_3_ELEMENT,
-    MID_1_AND_GRAB
+    MID_1_AND_GRAB,
+    RIGHT_BUMPSIDE_3_ELEMENT
   }
 }

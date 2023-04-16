@@ -10,8 +10,8 @@ import frc.robot.subsystems.EndAffectorSubsystem;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
 
-public class BumpSideThreeElementLeft extends SequentialCommandGroup {
-  public BumpSideThreeElementLeft(
+public class BumpSideThreeElementRight extends SequentialCommandGroup {
+  public BumpSideThreeElementRight(
       DrivetrainSubsystem drive,
       SwerveAutoFactory factory,
       ArmSubsystem arm,
@@ -34,25 +34,25 @@ public class BumpSideThreeElementLeft extends SequentialCommandGroup {
                 new WaitCommand(0.5)
                     .andThen(
                         factory
-                            .generateCommandFromFile("PickFirstElementBumpsideBlue", true, 4, 2.5)
+                            .generateCommandFromFile("PickFirstElementBumpsideRight", true, 4, 2.5)
                             .andThen(new WaitCommand(0.25)))),
                             new InstantCommand(() -> endAffector.idle()),
         new ArmPowerCommand(Constants.AUTON_SAFECHUCK, arm, 3)
-            .alongWith(factory.generateCommandFromFile("BumpSideBlueBowlFirst", false, 4, 2.5)).alongWith(new WaitCommand(1.1).andThen(new InstantCommand(() -> endAffector.fastOutake()))),
+            .alongWith(factory.generateCommandFromFile("BumpSideRightBowlFirst", false, 4, 2.5)).alongWith(new WaitCommand(1.2).andThen(new InstantCommand(() -> endAffector.fastOutake()))),
         
         new WaitCommand(0.25),
         new InstantCommand(() -> endAffector.halt()),
         new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3).andThen(new WaitCommand(0.0)
         .andThen(new ArmPowerCommand(Constants.LOW_CUBE_ARM_POSITION, arm, 3)))
             .alongWith(new WaitCommand(0.0)
-                .andThen(factory.generateCommandFromFile("BumpSideBluePickSecond", false, 3, 2.5)))
+                .andThen(factory.generateCommandFromFile("BumpSideRightPickSecond", false, 3, 2.5)))
             
             .alongWith(new WaitCommand(0.25)
                 .andThen(new InstantCommand(()-> endAffector.intake()))),
         new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3)
-            .andThen(new WaitCommand(1).andThen(new InstantCommand(()-> endAffector.idle()))
+            .andThen(new WaitCommand(0.75).andThen(new InstantCommand(()-> endAffector.idle()))
                 .andThen(new ArmPowerCommand(Constants.HIGH_CUBE_ARM_POSITION, arm, 3)).andThen(new InstantCommand(()-> endAffector.fastOutake())))
-            .alongWith(factory.generateCommandFromFile("BumpSideBlueScoreSecond", false, 3, 3)),
+            .alongWith(factory.generateCommandFromFile("BumpSideRightScoreSecond", false, 3, 3)),
             new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3)
             );
 
