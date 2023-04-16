@@ -18,8 +18,8 @@ public class BumpSideThreeElementLeft extends SequentialCommandGroup {
       EndAffectorSubsystem endAffector) {
     addCommands(
         new InstantCommand(() -> endAffector.halt()),
-        new ArmPowerCommand(Constants.BACKWARDS_MID_CONE, arm, 3),
-        new WaitCommand(0.25),
+        new ArmPowerCommand(Constants.BACKWARDS_HIGH_CONE, arm, 3),
+        new WaitCommand(1),
         new InstantCommand(
             () -> {
               endAffector.setCube();
@@ -29,15 +29,16 @@ public class BumpSideThreeElementLeft extends SequentialCommandGroup {
               endAffector.intake();
             }),
         new WaitCommand(0.25),
-        new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3).andThen(new WaitCommand(0.6)).andThen(new ArmPowerCommand(Constants.LOW_CUBE_ARM_POSITION, arm, 3))
+        new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3).andThen(new WaitCommand(0.5)).andThen(new ArmPowerCommand(Constants.LOW_CUBE_ARM_POSITION, arm, 3))
             .alongWith(
                 new WaitCommand(0.5)
                     .andThen(
                         factory
                             .generateCommandFromFile("PickFirstElementBumpsideBlue", true, 4, 2.5)
-                            .andThen(new InstantCommand(() -> endAffector.idle())))),
+                            .andThen(new WaitCommand(0.25)))),
+                            new InstantCommand(() -> endAffector.idle()),
         new ArmPowerCommand(Constants.AUTON_SAFECHUCK, arm, 3)
-            .alongWith(factory.generateCommandFromFile("BumpSideBlueBowlFirst", false, 4, 2.5)).alongWith(new WaitCommand(1.4).andThen(new InstantCommand(() -> endAffector.fastOutake()))),
+            .alongWith(factory.generateCommandFromFile("BumpSideBlueBowlFirst", false, 4, 2.5)).alongWith(new WaitCommand(1.2).andThen(new InstantCommand(() -> endAffector.fastOutake()))),
         
         new WaitCommand(0.25),
         new InstantCommand(() -> endAffector.halt()),
@@ -50,7 +51,7 @@ public class BumpSideThreeElementLeft extends SequentialCommandGroup {
                 .andThen(new InstantCommand(()-> endAffector.intake()))),
         new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3)
             .andThen(new WaitCommand(0.75).andThen(new InstantCommand(()-> endAffector.idle()))
-                .andThen(new ArmPowerCommand(Constants.MID_CUBE_ARM_POSITION, arm, 3)).andThen(new InstantCommand(()-> endAffector.fastOutake())))
+                .andThen(new ArmPowerCommand(Constants.HIGH_CUBE_ARM_POSITION, arm, 3)).andThen(new InstantCommand(()-> endAffector.fastOutake())))
             .alongWith(factory.generateCommandFromFile("BumpSideBlueScoreSecond", false, 3, 3)),
             new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3)
             );

@@ -35,7 +35,7 @@ public class FieldPositioningSystem extends SubsystemBase {
 
   private Pose2d currentRobotPose;
   private Pigeon2 inertialMeasurementUnit;
-  private boolean camerasEnabled = true;
+  private boolean camerasEnabled = false;
   private Supplier<SwerveModuleState[]> swerveOdomSupplier;
   private SwerveDrivePoseEstimator swerveDriveOdometry;
   private CameraInterperter[] cameras;
