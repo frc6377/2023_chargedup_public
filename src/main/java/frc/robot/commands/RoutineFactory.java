@@ -25,6 +25,7 @@ public class RoutineFactory {
   private final LeftVolumeAuto leftVolume;
   private final RightThreeElement rightThreeElement;
   private final LeftThreeElement leftThreeElement;
+  private final BumpSideThreeElementLeft leftBumpsideThreeElement;
 
   public RoutineFactory(
       ArmSubsystem arm,
@@ -40,6 +41,7 @@ public class RoutineFactory {
     leftVolume = new LeftVolumeAuto(drive, factory, endAffector, arm);
     rightThreeElement = new RightThreeElement(drive, factory, arm, endAffector);
     leftThreeElement = new LeftThreeElement(drive, factory, arm, endAffector);
+    leftBumpsideThreeElement = new BumpSideThreeElementLeft(drive, factory, arm, endAffector);
   }
 
   public Command getAuto(Routines routine) {
@@ -76,6 +78,9 @@ public class RoutineFactory {
       case LEFT_3_ELEMENT_NOCLIMB:
         return leftThreeElement;
 
+      case LEFT_BUMPSIDE_3_ELEMENT:
+        return leftBumpsideThreeElement;
+
       default:
         System.out.println("NO VALID AUTO FOUND! RUNNING NOTHING");
         return new InstantCommand();
@@ -92,6 +97,7 @@ public class RoutineFactory {
     RIGHT_2_ELEMENT_NOCLIMB,
     LEFT_VOLUME, 
     RIGHT_3_ELEMENT_NOCLIMB,
-    LEFT_3_ELEMENT_NOCLIMB
+    LEFT_3_ELEMENT_NOCLIMB,
+    LEFT_BUMPSIDE_3_ELEMENT
   }
 }
