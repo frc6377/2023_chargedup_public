@@ -297,7 +297,7 @@ public static final ArmPosition ARM_MAX_POSITION =
       new ArmPosition(
           Math.toRadians(48.416748), 6.591797, -12481.000000, ArmHeight.SINGLE_SUBSTATION);
   public static final ArmPosition DOUBLE_SUBSTATION_CONE_POSITION =
-      new ArmPosition(Math.toRadians(60), 880, -21000, ArmHeight.DOUBLE_SUBSTATION);
+      new ArmPosition(Math.toRadians(60), 880+360*1.5, -21000, ArmHeight.DOUBLE_SUBSTATION);
 
   public static final ArmPosition HYBRID_CUBE_ARM_POSITION =
       new ArmPosition(Math.toRadians(-7.5), 360, 23001, ArmHeight.LOW);
