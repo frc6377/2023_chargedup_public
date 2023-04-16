@@ -26,6 +26,7 @@ public class RoutineFactory {
   private final RightThreeElement rightThreeElement;
   private final LeftThreeElement leftThreeElement;
   private final BumpSideThreeElementLeft leftBumpsideThreeElement;
+  private final MidOneAndAHalf midOnePlusGrab;
 
   public RoutineFactory(
       ArmSubsystem arm,
@@ -42,6 +43,7 @@ public class RoutineFactory {
     rightThreeElement = new RightThreeElement(drive, factory, arm, endAffector);
     leftThreeElement = new LeftThreeElement(drive, factory, arm, endAffector);
     leftBumpsideThreeElement = new BumpSideThreeElementLeft(drive, factory, arm, endAffector);
+    midOnePlusGrab = new MidOneAndAHalf(drive, factory, arm, endAffector);
   }
 
   public Command getAuto(Routines routine) {
@@ -81,6 +83,9 @@ public class RoutineFactory {
       case LEFT_BUMPSIDE_3_ELEMENT:
         return leftBumpsideThreeElement;
 
+      case MID_1_AND_GRAB:
+        return midOnePlusGrab;
+
       default:
         System.out.println("NO VALID AUTO FOUND! RUNNING NOTHING");
         return new InstantCommand();
@@ -98,6 +103,7 @@ public class RoutineFactory {
     LEFT_VOLUME, 
     RIGHT_3_ELEMENT_NOCLIMB,
     LEFT_3_ELEMENT_NOCLIMB,
-    LEFT_BUMPSIDE_3_ELEMENT
+    LEFT_BUMPSIDE_3_ELEMENT,
+    MID_1_AND_GRAB
   }
 }

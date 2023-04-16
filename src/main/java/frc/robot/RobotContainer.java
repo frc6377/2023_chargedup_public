@@ -319,6 +319,7 @@ public class RobotContainer {
     autoChooser.addOption("left volume", Routines.LEFT_VOLUME);
     autoChooser.addOption("left 3 element no climb", Routines.LEFT_3_ELEMENT_NOCLIMB);
     autoChooser.addOption("left bumpside 3 element", Routines.LEFT_BUMPSIDE_3_ELEMENT);
+    autoChooser.addOption("mid 1.5 and mobility", Routines.MID_1_AND_GRAB);
     SmartDashboard.putData(autoChooser);
   }
 
