@@ -55,7 +55,7 @@ public class RightThreeElement extends SequentialCommandGroup {
                 .andThen(new InstantCommand(()-> endAffector.intake()))),
         new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3)
             .andThen(new WaitCommand(0.25).andThen(new InstantCommand(()-> endAffector.idle()))
-                .andThen(new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3)).andThen(new InstantCommand(()-> endAffector.fastOutake())))
+                .andThen(new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3)).alongWith(new WaitCommand(0.2).andThen(new InstantCommand(()-> endAffector.fastOutake()))))
             .alongWith(factory.generateCommandFromFile("ScoreSecondElementRight", false, 3, 3)));
   }
 }
