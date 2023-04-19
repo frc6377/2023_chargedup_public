@@ -266,7 +266,7 @@ public final class Constants {
   public static final double SHOULDER_CANCODER_OFFSET = 105.996;
 
   public static final int WRIST_CANCODER_ID = 14;
-  public static final double WRIST_CANCODER_OFFSET = 111.094;
+  public static final double WRIST_CANCODER_OFFSET = -143.701;
 public static final ArmPosition ARM_MAX_POSITION =
       new ArmPosition(110, 360 * 13.8, 22002, ArmHeight.NOT_SPECIFIED);
   public static final ArmPosition ARM_MIN_POSITION =
@@ -309,7 +309,7 @@ public static final ArmPosition ARM_MAX_POSITION =
       new ArmPosition(Math.toRadians(125), 8.2 * 360, 16000, ArmHeight.NOT_SPECIFIED);
 
   public static final ArmPosition BACKWARDS_MID_CONE = 
-      new ArmPosition(Math.toRadians(111), 300, 15900, ArmHeight.NOT_SPECIFIED);
+      new ArmPosition(Math.toRadians(114.56), 1066, 19660, ArmHeight.NOT_SPECIFIED);
 
   public static final ArmPosition AUTON_SAFECHUCK =
       new ArmPosition(Math.toRadians(20), 0, 17000, ArmHeight.NOT_SPECIFIED);
