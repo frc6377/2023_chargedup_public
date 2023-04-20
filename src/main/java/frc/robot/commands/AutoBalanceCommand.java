@@ -80,6 +80,6 @@ public class AutoBalanceCommand extends CommandBase {
       sign = -roll;
     }
 
-    return Math.copySign(Math.hypot(roll, pitch), sign);
+    return Math.copySign(Math.hypot(roll, pitch), -sign);
   }
 }
