@@ -29,7 +29,7 @@ public class MidOneAndAHalf extends SequentialCommandGroup {
         new WaitCommand(0.25),
         new InstantCommand(() -> endAffector.halt()),
         new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3).andThen(new WaitCommand(2).andThen(
-          new ArmPowerCommand(Constants.LOW_CONE_ARM_POSITION, arm, 3)
+          new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3)
               .alongWith(new InstantCommand(() -> endAffector.intake()))))
             .alongWith(
                 new WaitCommand(0.5)
