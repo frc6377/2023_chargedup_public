@@ -138,8 +138,8 @@ public class ArmSubsystem extends SubsystemBase {
     wristCANCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
     wristCANCoder.configMagnetOffset(Constants.WRIST_CANCODER_OFFSET);
     wristCANCoder.configSensorDirection(true);
-    wristMotor.setSelectedSensorPosition(
-        wristCANCoderToIntegratedSensor(wristCANCoder.getAbsolutePosition()));
+    // wristMotor.setSelectedSensorPosition(
+    //     wristCANCoderToIntegratedSensor(wristCANCoder.getAbsolutePosition()));
 
     System.out.println("Complete Construct ArmSubsystem");
   }
