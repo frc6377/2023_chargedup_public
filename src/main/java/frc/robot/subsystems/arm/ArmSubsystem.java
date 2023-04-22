@@ -164,7 +164,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     // DeltaBoard.putNumber("arb ffw", computeShoulderArbitraryFeedForward());
     DeltaBoard.putNumber("Arm Extension (encoder pos)", elevatorCANCoder.getPosition());
-    // DeltaBoard.putNumber("elevator setpoint raw", armPosition.armExtension);
+    DeltaBoard.putNumber("elevator setpoint raw", armPosition.armExtension);
     // DeltaBoard.putNumber("Elevator ffw", computeElevatorFeedForward());
 
     DeltaBoard.putNumber("Wrist Position (Ticks)", wristMotor.getSelectedSensorPosition());
