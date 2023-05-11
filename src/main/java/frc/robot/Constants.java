@@ -9,6 +9,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.subsystems.arm.ArmHeight;
 import frc.robot.subsystems.arm.ArmPosition;
 import frc.robot.subsystems.drivetrain.config.PodConfig;
+import frc.robot.subsystems.fieldPositioningSystem.CameraInformation;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -301,6 +303,7 @@ public final class Constants {
 
   public static final ArmPosition HYBRID_CONE_ARM_POSITION =
       new ArmPosition(Math.toRadians(35), 360, -27000, ArmHeight.LOW);
+
 
   // A value between 0 and 1.
   public static final double RAINBOW_ANIMATION_SPEED = 0.5;

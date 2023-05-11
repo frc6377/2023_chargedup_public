@@ -21,15 +21,15 @@ class FPSHardware {
   }
 
   private void configCameras(FieldPositioningSystem FPS, FPSConfiguration config) {
-    CameraInterperter[] interperters = new CameraInterperter[config.cameraInformations.length];
-    for (int i = 0; i < config.cameraInformations.length; i++) {
-      CameraInformation camInfo = config.cameraInformations[i];
-      interperters[i] =
-          new CameraInterperter(
-              camInfo.getCameraLocation(),
-              this.fieldPositioningSystem.aprilTagFieldLayout,
-              camInfo.getName());
-    }
-    FPS.setCameras(interperters);
+    // CameraInterperter[] interperters = new CameraInterperter[config.cameraInformations.length];
+    // for (int i = 0; i < config.cameraInformations.length; i++) {
+    //   CameraInformation camInfo = config.cameraInformations[i];
+    //   interperters[i] =
+    //       new CameraInterperter(
+    //           camInfo.getCameraLocation(),
+    //           this.fieldPositioningSystem.aprilTagFieldLayout,
+    //           camInfo.getName());
+    // }
+    // FPS.setCameras(interperters);
   }
 }
