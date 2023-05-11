@@ -20,11 +20,15 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.networktables.DeltaBoard;
 import frc.robot.networktables.Pose2DPublisher;
 import frc.robot.networktables.Topics;
+
+import java.io.Console;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 import org.photonvision.EstimatedRobotPose;
@@ -39,7 +43,8 @@ public class FieldPositioningSystem extends SubsystemBase {
   private boolean camerasEnabled = false;
   private Supplier<SwerveModuleState[]> swerveOdomSupplier;
   private SwerveDrivePoseEstimator swerveDriveOdometry;
-  private CameraInterperter[] cameras;
+  private CameraInterperter leftCamera;
+  private CameraInterperter rightCamera;
   private final Pose2DPublisher pub = Topics.PoseTopic().publish();
   private final DoubleArrayPublisher yprPub =
       NetworkTableInstance.getDefault().getDoubleArrayTopic("pitch").publish();
@@ -62,7 +67,8 @@ public class FieldPositioningSystem extends SubsystemBase {
       throw new FieldPositioningSystemError(
           "ERROR: Apriltag location file (" + aprilTagFileLocation + ") not found", e);
     }
-
+    leftCamera = new CameraInterperter(FPSConfiguration.leftCamera);
+    rightCamera = new CameraInterperter(FPSConfiguration.rightCamera);
     currentSwervePodPosition =
         new SwerveModulePosition[] {
           new SwerveModulePosition(),
@@ -137,6 +143,12 @@ public class FieldPositioningSystem extends SubsystemBase {
     yprPub.accept(ypr);
     yprOmegaPub.accept(yprVelocity);
     DeltaBoard.putString("pose", currentRobotPose.getX() + " " + currentRobotPose.getY());
+    
+    List<MXPlusBLine> allCameraPotentialPositionLines = leftCamera.getPotentialPositionsLines(ypr[0]);
+    allCameraPotentialPositionLines.addAll(rightCamera.getPotentialPositionsLines(ypr[0]));
+    if(allCameraPotentialPositionLines.size()>=2){
+      allCameraPotentialPositionLines.get(0)
+    }
   }
 
   /**

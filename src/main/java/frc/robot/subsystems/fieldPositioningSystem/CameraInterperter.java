@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -37,15 +38,22 @@ class CameraInterperter {
     return camera.getLatestResult().hasTargets();
   }
 
-  public MXPlusBLine getPotentialPositionsLine (double robotHeading) {
-    if(!hasTarget()) return null;
-    PhotonTrackedTarget bestTarget = camera.getLatestResult().getBestTarget();
-    double aprilTagAngle = bestTarget.getYaw();
+  public List<MXPlusBLine> getPotentialPositionsLines(double robotHeading){
+    List<PhotonTrackedTarget> targets = camera.getLatestResult().targets;
+    ArrayList<MXPlusBLine> lines = new ArrayList<>(); 
+
+    targets.forEach((x) -> {lines.add(getPotentialPositionsLine(robotHeading, x));});
+    return lines;
+    
+  }
+  //robotHeading is in Radians
+  public MXPlusBLine getPotentialPositionsLine (double robotHeading, PhotonTrackedTarget target) {
+    double aprilTagAngle = target.getYaw();
     double cameraAngleFrom0 = robotHeading + angularPosition;
     double cameraYawFrom0 = robotHeading + yaw;
     double slope = Math.tan(cameraYawFrom0 + aprilTagAngle);
-    double aprilTagX = aprilTags.getTagPose(bestTarget.getFiducialId()).get().getX();
-    double aprilTagY = aprilTags.getTagPose(bestTarget.getFiducialId()).get().getY();
+    double aprilTagX = aprilTags.getTagPose(target.getFiducialId()).get().getX();
+    double aprilTagY = aprilTags.getTagPose(target.getFiducialId()).get().getY();
     double cameraXRelativeToRobot = Math.cos(cameraAngleFrom0)*distanceFromCenter;
     double cameraYRelativeToRobot = Math.sin(cameraAngleFrom0)*distanceFromCenter;
     double b = aprilTagY-cameraYRelativeToRobot-(aprilTagX-cameraXRelativeToRobot)*slope;
