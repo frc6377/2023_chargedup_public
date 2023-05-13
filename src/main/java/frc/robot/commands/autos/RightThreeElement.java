@@ -46,16 +46,25 @@ public class RightThreeElement extends SequentialCommandGroup {
         new InstantCommand(() -> endAffector.fastOutake()),
         new WaitCommand(0.25),
         new InstantCommand(() -> endAffector.halt()),
-        new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3).andThen(new WaitCommand(0.0)
-        .andThen(new ArmPowerCommand(Constants.LOW_CUBE_ARM_POSITION, arm, 3)))
-            .alongWith(new WaitCommand(0.0)
-                .andThen(factory.generateCommandFromFile("PickSecondElementRight", true, 3, 2.5))) //yes this should be true
-            
-            .alongWith(new WaitCommand(0.25)
-                .andThen(new InstantCommand(()-> endAffector.intake()))),
         new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3)
-            .andThen(new WaitCommand(1).andThen(new InstantCommand(()-> endAffector.idle()))
-                .andThen(new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3)))
-            .alongWith(factory.generateCommandFromFile("ScoreSecondElementRight", false, 3, 3).andThen(new InstantCommand(()-> endAffector.fastOutake()))));
+            .andThen(
+                new WaitCommand(0.0)
+                    .andThen(new ArmPowerCommand(Constants.LOW_CUBE_ARM_POSITION, arm, 3)))
+            .alongWith(
+                new WaitCommand(0.0)
+                    .andThen(
+                        factory.generateCommandFromFile(
+                            "PickSecondElementRight", true, 3, 2.5))) // yes this should be true
+            .alongWith(
+                new WaitCommand(0.25).andThen(new InstantCommand(() -> endAffector.intake()))),
+        new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3)
+            .andThen(
+                new WaitCommand(1)
+                    .andThen(new InstantCommand(() -> endAffector.idle()))
+                    .andThen(new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3)))
+            .alongWith(
+                factory
+                    .generateCommandFromFile("ScoreSecondElementRight", false, 3, 3)
+                    .andThen(new InstantCommand(() -> endAffector.fastOutake()))));
   }
 }

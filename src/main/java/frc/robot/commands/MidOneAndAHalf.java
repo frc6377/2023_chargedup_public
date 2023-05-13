@@ -28,18 +28,18 @@ public class MidOneAndAHalf extends SequentialCommandGroup {
             }),
         new WaitCommand(0.25),
         new InstantCommand(() -> endAffector.halt()),
-        new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3).andThen(new WaitCommand(2).andThen(
-          new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3)
-              .alongWith(new InstantCommand(() -> endAffector.intake()))))
+        new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3)
+            .andThen(
+                new WaitCommand(2)
+                    .andThen(
+                        new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3)
+                            .alongWith(new InstantCommand(() -> endAffector.intake()))))
             .alongWith(
                 new WaitCommand(0.5)
-                    .andThen(factory
-                    .generateCommandFromFile("MobilityMiddle", true, 1, 1))
-                  
-                    ),
+                    .andThen(factory.generateCommandFromFile("MobilityMiddle", true, 1, 1))),
         new InstantCommand(() -> endAffector.idle()),
-        new ArmPowerCommand(Constants.STOWED_ARM_POSITION, arm, 3).alongWith(
-        factory.generateCommandFromFile("MobilityBalance", false)),
+        new ArmPowerCommand(Constants.STOWED_ARM_POSITION, arm, 3)
+            .alongWith(factory.generateCommandFromFile("MobilityBalance", false)),
         new AutoBalanceCommand(drive));
   }
 }

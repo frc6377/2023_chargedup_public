@@ -100,7 +100,7 @@ class CameraInterperter {
     filter = ambiguityFilter(filter);
     filter = visibityFilter(filter);
     filter = minTargets(filter);
-    if(filter != null) filter.setTimestampSeconds(rawData.getTimestampSeconds());
+    if (filter != null) filter.setTimestampSeconds(rawData.getTimestampSeconds());
     return filter;
   }
 
@@ -141,8 +141,7 @@ class CameraInterperter {
                 .transformBy(target.getBestCameraToTarget().inverse())
                 .transformBy(robotToCamera.inverse());
 
-        if ((targetID == 4 || targetID == 5) &&
-         estimatedRobotPose.getX() < xSubstationMinLimit
+        if ((targetID == 4 || targetID == 5) && estimatedRobotPose.getX() < xSubstationMinLimit
             || estimatedRobotPose.getX() > xSubstationMaxLimit) {
           accepted.add(target);
         } else if (estimatedRobotPose.getX() < xMinLimit || estimatedRobotPose.getX() > xMaxLimit) {

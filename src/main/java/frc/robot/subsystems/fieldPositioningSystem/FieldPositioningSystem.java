@@ -268,7 +268,8 @@ public class FieldPositioningSystem extends SubsystemBase {
       initalPose = initalPose.plus(estimatedPoses.get(i).times(confidence.get(i)));
       sum += confidence.get(i);
     }
-    Pose2d estiamtedPose = new Pose2d(initalPose.div(sum), swerveDriveOdometry.getEstimatedPosition().getRotation());
+    Pose2d estiamtedPose =
+        new Pose2d(initalPose.div(sum), swerveDriveOdometry.getEstimatedPosition().getRotation());
     swerveDriveOdometry.addVisionMeasurement(estiamtedPose, averageRecordTime);
   }
 

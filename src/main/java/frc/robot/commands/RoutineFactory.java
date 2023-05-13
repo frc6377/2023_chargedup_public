@@ -72,14 +72,13 @@ public class RoutineFactory {
 
       case RIGHT_2_ELEMENT_NOCLIMB:
         return rightTwoElementNoClimb;
-      
+
       case RIGHT_3_ELEMENT_NOCLIMB:
         return rightThreeElement;
 
       case LEFT_VOLUME:
         return leftVolume;
-      
-        
+
       case LEFT_3_ELEMENT_NOCLIMB:
         return leftThreeElement;
 
@@ -106,7 +105,7 @@ public class RoutineFactory {
     RIGHT_2_ELEMENT_CLIMB,
     LEFT_2_ELEMENT_NOCLIMB,
     RIGHT_2_ELEMENT_NOCLIMB,
-    LEFT_VOLUME, 
+    LEFT_VOLUME,
     RIGHT_3_ELEMENT_NOCLIMB,
     LEFT_3_ELEMENT_NOCLIMB,
     LEFT_BUMPSIDE_3_ELEMENT,

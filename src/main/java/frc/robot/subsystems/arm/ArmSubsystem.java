@@ -150,7 +150,7 @@ public class ArmSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if(DriverStation.isDisabled()){
+    if (DriverStation.isDisabled()) {
       shoulderPPC.setGoal(shoulderThetaFromCANCoder());
       elevatorPPC.setGoal(elevatorCANCoder.getPosition());
     }
