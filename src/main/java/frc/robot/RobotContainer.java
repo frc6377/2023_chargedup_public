@@ -116,7 +116,7 @@ public class RobotContainer {
 
   private void configureBindings() {
     Trigger highGearButton = driver.rightBumper();
-    Trigger strafe = driver.a();
+    Trigger driverPickup = driver.a();
 
     DriverConfig driverConfig = new DriverConfig();
     DoubleSupplier xSupplier =
@@ -141,8 +141,12 @@ public class RobotContainer {
             turnSupplier,
             pointingDriveInput);
 
-    strafe.whileTrue(autoCommand.generateStrafeCommand());
-
+    driverPickup
+        .and(() -> gamePieceMode.isCube())
+        .onTrue(new ArmPowerCommandWithZero(Constants.LOW_CUBE_ARM_POSITION, arm, 3));
+    driverPickup
+        .and(() -> gamePieceMode.isCone())
+        .onTrue(new ArmPowerCommandWithZero(Constants.LOW_CONE_ARM_POSITION, arm, 3));
     // strafe.onTrue(SequentialCommandGroup(Commands.startEnd(()->
     // driveCommand.setDriveType(DriveType.STRAFE),
     // ()->driveCommand.setDriveType(DriveType.CLASSIC), new
