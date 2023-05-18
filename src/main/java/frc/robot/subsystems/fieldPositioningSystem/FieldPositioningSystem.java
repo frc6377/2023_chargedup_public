@@ -67,8 +67,8 @@ public class FieldPositioningSystem extends SubsystemBase {
       throw new FieldPositioningSystemError(
           "ERROR: Apriltag location file (" + aprilTagFileLocation + ") not found", e);
     }
-    leftCamera = new CameraInterperter(FPSConfiguration.leftCamera);
-    rightCamera = new CameraInterperter(FPSConfiguration.rightCamera);
+    leftCamera = new CameraInterperter(aprilTagFieldLayout, FPSConfiguration.leftCamera);
+    rightCamera = new CameraInterperter(aprilTagFieldLayout, FPSConfiguration.rightCamera);
     currentSwervePodPosition =
         new SwerveModulePosition[] {
           new SwerveModulePosition(),

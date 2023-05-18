@@ -27,7 +27,8 @@ class CameraInterperter {
   private final double angularPosition;
   private final double distanceFromCenter;
   private final double yaw;
-  public CameraInterperter (CameraInformation cameraInformation) {
+  public CameraInterperter (AprilTagFieldLayout aprilTags, CameraInformation cameraInformation) {
+    this.aprilTags = aprilTags;
     camera = new PhotonCamera(cameraInformation.getName());
     this.angularPosition = cameraInformation.getTheta();
     this.distanceFromCenter = cameraInformation.getDistanceFromCenter();
@@ -48,6 +49,7 @@ class CameraInterperter {
   }
   //robotHeading is in Radians
   public MXPlusBLine getPotentialPositionsLine (double robotHeading, PhotonTrackedTarget target) {
+    if(target.getFiducialId()>8||target.getFiducialId()<1) return null;
     double aprilTagAngle = target.getYaw();
     double cameraAngleFrom0 = robotHeading + angularPosition;
     double cameraYawFrom0 = robotHeading + yaw;
