@@ -144,10 +144,11 @@ public class FieldPositioningSystem extends SubsystemBase {
     yprOmegaPub.accept(yprVelocity);
     DeltaBoard.putString("pose", currentRobotPose.getX() + " " + currentRobotPose.getY());
     
-    List<MXPlusBLine> allCameraPotentialPositionLines = leftCamera.getPotentialPositionsLines(ypr[0]);
-    allCameraPotentialPositionLines.addAll(rightCamera.getPotentialPositionsLines(ypr[0]));
-    if(allCameraPotentialPositionLines.size()>=2){
-      allCameraPotentialPositionLines.get(0)
+    List<MXPlusBLine> allPotentialPositionLines = leftCamera.getPotentialPositionsLines(ypr[0]);
+    allPotentialPositionLines.addAll(rightCamera.getPotentialPositionsLines(ypr[0]));
+    if(allPotentialPositionLines.size()>=2){
+      Translation2d aprilTagEstimatedPose = allPotentialPositionLines.get(0).getIntersection(allPotentialPositionLines.get(1));
+      field.getObject("Camera Position").setPose(new Pose2d(aprilTagEstimatedPose, getCurrentRobotRotationXY()));
     }
   }
 
