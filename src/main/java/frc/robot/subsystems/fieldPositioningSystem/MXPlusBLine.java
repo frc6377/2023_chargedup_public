@@ -1,4 +1,6 @@
 package frc.robot.subsystems.fieldPositioningSystem;
+import java.util.List;
+
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class MXPlusBLine {
@@ -13,6 +15,9 @@ public class MXPlusBLine {
     }
     public double getY() {
         return this.y;
+    }
+    public Translation2d getYIntersect(){
+        return new Translation2d(0, this.y);
     }
     public Translation2d getIntersection(MXPlusBLine otherLine){
         double intersectionX = (otherLine.getY()-this.y)/(this.slope-otherLine.getSlope());

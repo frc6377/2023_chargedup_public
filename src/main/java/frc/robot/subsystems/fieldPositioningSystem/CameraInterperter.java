@@ -5,6 +5,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagPoseEstimate;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.ArrayList;
@@ -59,6 +60,7 @@ class CameraInterperter {
     double cameraXRelativeToRobot = Math.cos(cameraAngleFrom0)*distanceFromCenter;
     double cameraYRelativeToRobot = Math.sin(cameraAngleFrom0)*distanceFromCenter;
     double b = aprilTagY-cameraYRelativeToRobot-(aprilTagX-cameraXRelativeToRobot)*slope;
+    
     return new MXPlusBLine(slope, b);
   }
 }

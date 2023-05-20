@@ -1,6 +1,10 @@
 package frc.robot.subsystems.fieldPositioningSystem;
 
 import com.ctre.phoenix.sensors.Pigeon2;
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPoint;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -11,6 +15,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -25,6 +30,7 @@ import frc.robot.networktables.DeltaBoard;
 import frc.robot.networktables.Pose2DPublisher;
 import frc.robot.networktables.Topics;
 
+import java.beans.Statement;
 import java.io.Console;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -149,6 +155,7 @@ public class FieldPositioningSystem extends SubsystemBase {
     if(allPotentialPositionLines.size()>=2){
       Translation2d aprilTagEstimatedPose = allPotentialPositionLines.get(0).getIntersection(allPotentialPositionLines.get(1));
       field.getObject("Camera Position").setPose(new Pose2d(aprilTagEstimatedPose, getCurrentRobotRotationXY()));
+      field.getObject("AprilTag1").setTrajectory(PathPlanner.generatePath(new ArrayList<PathConstraints>(), new ArrayList<PathPoint>().add(new PathPoint(allPotentialPositionLines.get(0).getYIntersect(), getCurrentRobotRotationXY()))).add(new PathPoint(aprilTagEstimatedPose, getCurrentRobotRotationXY())));
     }
   }
 
