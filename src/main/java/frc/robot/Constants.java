@@ -29,10 +29,10 @@ public final class Constants {
   private static final double BACK_LEFT_V1_CANCODER_OFFSET = 214.805;
   private static final double BACK_RIGHT_V1_CANCODER_OFFSET = 108.809 + 180;
 
-  private static final double FRONT_LEFT_V2_CANCODER_OFFSET = 180 + 261.123;
-  private static final double FRONT_RIGHT_V2_CANCODER_OFFSET = 180 + 106.172;
-  private static final double BACK_LEFT_V2_CANCODER_OFFSET = 180 + 287.139;
-  private static final double BACK_RIGHT_V2_CANCODER_OFFSET = 180 + 53.350;
+  private static final double FRONT_LEFT_V2_CANCODER_OFFSET = 139.570;
+  private static final double FRONT_RIGHT_V2_CANCODER_OFFSET = 286.436;
+  private static final double BACK_LEFT_V2_CANCODER_OFFSET = 107.666;
+  private static final double BACK_RIGHT_V2_CANCODER_OFFSET = 233.438;
 
   public static final int DEGREES_0 = 0;
   public static final int DEGREES_45 = 45;
@@ -266,7 +266,7 @@ public final class Constants {
   public static final double SHOULDER_CANCODER_OFFSET = 105.996;
 
   public static final int WRIST_CANCODER_ID = 14;
-  public static final double WRIST_CANCODER_OFFSET = 111.094;
+  public static final double WRIST_CANCODER_OFFSET = 175.254;
   public static final ArmPosition ARM_MAX_POSITION =
       new ArmPosition(110, 360 * 13.8, 22002, ArmHeight.NOT_SPECIFIED);
   public static final ArmPosition ARM_MIN_POSITION =
@@ -297,7 +297,7 @@ public final class Constants {
       new ArmPosition(
           Math.toRadians(48.416748), 6.591797, -12481.000000, ArmHeight.SINGLE_SUBSTATION);
   public static final ArmPosition DOUBLE_SUBSTATION_CONE_POSITION =
-      new ArmPosition(Math.toRadians(60), 880, -21000, ArmHeight.DOUBLE_SUBSTATION);
+      new ArmPosition(Math.toRadians(60), 880 + 360 * 1.5, -21000, ArmHeight.DOUBLE_SUBSTATION);
 
   public static final ArmPosition HYBRID_CUBE_ARM_POSITION =
       new ArmPosition(Math.toRadians(-7.5), 360, 23001, ArmHeight.LOW);
@@ -307,6 +307,12 @@ public final class Constants {
 
   public static final ArmPosition BACKWARDS_HIGH_CONE =
       new ArmPosition(Math.toRadians(125), 8.2 * 360, 16000, ArmHeight.NOT_SPECIFIED);
+
+  public static final ArmPosition BACKWARDS_MID_CONE =
+      new ArmPosition(Math.toRadians(114.56), 1066, 19660, ArmHeight.NOT_SPECIFIED);
+
+  public static final ArmPosition AUTON_SAFECHUCK =
+      new ArmPosition(Math.toRadians(20), 0, 17000, ArmHeight.NOT_SPECIFIED);
 
   public static final ArmPosition SELF_RIGHT =
       new ArmPosition(Math.toRadians(125), 0, 0, ArmHeight.HIGH);

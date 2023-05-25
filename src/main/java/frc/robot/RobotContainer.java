@@ -116,7 +116,7 @@ public class RobotContainer {
 
   private void configureBindings() {
     Trigger highGearButton = driver.rightBumper();
-    Trigger strafe = driver.a();
+    Trigger driverPickup = driver.a();
 
     DriverConfig driverConfig = new DriverConfig();
     DoubleSupplier xSupplier =
@@ -130,6 +130,7 @@ public class RobotContainer {
     DoubleSupplier gunnerLeftYSupplier = gunner::getLeftY;
     DoubleSupplier gunnerRightYSupplier = gunner::getRightY;
     Trigger gunnerHybridButton = gunner.rightBumper();
+    Trigger driverFunnyButton = driver.povUp();
 
     DriveCommand driveCommand =
         new DriveCommand(
@@ -140,8 +141,12 @@ public class RobotContainer {
             turnSupplier,
             pointingDriveInput);
 
-    strafe.whileTrue(autoCommand.generateStrafeCommand());
-
+    driverPickup
+        .and(() -> gamePieceMode.isCube())
+        .onTrue(new ArmPowerCommandWithZero(Constants.LOW_CUBE_ARM_POSITION, arm, 3));
+    driverPickup
+        .and(() -> gamePieceMode.isCone())
+        .onTrue(new ArmPowerCommandWithZero(Constants.LOW_CONE_ARM_POSITION, arm, 3));
     // strafe.onTrue(SequentialCommandGroup(Commands.startEnd(()->
     // driveCommand.setDriveType(DriveType.STRAFE),
     // ()->driveCommand.setDriveType(DriveType.CLASSIC), new
@@ -324,7 +329,12 @@ public class RobotContainer {
     autoChooser.addOption("right 2 element climb", Routines.RIGHT_2_ELEMENT_CLIMB);
     autoChooser.addOption("left 2 element no climb", Routines.LEFT_2_ELEMENT_NOCLIMB);
     autoChooser.addOption("right 2 element no climb", Routines.RIGHT_2_ELEMENT_NOCLIMB);
+    autoChooser.addOption("right 3 element no climb", Routines.RIGHT_3_ELEMENT_NOCLIMB);
     autoChooser.addOption("left volume", Routines.LEFT_VOLUME);
+    autoChooser.addOption("left 3 element no climb", Routines.LEFT_3_ELEMENT_NOCLIMB);
+    autoChooser.addOption("left bumpside 3 element", Routines.LEFT_BUMPSIDE_3_ELEMENT);
+    autoChooser.addOption("mid 1.5 and mobility", Routines.MID_1_AND_GRAB);
+    autoChooser.addOption("right bumpside 3 element", Routines.RIGHT_BUMPSIDE_3_ELEMENT);
     SmartDashboard.putData(autoChooser);
   }
 

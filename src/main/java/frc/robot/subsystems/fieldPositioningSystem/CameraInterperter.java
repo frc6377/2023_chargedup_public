@@ -61,12 +61,13 @@ class CameraInterperter {
       if (filteredData == null || filteredData.targets.size() == 0) {
         return Optional.empty();
       }
-
+      System.out.print(filteredData.targets.size());
       guessedPose = multiTagPNPStrategy(filteredData);
       for (PhotonTrackedTarget target : filteredData.targets) {
         lastAmbiguity += target.getPoseAmbiguity();
       }
       lastAmbiguity /= filteredData.targets.size();
+      System.out.println(guessedPose.isPresent());
     } else {
       guessedPose = multiTagPNPStrategy(rawData);
       for (PhotonTrackedTarget target : rawData.targets) {
@@ -98,9 +99,8 @@ class CameraInterperter {
     PhotonPipelineResult filter = rawData;
     filter = ambiguityFilter(filter);
     filter = visibityFilter(filter);
-
-    // filter = minTargets(filter);
-
+    filter = minTargets(filter);
+    if (filter != null) filter.setTimestampSeconds(rawData.getTimestampSeconds());
     return filter;
   }
 

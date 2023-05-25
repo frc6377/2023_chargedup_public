@@ -69,17 +69,17 @@ public class AutoBalanceCommand extends CommandBase {
 
     double sign = 0;
     if (yaw >= -45 && yaw < 45) {
-      sign = roll;
+      sign = pitch;
     } else if (yaw >= 45 && yaw < 135) {
-      sign = -pitch;
+      sign = -roll;
 
     } else if (yaw <= -45 && yaw > -135) {
-      sign = pitch;
+      sign = roll;
 
     } else {
-      sign = -roll;
+      sign = -pitch;
     }
 
-    return Math.copySign(Math.hypot(roll, pitch), sign);
+    return Math.copySign(Math.hypot(roll, pitch), -sign);
   }
 }

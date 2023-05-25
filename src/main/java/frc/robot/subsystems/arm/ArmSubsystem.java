@@ -14,6 +14,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.networktables.DeltaBoard;
@@ -149,6 +150,13 @@ public class ArmSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    if (DriverStation.isDisabled()) {
+      shoulderPPC.setGoal(shoulderThetaFromCANCoder());
+      elevatorPPC.setGoal(elevatorCANCoder.getPosition());
+    }
+
+    DeltaBoard.putNumber("ElevatorOutput", extendMotor.get());
+
     double shoulderOutput;
     shoulderOutput = computeShoulderOutput();
 
@@ -158,7 +166,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     // DeltaBoard.putNumber("arb ffw", computeShoulderArbitraryFeedForward());
     DeltaBoard.putNumber("Arm Extension (encoder pos)", elevatorCANCoder.getPosition());
-    // DeltaBoard.putNumber("elevator setpoint raw", armPosition.armExtension);
+    DeltaBoard.putNumber("elevator setpoint raw", armPosition.armExtension);
     // DeltaBoard.putNumber("Elevator ffw", computeElevatorFeedForward());
 
     DeltaBoard.putNumber("Wrist Position (Ticks)", wristMotor.getSelectedSensorPosition());
