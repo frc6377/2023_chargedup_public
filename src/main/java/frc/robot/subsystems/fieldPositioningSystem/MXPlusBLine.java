@@ -1,14 +1,17 @@
 package frc.robot.subsystems.fieldPositioningSystem;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class MXPlusBLine {
   private final double slope;
   private final double y;
+  private final Translation2d tagPos;
 
-  public MXPlusBLine(double slope, double y) {
+  public MXPlusBLine(double slope, double y, Translation2d tagPos) {
     this.slope = slope;
     this.y = y;
+    this.tagPos = tagPos;
   }
 
   public double getSlope() {
@@ -17,6 +20,10 @@ public class MXPlusBLine {
 
   public double getY() {
     return this.y;
+  }
+
+  public Translation2d getTagPose() {
+    return this.tagPos;
   }
 
   public Translation2d getYIntersect() {
@@ -35,6 +42,6 @@ public class MXPlusBLine {
     }
     double comparisonLineSlope = -1 / this.slope;
     double comparisonLineY = comparisonPoint.getY() - comparisonLineSlope * comparisonPoint.getX();
-    return getIntersection(new MXPlusBLine(comparisonLineSlope, comparisonLineY));
+    return getIntersection(new MXPlusBLine(comparisonLineSlope, comparisonLineY, this.tagPos));
   }
 }

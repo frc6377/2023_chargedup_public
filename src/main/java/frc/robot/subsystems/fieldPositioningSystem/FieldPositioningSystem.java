@@ -139,24 +139,23 @@ public class FieldPositioningSystem extends SubsystemBase {
     yprPub.accept(ypr);
     yprOmegaPub.accept(yprVelocity);
     DeltaBoard.putString("pose", currentRobotPose.getX() + " " + currentRobotPose.getY());
-
+    SmartDashboard.putNumber("Robot Rotation", ypr[0]);
     List<MXPlusBLine> allPotentialPositionLines = leftCamera.getPotentialPositionsLines(ypr[0]);
     allPotentialPositionLines.addAll(rightCamera.getPotentialPositionsLines(ypr[0]));
-    if (allPotentialPositionLines.size() >= 2) {
+    if (allPotentialPositionLines.size() >= 2 && allPotentialPositionLines.get(0)!=null && allPotentialPositionLines.get(1)!=null) {
       Translation2d aprilTagEstimatedPose =
           allPotentialPositionLines.get(0).getIntersection(allPotentialPositionLines.get(1));
       field
           .getObject("Camera Position")
           .setPose(new Pose2d(aprilTagEstimatedPose, getCurrentRobotRotationXY()));
-      List<PathPoint> line = new ArrayList<PathPoint>();
-      line.add(
-          new PathPoint(
-              allPotentialPositionLines.get(0).getYIntersect(),
-              new Rotation2d(Math.atan(allPotentialPositionLines.get(0).getSlope()))));
-      line.add(new PathPoint(aprilTagEstimatedPose, getCurrentRobotRotationXY()));
       field
           .getObject("AprilTag1")
-          .setTrajectory(PathPlanner.generatePath(new PathConstraints(100000, 100000), line));
+          .setPose(new Pose2d(allPotentialPositionLines.get(0).getTagPose(),
+          new Rotation2d(Math.atan(allPotentialPositionLines.get(0).getSlope()))));
+      field
+          .getObject("AprilTag2")
+          .setPose(new Pose2d(allPotentialPositionLines.get(1).getTagPose(),
+          new Rotation2d(Math.atan(allPotentialPositionLines.get(0).getSlope()))));
     }
   }
 
