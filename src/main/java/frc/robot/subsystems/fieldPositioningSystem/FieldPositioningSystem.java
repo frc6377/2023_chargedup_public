@@ -155,7 +155,10 @@ public class FieldPositioningSystem extends SubsystemBase {
     if(allPotentialPositionLines.size()>=2){
       Translation2d aprilTagEstimatedPose = allPotentialPositionLines.get(0).getIntersection(allPotentialPositionLines.get(1));
       field.getObject("Camera Position").setPose(new Pose2d(aprilTagEstimatedPose, getCurrentRobotRotationXY()));
-      field.getObject("AprilTag1").setTrajectory(PathPlanner.generatePath(new ArrayList<PathConstraints>(), new ArrayList<PathPoint>().add(new PathPoint(allPotentialPositionLines.get(0).getYIntersect(), getCurrentRobotRotationXY()))).add(new PathPoint(aprilTagEstimatedPose, getCurrentRobotRotationXY())));
+      List<PathPoint> line = new ArrayList<PathPoint>();
+      line.add(new PathPoint(allPotentialPositionLines.get(0).getYIntersect(), new Rotation2d(Math.atan(allPotentialPositionLines.get(0).getSlope()))));
+      line.add(new PathPoint(aprilTagEstimatedPose, getCurrentRobotRotationXY()));
+      field.getObject("AprilTag1").setTrajectory(PathPlanner.generatePath(new PathConstraints(100000, 100000), line));
     }
   }
 
