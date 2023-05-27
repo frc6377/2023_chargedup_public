@@ -10,11 +10,11 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.networktables.DeltaBoard;
 import frc.robot.subsystems.color.patterns.BIFlag;
 import frc.robot.subsystems.color.patterns.FireFlyPattern;
 import frc.robot.subsystems.color.patterns.PatternNode;
 import frc.robot.subsystems.color.patterns.TransFlag;
+import java.util.ArrayList;
 import java.util.function.Consumer;
 
 public class SignalingSubsystem extends SubsystemBase {
@@ -31,7 +31,8 @@ public class SignalingSubsystem extends SubsystemBase {
 
   private GamePieceMode mode;
   private boolean hasGamePiece;
-  private Timer flashTimer = new Timer();
+  private final Timer flashTimer = new Timer();
+  private final Timer gamePieceSignalingTimer = new Timer();
   private boolean flashOn = true;
   private final Consumer<Double> driverRumbleConsumer;
 
@@ -39,7 +40,6 @@ public class SignalingSubsystem extends SubsystemBase {
 
   public SignalingSubsystem(
       int gamePieceID, final GamePieceMode gamePieceMode, Consumer<Double> driverRumbleConsumer) {
-
     this.mode = gamePieceMode;
     this.driverRumbleConsumer = driverRumbleConsumer;
 
@@ -92,13 +92,19 @@ public class SignalingSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     if (DriverStation.isDisabled()) updatePattern();
-    if (mode.shouldFlash()) {
-      if (flashTimer.get() > Constants.FLASHING_TIME) {
+    else if (mode.shouldFlash()) {
+      if (flashTimer.hasElapsed(Constants.FLASHING_TIME)) {
         flashTimer.reset();
         flashOn = !flashOn;
         if (flashOn) writeLEDsGamePiece(mode.color());
         else writeLEDsGamePiece(RGB.BLACK);
       }
+    }
+    if (!hasGamePiece && gamePieceSignalingTimer.hasElapsed(Constants.GAME_PIECE_SIGNALING_TIME)) {
+      driverRumbleConsumer.accept(0.0);
+      updateLEDs();
+      gamePieceSignalingTimer.reset();
+      gamePieceSignalingTimer.stop();
     }
   }
 
@@ -110,8 +116,8 @@ public class SignalingSubsystem extends SubsystemBase {
 
   public void hasGamePieceSignalStop() {
     hasGamePiece = false;
-    driverRumbleConsumer.accept(0.0);
-    updateLEDs();
+    gamePieceSignalingTimer.reset();
+    gamePieceSignalingTimer.start();
   }
 
   private void clearLEDsGamePiece() {
@@ -134,7 +140,7 @@ public class SignalingSubsystem extends SubsystemBase {
       return;
     }
 
-    DeltaBoard.putString("Disable Pattern", disablePattern.name());
+    // DeltaBoard.putString("Disable Pattern", disablePattern.name());
 
     switch (disablePattern) {
         // case BI_FLAG:
@@ -181,8 +187,20 @@ public class SignalingSubsystem extends SubsystemBase {
     FIRE_FLY;
 
     public static DisablePattern getRandom() {
+      // Do not use due to special request
+      DisablePattern[] DNU = {DisablePattern.TRANS_FLAG};
       DisablePattern[] allPatterns = DisablePattern.values();
-      return allPatterns[(int) Math.floor(Math.random() * (allPatterns.length))];
+      ArrayList<DisablePattern> useable = new ArrayList<>();
+      for (DisablePattern p : allPatterns) {
+        boolean skip = false;
+        for (DisablePattern d : DNU) {
+          if (p == d) skip = true;
+        }
+        if (skip) continue;
+        useable.add(p);
+      }
+
+      return useable.get((int) Math.floor(Math.random() * (useable.size())));
     }
   }
 }

@@ -18,7 +18,6 @@ import frc.config.RobotVersion;
 import frc.robot.commands.ArmManualCommand;
 import frc.robot.commands.ArmPowerCommand;
 import frc.robot.commands.ArmPowerCommandWithZero;
-import frc.robot.commands.AutoBalanceCommand;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.EndAffectorEjectCommand;
 import frc.robot.commands.IntakeCommand;
@@ -117,7 +116,7 @@ public class RobotContainer {
 
   private void configureBindings() {
     Trigger highGearButton = driver.rightBumper();
-    Trigger strafe = driver.a();
+    Trigger driverPickup = driver.a();
 
     DriverConfig driverConfig = new DriverConfig();
     DoubleSupplier xSupplier =
@@ -131,6 +130,7 @@ public class RobotContainer {
     DoubleSupplier gunnerLeftYSupplier = gunner::getLeftY;
     DoubleSupplier gunnerRightYSupplier = gunner::getRightY;
     Trigger gunnerHybridButton = gunner.rightBumper();
+    Trigger driverFunnyButton = driver.povUp();
 
     DriveCommand driveCommand =
         new DriveCommand(
@@ -141,8 +141,12 @@ public class RobotContainer {
             turnSupplier,
             pointingDriveInput);
 
-    strafe.whileTrue(autoCommand.generateStrafeCommand());
-
+    driverPickup
+        .and(() -> gamePieceMode.isCube())
+        .onTrue(new ArmPowerCommandWithZero(Constants.LOW_CUBE_ARM_POSITION, arm, 3));
+    driverPickup
+        .and(() -> gamePieceMode.isCone())
+        .onTrue(new ArmPowerCommandWithZero(Constants.LOW_CONE_ARM_POSITION, arm, 3));
     // strafe.onTrue(SequentialCommandGroup(Commands.startEnd(()->
     // driveCommand.setDriveType(DriveType.STRAFE),
     // ()->driveCommand.setDriveType(DriveType.CLASSIC), new
@@ -156,7 +160,7 @@ public class RobotContainer {
     Trigger intakeButton = driver.leftTrigger(0.3);
     Trigger shootButton = driver.rightTrigger(0.3);
 
-    intakeButton.whileTrue(new IntakeCommand(endAffector, colorStrip));
+    intakeButton.whileTrue(new IntakeCommand(endAffector, colorStrip, arm));
 
     DoubleSupplier shootSupplier = driver::getRightTriggerAxis;
 
@@ -211,6 +215,8 @@ public class RobotContainer {
     Trigger zeroElevator = gunner.start();
     zeroElevator.onTrue(new ZeroElevator(arm));
 
+    Trigger gunnerSelfRight1 = gunner.start();
+    Trigger gunnerSelfRight2 = gunner.back();
     Trigger gunnerLowButton = gunner.a();
     Trigger gunnerMidButton = gunner.b();
     Trigger gunnerHighButton = gunner.y();
@@ -219,6 +225,12 @@ public class RobotContainer {
     Trigger gunnerRightY =
         new Trigger(() -> Math.abs(gunner.getRightY()) > Constants.ARM_MANUAL_OVERRIDE_DEADZONE);
 
+    driverStowed
+        .and(() -> gamePieceMode != GamePieceMode.SINGLE_SUBSTATION)
+        .onTrue(Commands.runOnce(() -> driverStowBehavior().schedule(), new Subsystem[] {}));
+    driverStowed
+        .and(() -> gamePieceMode == GamePieceMode.SINGLE_SUBSTATION)
+        .onTrue(new ArmPowerCommand(Constants.DOUBLE_SUBSTATION_CONE_POSITION, arm, 3));
     driverDefenseStowed
         .and(() -> gamePieceMode != GamePieceMode.SINGLE_SUBSTATION)
         .onTrue(new ArmPowerCommandWithZero(Constants.HIGH_STOWED_ARM_POSITION, arm, 3));
@@ -229,6 +241,9 @@ public class RobotContainer {
         .or(gunnerRightY)
         .onTrue(new ArmManualCommand(gunnerLeftYSupplier, gunnerRightYSupplier, arm));
 
+    gunnerSelfRight1
+        .and(gunnerSelfRight2)
+        .onTrue(new ArmPowerCommand(Constants.SELF_RIGHT, arm, 3));
     gunnerLowButton
         .and(() -> gamePieceMode.isCube())
         .onTrue(new ArmPowerCommandWithZero(Constants.LOW_CUBE_ARM_POSITION, arm, 3));
@@ -246,16 +261,16 @@ public class RobotContainer {
         .onTrue(new ArmPowerCommand(Constants.HIGH_CUBE_ARM_POSITION, arm, 3));
     gunnerHighButton
         .and(() -> gamePieceMode.isCone())
-        .onTrue(new ArmPowerCommand(Constants.HIGH_CONE_ARM_POSITION, arm, 3));
+        .onTrue(
+            new ArmPowerCommand(Constants.HIGH_CONE_ARM_POSITION, arm, 3)
+                .andThen(
+                    new InstantCommand(() -> arm.setTarget(Constants.HIGHER_CONE_ARM_POSITION))));
     gunnerHybridButton
         .and(() -> gamePieceMode.isCube())
         .onTrue(new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3));
     gunnerHybridButton
         .and(() -> gamePieceMode.isCone())
         .onTrue(new ArmPowerCommand(Constants.HYBRID_CONE_ARM_POSITION, arm, 3));
-
-    Trigger gunnerLeftTrigger = gunner.leftTrigger();
-    gunnerLeftTrigger.onTrue(new AutoBalanceCommand(drivetrainSubsystem));
   }
 
   private Command driverStowBehavior() {
@@ -270,7 +285,6 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     // AutoRoutines should be used to add more auto routines that we'll execute.
-
     return routineFactory.getAuto(autoChooser.getSelected());
   }
 
@@ -315,6 +329,12 @@ public class RobotContainer {
     autoChooser.addOption("right 2 element climb", Routines.RIGHT_2_ELEMENT_CLIMB);
     autoChooser.addOption("left 2 element no climb", Routines.LEFT_2_ELEMENT_NOCLIMB);
     autoChooser.addOption("right 2 element no climb", Routines.RIGHT_2_ELEMENT_NOCLIMB);
+    autoChooser.addOption("right 3 element no climb", Routines.RIGHT_3_ELEMENT_NOCLIMB);
+    autoChooser.addOption("left volume", Routines.LEFT_VOLUME);
+    autoChooser.addOption("left 3 element no climb", Routines.LEFT_3_ELEMENT_NOCLIMB);
+    autoChooser.addOption("left bumpside 3 element", Routines.LEFT_BUMPSIDE_3_ELEMENT);
+    autoChooser.addOption("mid 1.5 and mobility", Routines.MID_1_AND_GRAB);
+    autoChooser.addOption("right bumpside 3 element", Routines.RIGHT_BUMPSIDE_3_ELEMENT);
     SmartDashboard.putData(autoChooser);
   }
 

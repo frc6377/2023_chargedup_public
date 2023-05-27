@@ -13,7 +13,7 @@ public class EndAffectorSubsystem extends SubsystemBase {
   public EndAffectorSubsystem(int ID, double kP, GamePieceMode gamePieceMode) {
 
     motor = new WPI_TalonFX(ID);
-    motor.configOpenloopRamp(0.25);
+    motor.configOpenloopRamp(0.0);
     motor.config_kP(0, kP);
     this.gamePieceMode = gamePieceMode;
   }
@@ -35,7 +35,7 @@ public class EndAffectorSubsystem extends SubsystemBase {
   }
 
   public void fastOutake() {
-    motor.set(-Constants.END_AFFECTOR_OUTTAKE_SPEED * ((gamePieceMode.isCube()) ? -1 : 30));
+    motor.set(-Constants.END_AFFECTOR_OUTTAKE_SPEED * ((gamePieceMode.isCube()) ? -300 : 30));
   }
 
   public double getIntakePosition() {

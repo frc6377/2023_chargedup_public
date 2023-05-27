@@ -26,7 +26,6 @@ import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.networktables.DeltaBoard;
 import frc.robot.networktables.Pose2DPublisher;
 import frc.robot.networktables.Topics;
 
@@ -64,7 +63,7 @@ public class FieldPositioningSystem extends SubsystemBase {
   }
 
   public FieldPositioningSystem() {
-    SmartDashboard.putBoolean("Use Rejection", false);
+    SmartDashboard.putBoolean("Use Rejection", true);
     final String aprilTagFileLocation =
         Filesystem.getDeployDirectory().getAbsolutePath() + "/2023-Apriltaglocation.json";
     try {

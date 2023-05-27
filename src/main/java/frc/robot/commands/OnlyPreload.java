@@ -9,6 +9,7 @@ import frc.robot.subsystems.arm.ArmSubsystem;
 public class OnlyPreload extends SequentialCommandGroup {
   public OnlyPreload(ArmSubsystem arm) {
     addCommands(
+        new ArmPowerCommand(arm.getUnbindPosition(), arm, 3),
         new WaitCommand(1),
         new ScheduleCommand(
             new ArmPowerCommand(Constants.LOW_CUBE_ARM_POSITION, arm, 3).withTimeout(0.5)));
