@@ -1,9 +1,5 @@
 package frc.robot.subsystems.fieldPositioningSystem;
 
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
-
 public class CameraInformation {
   private String name;
   private double theta;
@@ -17,15 +13,10 @@ public class CameraInformation {
    * @param y y of the camera relative to robot center in meters
    * @param yaw yaw of the camera relative to robot center in radians
    */
-
-  public CameraInformation(
-      final String name,
-      final double x,
-      final double y,
-      final double yaw) {
+  public CameraInformation(final String name, final double x, final double y, final double yaw) {
     this.name = name;
-    this.theta = Math.atan2(y,x);
-    this.distanceFromCenter = Math.sqrt(x*x+y*y);
+    this.theta = Math.atan2(y, x);
+    this.distanceFromCenter = Math.sqrt(x * x + y * y);
     this.yaw = yaw;
   }
 
@@ -33,15 +24,15 @@ public class CameraInformation {
     return name;
   }
 
-  public double getTheta () {
+  public double getTheta() {
     return theta;
   }
 
-  public double getDistanceFromCenter () {
+  public double getDistanceFromCenter() {
     return distanceFromCenter;
   }
 
-  public double getYaw () {
+  public double getYaw() {
     return yaw;
   }
 }

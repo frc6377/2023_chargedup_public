@@ -9,8 +9,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.subsystems.arm.ArmHeight;
 import frc.robot.subsystems.arm.ArmPosition;
 import frc.robot.subsystems.drivetrain.config.PodConfig;
-import frc.robot.subsystems.fieldPositioningSystem.CameraInformation;
-
 import java.util.Arrays;
 import java.util.List;
 

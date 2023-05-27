@@ -4,39 +4,30 @@ import com.ctre.phoenix.sensors.Pigeon2;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPoint;
-
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+import frc.robot.networktables.DeltaBoard;
 import frc.robot.networktables.Pose2DPublisher;
 import frc.robot.networktables.Topics;
-
-import java.beans.Statement;
-import java.io.Console;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
-import org.photonvision.EstimatedRobotPose;
 
 public class FieldPositioningSystem extends SubsystemBase {
 
@@ -148,16 +139,24 @@ public class FieldPositioningSystem extends SubsystemBase {
     yprPub.accept(ypr);
     yprOmegaPub.accept(yprVelocity);
     DeltaBoard.putString("pose", currentRobotPose.getX() + " " + currentRobotPose.getY());
-    
+
     List<MXPlusBLine> allPotentialPositionLines = leftCamera.getPotentialPositionsLines(ypr[0]);
     allPotentialPositionLines.addAll(rightCamera.getPotentialPositionsLines(ypr[0]));
-    if(allPotentialPositionLines.size()>=2){
-      Translation2d aprilTagEstimatedPose = allPotentialPositionLines.get(0).getIntersection(allPotentialPositionLines.get(1));
-      field.getObject("Camera Position").setPose(new Pose2d(aprilTagEstimatedPose, getCurrentRobotRotationXY()));
+    if (allPotentialPositionLines.size() >= 2) {
+      Translation2d aprilTagEstimatedPose =
+          allPotentialPositionLines.get(0).getIntersection(allPotentialPositionLines.get(1));
+      field
+          .getObject("Camera Position")
+          .setPose(new Pose2d(aprilTagEstimatedPose, getCurrentRobotRotationXY()));
       List<PathPoint> line = new ArrayList<PathPoint>();
-      line.add(new PathPoint(allPotentialPositionLines.get(0).getYIntersect(), new Rotation2d(Math.atan(allPotentialPositionLines.get(0).getSlope()))));
+      line.add(
+          new PathPoint(
+              allPotentialPositionLines.get(0).getYIntersect(),
+              new Rotation2d(Math.atan(allPotentialPositionLines.get(0).getSlope()))));
       line.add(new PathPoint(aprilTagEstimatedPose, getCurrentRobotRotationXY()));
-      field.getObject("AprilTag1").setTrajectory(PathPlanner.generatePath(new PathConstraints(100000, 100000), line));
+      field
+          .getObject("AprilTag1")
+          .setTrajectory(PathPlanner.generatePath(new PathConstraints(100000, 100000), line));
     }
   }
 
@@ -170,9 +169,7 @@ public class FieldPositioningSystem extends SubsystemBase {
     inertialMeasurementUnit = pigeon;
   }
 
-  public void setCameras(CameraInterperter[] cameras) {
-    
-  }
+  public void setCameras(CameraInterperter[] cameras) {}
 
   /** Reset the IMU in accordance to driver perspictive. */
   public void resetIMU() {
