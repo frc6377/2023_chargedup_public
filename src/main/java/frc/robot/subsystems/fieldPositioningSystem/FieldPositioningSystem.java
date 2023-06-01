@@ -138,8 +138,6 @@ public class FieldPositioningSystem extends SubsystemBase {
     ypr[0] = getRobotXYPose().getRotation().getDegrees();
     yprPub.accept(ypr);
     yprOmegaPub.accept(yprVelocity);
-    DeltaBoard.putString("pose", currentRobotPose.getX() + " " + currentRobotPose.getY());
-    SmartDashboard.putNumber("Robot Rotation", ypr[0]);
     List<MXPlusBLine> allPotentialPositionLines = leftCamera.getPotentialPositionsLines(ypr[0]);
     allPotentialPositionLines.addAll(rightCamera.getPotentialPositionsLines(ypr[0]));
     if (allPotentialPositionLines.size() >= 2 && allPotentialPositionLines.get(0)!=null && allPotentialPositionLines.get(1)!=null) {
@@ -148,14 +146,7 @@ public class FieldPositioningSystem extends SubsystemBase {
       field
           .getObject("Camera Position")
           .setPose(new Pose2d(aprilTagEstimatedPose, getCurrentRobotRotationXY()));
-      field
-          .getObject("AprilTag1")
-          .setPose(new Pose2d(allPotentialPositionLines.get(0).getTagPose(),
-          new Rotation2d(Math.atan(allPotentialPositionLines.get(0).getSlope()))));
-      field
-          .getObject("AprilTag2")
-          .setPose(new Pose2d(allPotentialPositionLines.get(1).getTagPose(),
-          new Rotation2d(Math.atan(allPotentialPositionLines.get(0).getSlope()))));
+      swerveDriveOdometry.addVisionMeasurement(new Pose2d(aprilTagEstimatedPose, getCurrentRobotRotationXY()), Timer.getFPGATimestamp());
     }
   }
 

@@ -2,6 +2,7 @@ package frc.robot.subsystems.fieldPositioningSystem;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -43,15 +44,14 @@ class CameraInterperter {
   public MXPlusBLine getPotentialPositionsLine(double robotHeading, PhotonTrackedTarget target) {
     if (target.getFiducialId() > 8 || target.getFiducialId() < 1) return null;
     double aprilTagAngle = Math.toRadians(target.getYaw());
-    double cameraAngleFrom0 = angularPosition - Math.toRadians(robotHeading);
+    double cameraAngleFrom0 = angularPosition + Math.toRadians(robotHeading);
     double cameraYawFrom0 = yaw + Math.toRadians(robotHeading);
-    double slope = Math.tan(cameraYawFrom0 + aprilTagAngle);
+    double slope = Math.tan(aprilTagAngle - cameraYawFrom0);
     double aprilTagX = aprilTags.getTagPose(target.getFiducialId()).get().getX();
     double aprilTagY = aprilTags.getTagPose(target.getFiducialId()).get().getY();
     double cameraXRelativeToRobot = Math.cos(cameraAngleFrom0) * distanceFromCenter;
     double cameraYRelativeToRobot = Math.sin(cameraAngleFrom0) * distanceFromCenter;
     double b = aprilTagY - cameraYRelativeToRobot - (aprilTagX - cameraXRelativeToRobot) * slope;
-    SmartDashboard.putNumber(camera.getName() + " angle to AprilTag " + target.getFiducialId(), cameraYawFrom0 + aprilTagAngle);
-    return new MXPlusBLine(slope, b, new Translation2d(aprilTagX+cameraXRelativeToRobot,aprilTagY+cameraYRelativeToRobot));
+    return new MXPlusBLine(slope, b, new Pose2d(aprilTagX+cameraXRelativeToRobot,aprilTagY+cameraYRelativeToRobot, new Rotation2d(cameraYawFrom0 + aprilTagAngle)));
   }
 }
