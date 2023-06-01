@@ -5,7 +5,6 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -17,16 +16,13 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.networktables.Pose2DPublisher;
 import frc.robot.networktables.Topics;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Optional;
+import java.util.List;
 import java.util.function.Supplier;
-import org.photonvision.EstimatedRobotPose;
 
 public class FieldPositioningSystem extends SubsystemBase {
 
@@ -38,7 +34,8 @@ public class FieldPositioningSystem extends SubsystemBase {
   private boolean camerasEnabled = false;
   private Supplier<SwerveModuleState[]> swerveOdomSupplier;
   private SwerveDrivePoseEstimator swerveDriveOdometry;
-  private CameraInterperter[] cameras;
+  private CameraInterperter leftCamera;
+  private CameraInterperter rightCamera;
   private final Pose2DPublisher pub = Topics.PoseTopic().publish();
   private final DoubleArrayPublisher yprPub =
       NetworkTableInstance.getDefault().getDoubleArrayTopic("pitch").publish();
@@ -61,7 +58,8 @@ public class FieldPositioningSystem extends SubsystemBase {
       throw new FieldPositioningSystemError(
           "ERROR: Apriltag location file (" + aprilTagFileLocation + ") not found", e);
     }
-
+    leftCamera = new CameraInterperter(aprilTagFieldLayout, FPSConfiguration.leftCamera);
+    rightCamera = new CameraInterperter(aprilTagFieldLayout, FPSConfiguration.rightCamera);
     currentSwervePodPosition =
         new SwerveModulePosition[] {
           new SwerveModulePosition(),
@@ -73,10 +71,6 @@ public class FieldPositioningSystem extends SubsystemBase {
     SmartDashboard.putData("Field", field);
 
     currentRobotPose = new Pose2d();
-    new FPSHardware(this).configure(this, new FPSConfiguration());
-    enableCameraDebug(0);
-
-    enableCameraDebug(1);
   }
 
   /**
@@ -125,7 +119,7 @@ public class FieldPositioningSystem extends SubsystemBase {
   @Override
   public void periodic() {
     updateSwerveDriveOdometry();
-    doVisionEstimation();
+
     if (swerveDriveOdometry != null) {
       currentRobotPose = swerveDriveOdometry.getEstimatedPosition();
     }
@@ -138,7 +132,19 @@ public class FieldPositioningSystem extends SubsystemBase {
     ypr[0] = getRobotXYPose().getRotation().getDegrees();
     yprPub.accept(ypr);
     yprOmegaPub.accept(yprVelocity);
-    // DeltaBoard.putString("pose", currentRobotPose.getX() + " " + currentRobotPose.getY());
+    List<MXPlusBLine> allPotentialPositionLines = leftCamera.getPotentialPositionsLines(ypr[0]);
+    allPotentialPositionLines.addAll(rightCamera.getPotentialPositionsLines(ypr[0]));
+    if (allPotentialPositionLines.size() >= 2
+        && allPotentialPositionLines.get(0) != null
+        && allPotentialPositionLines.get(1) != null) {
+      Translation2d aprilTagEstimatedPose =
+          allPotentialPositionLines.get(0).getIntersection(allPotentialPositionLines.get(1));
+      field
+          .getObject("Camera Position")
+          .setPose(new Pose2d(aprilTagEstimatedPose, getCurrentRobotRotationXY()));
+      swerveDriveOdometry.addVisionMeasurement(
+          new Pose2d(aprilTagEstimatedPose, getCurrentRobotRotationXY()), Timer.getFPGATimestamp());
+    }
   }
 
   /**
@@ -150,13 +156,7 @@ public class FieldPositioningSystem extends SubsystemBase {
     inertialMeasurementUnit = pigeon;
   }
 
-  public void setCameras(CameraInterperter[] cameras) {
-    this.cameras = cameras;
-    Pose3d robotPose3d = new Pose3d(currentRobotPose);
-    for (CameraInterperter camera : cameras) {
-      camera.setReferncePose(robotPose3d);
-    }
-  }
+  public void setCameras(CameraInterperter[] cameras) {}
 
   /** Reset the IMU in accordance to driver perspictive. */
   public void resetIMU() {
@@ -218,65 +218,4 @@ public class FieldPositioningSystem extends SubsystemBase {
   }
 
   /* -------------------- Cameras -------------------- */
-
-  /** Run vision estimation on cameras. */
-  private void doVisionEstimation() {
-    if (!camerasEnabled) {
-      return;
-    }
-
-    Pose2d robotPose = swerveDriveOdometry.getEstimatedPosition();
-    Pose3d robotPose3d = new Pose3d(robotPose);
-    for (CameraInterperter camera : cameras) {
-      camera.setReferncePose(robotPose3d);
-    }
-
-    ArrayList<Integer> confidence = new ArrayList<>();
-    ArrayList<Translation2d> estimatedPoses = new ArrayList<>();
-    double averageRecordTime = 0;
-    int numberOfMeasurements = 0;
-
-    for (CameraInterperter interperter : cameras) {
-      Optional<EstimatedRobotPose> potentialMeasurement = interperter.measure();
-      if (potentialMeasurement.isEmpty()) continue;
-
-      EstimatedRobotPose measurement = potentialMeasurement.get();
-      averageRecordTime += measurement.timestampSeconds;
-      numberOfMeasurements += 1;
-
-      Translation2d measuredLocation = measurement.estimatedPose.toPose2d().getTranslation();
-
-      final double correctionDistance =
-          measuredLocation.getDistance(swerveDriveOdometry.getEstimatedPosition().getTranslation());
-
-      // if (correctionDistance > FPSConfiguration.CAMER_OUTLIER_DISTANCE) {
-      //   continue;
-      // }
-      confidence.add(measurement.targetsUsed.size());
-      estimatedPoses.add(measuredLocation);
-      //   swerveDriveOdometry.addVisionMeasurement(
-      //       new Pose2d(measuredLocation, getRotionFromIMU()),
-      //       measurement.timestampSeconds);
-    }
-
-    if (numberOfMeasurements == 0) return;
-    averageRecordTime /= numberOfMeasurements;
-
-    Translation2d initalPose = new Translation2d();
-    int sum = 0;
-    for (int i = 0; i < confidence.size(); i++) {
-      initalPose = initalPose.plus(estimatedPoses.get(i).times(confidence.get(i)));
-      sum += confidence.get(i);
-    }
-    Pose2d estiamtedPose =
-        new Pose2d(initalPose.div(sum), swerveDriveOdometry.getEstimatedPosition().getRotation());
-    swerveDriveOdometry.addVisionMeasurement(estiamtedPose, averageRecordTime);
-  }
-
-  private void enableCameraDebug(int targetCameraIndex) {
-    if (targetCameraIndex >= cameras.length) return;
-    final FieldObject2d rawCameraPose = field.getObject("Camera Pose ID:" + targetCameraIndex);
-
-    cameras[targetCameraIndex].setCameraFieldObject(rawCameraPose);
-  }
 }
