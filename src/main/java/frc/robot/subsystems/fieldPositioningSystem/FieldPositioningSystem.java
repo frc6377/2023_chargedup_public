@@ -71,7 +71,6 @@ public class FieldPositioningSystem extends SubsystemBase {
     SmartDashboard.putData("Field", field);
 
     currentRobotPose = new Pose2d();
-    new FPSHardware(this).configure(this, new FPSConfiguration());
   }
 
   /**
