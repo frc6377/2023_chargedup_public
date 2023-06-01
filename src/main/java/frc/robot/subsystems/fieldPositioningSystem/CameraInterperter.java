@@ -3,9 +3,6 @@ package frc.robot.subsystems.fieldPositioningSystem;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 import java.util.ArrayList;
 import java.util.List;
 import org.photonvision.PhotonCamera;
@@ -52,6 +49,12 @@ class CameraInterperter {
     double cameraXRelativeToRobot = Math.cos(cameraAngleFrom0) * distanceFromCenter;
     double cameraYRelativeToRobot = Math.sin(cameraAngleFrom0) * distanceFromCenter;
     double b = aprilTagY - cameraYRelativeToRobot - (aprilTagX - cameraXRelativeToRobot) * slope;
-    return new MXPlusBLine(slope, b, new Pose2d(aprilTagX+cameraXRelativeToRobot,aprilTagY+cameraYRelativeToRobot, new Rotation2d(cameraYawFrom0 + aprilTagAngle)));
+    return new MXPlusBLine(
+        slope,
+        b,
+        new Pose2d(
+            aprilTagX + cameraXRelativeToRobot,
+            aprilTagY + cameraYRelativeToRobot,
+            new Rotation2d(cameraYawFrom0 + aprilTagAngle)));
   }
 }

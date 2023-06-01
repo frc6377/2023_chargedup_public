@@ -1,9 +1,6 @@
 package frc.robot.subsystems.fieldPositioningSystem;
 
 import com.ctre.phoenix.sensors.Pigeon2;
-import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPoint;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -21,11 +18,9 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.networktables.DeltaBoard;
 import frc.robot.networktables.Pose2DPublisher;
 import frc.robot.networktables.Topics;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -140,13 +135,16 @@ public class FieldPositioningSystem extends SubsystemBase {
     yprOmegaPub.accept(yprVelocity);
     List<MXPlusBLine> allPotentialPositionLines = leftCamera.getPotentialPositionsLines(ypr[0]);
     allPotentialPositionLines.addAll(rightCamera.getPotentialPositionsLines(ypr[0]));
-    if (allPotentialPositionLines.size() >= 2 && allPotentialPositionLines.get(0)!=null && allPotentialPositionLines.get(1)!=null) {
+    if (allPotentialPositionLines.size() >= 2
+        && allPotentialPositionLines.get(0) != null
+        && allPotentialPositionLines.get(1) != null) {
       Translation2d aprilTagEstimatedPose =
           allPotentialPositionLines.get(0).getIntersection(allPotentialPositionLines.get(1));
       field
           .getObject("Camera Position")
           .setPose(new Pose2d(aprilTagEstimatedPose, getCurrentRobotRotationXY()));
-      swerveDriveOdometry.addVisionMeasurement(new Pose2d(aprilTagEstimatedPose, getCurrentRobotRotationXY()), Timer.getFPGATimestamp());
+      swerveDriveOdometry.addVisionMeasurement(
+          new Pose2d(aprilTagEstimatedPose, getCurrentRobotRotationXY()), Timer.getFPGATimestamp());
     }
   }
 
