@@ -71,6 +71,8 @@ public class FieldPositioningSystem extends SubsystemBase {
     SmartDashboard.putData("Field", field);
 
     currentRobotPose = new Pose2d();
+    inertialMeasurementUnit = new Pigeon2(0);
+    inertialMeasurementUnit.setYaw(0);
   }
 
   /**
