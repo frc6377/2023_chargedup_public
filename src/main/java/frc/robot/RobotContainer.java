@@ -341,4 +341,8 @@ public class RobotContainer {
   public void setElevator() {
     arm.setElevator();
   }
+
+  public void onFatalError() {
+    colorStrip.displayCriticalError();
+  }
 }

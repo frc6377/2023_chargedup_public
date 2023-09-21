@@ -150,6 +150,7 @@ public class ArmSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    motorProtection();
     if (DriverStation.isDisabled()) {
       shoulderPPC.setGoal(shoulderThetaFromCANCoder());
       elevatorPPC.setGoal(elevatorCANCoder.getPosition());
@@ -172,8 +173,6 @@ public class ArmSubsystem extends SubsystemBase {
     DeltaBoard.putNumber("Wrist Position (Ticks)", wristMotor.getSelectedSensorPosition());
     DeltaBoard.putNumber("shoulder angle (degrees)", Math.toDegrees(shoulderThetaFromCANCoder()));
     // DeltaBoard.putNumber("Elevator Target (meters)", currentArmExtenstionMeters());
-
-    DeltaBoard.putNumber("Elevator Temp C", extendMotor.getMotorTemperature());
   }
 
   public void setElevatorPercent(double elevatorPercentOutput) {
@@ -329,6 +328,22 @@ public class ArmSubsystem extends SubsystemBase {
             currentArmExtenstionRevs(),
             armPosition.wristRotation,
             ArmHeight.NOT_SPECIFIED));
+  }
+
+  private void motorProtection() {
+    DeltaBoard.putNumber("Elevator Temp C", extendMotor.getMotorTemperature());
+
+    double motorTemp = extendMotor.getMotorTemperature();
+    if (Constants.WARNING_MOTOR_TEMP < motorTemp) {
+      DeltaBoard.putBoolean("ElevatorIsNominal", false);
+    } else {
+      DeltaBoard.putBoolean("ElevatorIsNominal", true);
+    }
+
+    if (Constants.STOP_MOTOR_TEMP < motorTemp && !DriverStation.isFMSAttached()) {
+
+      throw new RuntimeException("Elevator Motor is out of temp");
+    }
   }
 
   public void setElevator() {

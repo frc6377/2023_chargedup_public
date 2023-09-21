@@ -25,7 +25,12 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-    CommandScheduler.getInstance().run();
+    try {
+      CommandScheduler.getInstance().run();
+    } catch (Exception e) {
+      m_robotContainer.onFatalError();
+      throw e;
+    }
   }
 
   @Override
