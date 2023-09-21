@@ -263,10 +263,12 @@ public final class Constants {
   public static final double ARM_ALLOWED_ANGLE_ERROR = 0.001;
   public static final double ARM_ALLOWED_EXTENSION_ERROR = 0.0254;
   public static final int BREAK_VICTOR_ID = 7;
-  public static final double SHOULDER_CANCODER_OFFSET = 105.996;
+  public static final double SHOULDER_CANCODER_OFFSET = -129.990;
 
   public static final int WRIST_CANCODER_ID = 14;
-  public static final double WRIST_CANCODER_OFFSET = 171.387;
+  public static final double WRIST_CANCODER_OFFSET = -111.094;
+  public static final double ZEROING_OFFSET =
+      -6208; // Ticks from zero when the wrist is on the ground
   public static final ArmPosition ARM_MAX_POSITION =
       new ArmPosition(110, 360 * 13.8, 22002, ArmHeight.NOT_SPECIFIED);
   public static final ArmPosition ARM_MIN_POSITION =

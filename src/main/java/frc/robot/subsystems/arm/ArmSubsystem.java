@@ -14,7 +14,11 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.networktables.DeltaBoard;
@@ -37,6 +41,10 @@ public class ArmSubsystem extends SubsystemBase {
   private final CANCoder shoulderCANCoder;
   private final CANCoder wristCANCoder;
   private final CANCoder elevatorCANCoder;
+
+  // Shuffleboard tab to allow for automatic offset configuration
+  private final ShuffleboardTab offsetTab = Shuffleboard.getTab("Offsets");
+  private final GenericEntry wristOffsetEntry;
 
   private final CANSparkMax extendMotor;
   private final RelativeEncoder extendEncoder;
@@ -133,6 +141,18 @@ public class ArmSubsystem extends SubsystemBase {
     wristMotor.config_kP(0, Constants.WRIST_KP);
     wristMotor.configMotionAcceleration(Constants.WRIST_MAX_ACCELLERATION);
     wristMotor.configMotionCruiseVelocity(Constants.WRIST_MAX_VELOCITY);
+
+    offsetTab
+        .add(
+            new InstantCommand(this::configureWristOffset)
+                .ignoringDisable(true)
+                .withName("Zero Wrist"))
+        .withPosition(0, 0);
+    wristOffsetEntry =
+        offsetTab
+            .add("Wrist Offset", Constants.WRIST_CANCODER_OFFSET)
+            .withPosition(1, 0)
+            .getEntry();
 
     wristCANCoder = new CANCoder(Constants.WRIST_CANCODER_ID);
     wristCANCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
@@ -298,6 +318,19 @@ public class ArmSubsystem extends SubsystemBase {
     theta /= Constants.WRIST_GEAR_RATIO; // output shaft to input shaft
     theta /= 360; // degrees to revs
     return theta * 2048; // revs to ticks
+  }
+
+  private void configureWristOffset() {
+    /* Reconfigures the wrist position assuming the elevator is entirely back,
+     * shoulder is entirely down, and the wrist is touching the ground.
+     * The new offset is displayed so the constant can be updated.
+     */
+    if (DriverStation.isDisabled()) {
+      wristOffsetEntry.setDouble(
+          -(wristCANCoder.getAbsolutePosition() - Constants.WRIST_CANCODER_OFFSET)
+              + (Constants.ZEROING_OFFSET / 2048) * 360 * Constants.WRIST_GEAR_RATIO);
+      wristMotor.setSelectedSensorPosition(Constants.ZEROING_OFFSET);
+    }
   }
 
   public ArmPosition getArmPosition() {
