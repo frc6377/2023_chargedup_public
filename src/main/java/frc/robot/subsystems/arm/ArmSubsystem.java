@@ -334,11 +334,7 @@ public class ArmSubsystem extends SubsystemBase {
      double motorTemp = extendMotor.getMotorTemperature();
      DeltaBoard.putNumber("Elevator Temp C", motorTemp);
 
-    if (Constants.WARNING_MOTOR_TEMP < motorTemp) {
-      DeltaBoard.putBoolean("ElevatorIsNominal", false);
-    } else {
-      DeltaBoard.putBoolean("ElevatorIsNominal", true);
-    }
+    DeltaBoard.putBoolean("ElevatorIsNominal", Constants.WARNING_MOTOR_TEMP > motorTemp);
 
     if (Constants.STOP_MOTOR_TEMP < motorTemp && !DriverStation.isFMSAttached()) {
 
