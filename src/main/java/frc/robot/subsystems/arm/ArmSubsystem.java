@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.OverheatedException;
 import frc.robot.networktables.DeltaBoard;
 import frc.robot.subsystems.color.GamePieceMode;
 import java.util.function.Supplier;
@@ -188,6 +189,7 @@ public class ArmSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    motorProtection();
     if (DriverStation.isDisabled()) {
       shoulderPPC.setGoal(shoulderThetaFromCANCoder());
       elevatorPPC.setGoal(elevatorCANCoder.getPosition());
@@ -385,6 +387,18 @@ public class ArmSubsystem extends SubsystemBase {
             currentArmExtenstionRevs(),
             armPosition.wristRotation,
             ArmHeight.NOT_SPECIFIED));
+  }
+
+  private void motorProtection() {
+    double motorTemp = extendMotor.getMotorTemperature();
+    DeltaBoard.putNumber("Elevator Temp C", motorTemp);
+
+    DeltaBoard.putBoolean("ElevatorIsNominal", Constants.WARNING_MOTOR_TEMP > motorTemp);
+
+    if (Constants.STOP_MOTOR_TEMP < motorTemp && !DriverStation.isFMSAttached()) {
+
+      throw new OverheatedException("Elevator Motor is out of temp");
+    }
   }
 
   public void setElevator() {
