@@ -203,4 +203,8 @@ public class SignalingSubsystem extends SubsystemBase {
       return useable.get((int) Math.floor(Math.random() * (useable.size())));
     }
   }
+
+  public void displayCriticalError() {
+    gamePieceCandle.setLEDs(255, 0, 0);
+  }
 }

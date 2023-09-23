@@ -331,4 +331,6 @@ public final class Constants {
   public static final double RUMBLE_INTENSITY = 0.75;
   public static final double GAME_PIECE_SIGNALING_TIME = 0.5;
   public static final double FLASHING_TIME = 0.2;
+  public static final int WARNING_MOTOR_TEMP = 80;
+  public static final double STOP_MOTOR_TEMP = 95;
 }
