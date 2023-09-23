@@ -17,6 +17,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.OverheatedException;
 import frc.robot.networktables.DeltaBoard;
 import frc.robot.subsystems.color.GamePieceMode;
 import java.util.function.Supplier;
@@ -338,7 +339,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     if (Constants.STOP_MOTOR_TEMP < motorTemp && !DriverStation.isFMSAttached()) {
 
-      throw new RuntimeException("Elevator Motor is out of temp");
+      throw new OverheatedException("Elevator Motor is out of temp");
     }
   }
 

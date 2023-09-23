@@ -27,7 +27,7 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     try {
       CommandScheduler.getInstance().run();
-    } catch (Exception e) {
+    } catch (OverheatedException  e) {
       m_robotContainer.onFatalError();
       throw e;
     }
