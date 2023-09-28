@@ -27,7 +27,6 @@ import frc.robot.OverheatedException;
 import frc.robot.networktables.DeltaBoard;
 import frc.robot.subsystems.color.GamePieceMode;
 import frc.robot.utilities.DebugLog;
-
 import java.util.function.Supplier;
 
 public class ArmSubsystem extends SubsystemBase {
@@ -64,7 +63,7 @@ public class ArmSubsystem extends SubsystemBase {
   private boolean elevatorInPercentControl = false;
   private double elevatorPercentOutput = 0;
 
-  //High Speed Data logging
+  // High Speed Data logging
   private DataLog armLog = DataLogManager.getLog();
   private DebugLog<Double> armRotationLog;
   private DebugLog<Double> armExtensionLog;
@@ -237,7 +236,7 @@ public class ArmSubsystem extends SubsystemBase {
     shoulderPPC.setGoal(this.armPosition.armRotation);
     elevatorPPC.setGoal(this.armPosition.armExtension);
     wristMotor.set(ControlMode.MotionMagic, this.armPosition.wristRotation);
-    
+
     armRotationLog.log(armPosition.armRotation);
     armExtensionLog.log(armPosition.armExtension);
     wristRotationLog.log(armPosition.wristRotation);
