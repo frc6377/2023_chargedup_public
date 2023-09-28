@@ -15,6 +15,8 @@ import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -24,6 +26,7 @@ import frc.robot.Constants;
 import frc.robot.OverheatedException;
 import frc.robot.networktables.DeltaBoard;
 import frc.robot.subsystems.color.GamePieceMode;
+import frc.robot.utilities.DebugLog;
 import java.util.function.Supplier;
 
 public class ArmSubsystem extends SubsystemBase {
@@ -59,6 +62,14 @@ public class ArmSubsystem extends SubsystemBase {
   private ArmPosition armPosition = Constants.LOW_CUBE_ARM_POSITION;
   private boolean elevatorInPercentControl = false;
   private double elevatorPercentOutput = 0;
+
+  // High Speed Data logging
+  private DataLog armLog = DataLogManager.getLog();
+  private DebugLog<Double> armRotationLog;
+  private DebugLog<Double> armExtensionLog;
+  private DebugLog<Double> wristRotationLog;
+  private DebugLog<String> armPosLog;
+  private DebugLog<Double> elevatorPercentOutputLog;
 
   public ArmSubsystem(Supplier<GamePieceMode> supplier) {
     this();
@@ -162,6 +173,12 @@ public class ArmSubsystem extends SubsystemBase {
     wristMotor.setSelectedSensorPosition(
         wristCANCoderToIntegratedSensor(wristCANCoder.getAbsolutePosition()));
 
+    armRotationLog = new DebugLog(0.0, "/arm/armRotation", this);
+    armExtensionLog = new DebugLog(0.0, "/arm/armExtension", this);
+    wristRotationLog = new DebugLog(0.0, "/arm/wristRotation", this);
+    elevatorPercentOutputLog = new DebugLog(0.0, "/arm/elevatorPercentOutput", this);
+    armPosLog = new DebugLog("", "/arm/armPositionOutput", this);
+
     System.out.println("Complete Construct ArmSubsystem");
   }
 
@@ -194,6 +211,10 @@ public class ArmSubsystem extends SubsystemBase {
     DeltaBoard.putNumber("Wrist Position (Ticks)", wristMotor.getSelectedSensorPosition());
     DeltaBoard.putNumber("shoulder angle (degrees)", Math.toDegrees(shoulderThetaFromCANCoder()));
     // DeltaBoard.putNumber("Elevator Target (meters)", currentArmExtenstionMeters());
+
+    DeltaBoard.putNumber("Elevator Temp C", extendMotor.getMotorTemperature());
+
+    armPosLog.log(armPosition.toString());
   }
 
   public void setElevatorPercent(double elevatorPercentOutput) {
@@ -215,12 +236,15 @@ public class ArmSubsystem extends SubsystemBase {
     shoulderPPC.setGoal(this.armPosition.armRotation);
     elevatorPPC.setGoal(this.armPosition.armExtension);
     wristMotor.set(ControlMode.MotionMagic, this.armPosition.wristRotation);
+
+    armRotationLog.log(armPosition.armRotation);
+    armExtensionLog.log(armPosition.armExtension);
+    wristRotationLog.log(armPosition.wristRotation);
     // DeltaBoard.putNumber("Shoulder Target", armPosition.armRotation);
   }
 
   /**
    * Calculates the amount of power needed to counteract the force of gravity to keep the arm at a
-   * constant angle.
    *
    * @return The power needed to keep the arme stable, in percent output
    */
@@ -378,9 +402,12 @@ public class ArmSubsystem extends SubsystemBase {
 
   public void setElevator() {
     if (!elevatorInPercentControl) {
-      extendMotor.set(computeElevatorOutput());
+      double elevatorCompute = computeElevatorOutput();
+      extendMotor.set(elevatorCompute);
+      elevatorPercentOutputLog.log(elevatorCompute);
     } else {
       extendMotor.set(elevatorPercentOutput);
+      elevatorPercentOutputLog.log(elevatorPercentOutput);
     }
   }
 
