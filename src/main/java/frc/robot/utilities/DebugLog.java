@@ -11,15 +11,15 @@ import frc.robot.Robot;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
-public class DebugLog<T>{
-    private static final DataLog datalog = DataLogManager.getLog();
-    private static final HashMap<String,GenericEntry> entries = new HashMap<String,GenericEntry>();
+public class DebugLog<T> {
+  private static final DataLog datalog = DataLogManager.getLog();
+  private static final HashMap<String, GenericEntry> entries = new HashMap<String, GenericEntry>();
 
-    private ShuffleboardTab networkTab;
-    private GenericEntry networkEntry;
-    private Integer localEntry;
-    private Consumer<T> localConsumer;
-    private final String name;
+  private ShuffleboardTab networkTab;
+  private GenericEntry networkEntry;
+  private Integer localEntry;
+  private Consumer<T> localConsumer;
+  private final String name;
 
   public DebugLog(T defaultValue, String name, SubsystemBase subsystem) {
     this.name = name;
