@@ -16,8 +16,6 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.util.datalog.DoubleLogEntry;
-import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -28,6 +26,7 @@ import frc.robot.Constants;
 import frc.robot.OverheatedException;
 import frc.robot.networktables.DeltaBoard;
 import frc.robot.subsystems.color.GamePieceMode;
+import frc.robot.utilities.DebugLog;
 import java.util.function.Supplier;
 
 public class ArmSubsystem extends SubsystemBase {
@@ -64,14 +63,14 @@ public class ArmSubsystem extends SubsystemBase {
   private boolean elevatorInPercentControl = false;
   private double elevatorPercentOutput = 0;
 
-  //High Speed Data logging
+  // High Speed Data logging
   private DataLog armLog = DataLogManager.getLog();
-  private DoubleLogEntry armRotationLog;
-  private DoubleLogEntry armExtensionLog;
-  private DoubleLogEntry wristRotationLog;
-  private StringLogEntry armPosLog;
-  private DoubleLogEntry elevatorPercentOutputLog;
-  
+  private DebugLog<Double> armRotationLog;
+  private DebugLog<Double> armExtensionLog;
+  private DebugLog<Double> wristRotationLog;
+  private DebugLog<String> armPosLog;
+  private DebugLog<Double> elevatorPercentOutputLog;
+
   public ArmSubsystem(Supplier<GamePieceMode> supplier) {
     this();
     this.gamePieceModeSupplier = supplier;
@@ -174,11 +173,11 @@ public class ArmSubsystem extends SubsystemBase {
     wristMotor.setSelectedSensorPosition(
         wristCANCoderToIntegratedSensor(wristCANCoder.getAbsolutePosition()));
 
-    armRotationLog = new DoubleLogEntry(armLog, "/arm/armRotation");
-    armExtensionLog = new DoubleLogEntry(armLog, "/arm/armExtension");
-    wristRotationLog = new DoubleLogEntry(armLog, "/arm/wristRotation");
-    elevatorPercentOutputLog = new DoubleLogEntry(armLog, "/arm/elevatorPercentOutput");
-    armPosLog = new StringLogEntry(armLog, "/arm/armPositionOutput");
+    armRotationLog = new DebugLog(0, "/arm/armRotation", this);
+    armExtensionLog = new DebugLog(0, "/arm/armExtension", this);
+    wristRotationLog = new DebugLog(0, "/arm/wristRotation", this);
+    elevatorPercentOutputLog = new DebugLog(0, "/arm/elevatorPercentOutput", this);
+    armPosLog = new DebugLog("", "/arm/armPositionOutput", this);
 
     System.out.println("Complete Construct ArmSubsystem");
   }
@@ -215,11 +214,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     DeltaBoard.putNumber("Elevator Temp C", extendMotor.getMotorTemperature());
 
-    armRotationLog.append(armPosition.armRotation);
-    armExtensionLog.append(armPosition.armExtension);
-    wristRotationLog.append(armPosition.wristRotation);
-    elevatorPercentOutputLog.append(computeElevatorOutput());
-    armPosLog.append(armPosition.toString());
+    armPosLog.log(armPosition.toString());
   }
 
   public void setElevatorPercent(double elevatorPercentOutput) {
@@ -241,6 +236,10 @@ public class ArmSubsystem extends SubsystemBase {
     shoulderPPC.setGoal(this.armPosition.armRotation);
     elevatorPPC.setGoal(this.armPosition.armExtension);
     wristMotor.set(ControlMode.MotionMagic, this.armPosition.wristRotation);
+
+    armRotationLog.log(armPosition.armRotation);
+    armExtensionLog.log(armPosition.armExtension);
+    wristRotationLog.log(armPosition.wristRotation);
     // DeltaBoard.putNumber("Shoulder Target", armPosition.armRotation);
   }
 
@@ -403,9 +402,12 @@ public class ArmSubsystem extends SubsystemBase {
 
   public void setElevator() {
     if (!elevatorInPercentControl) {
-      extendMotor.set(computeElevatorOutput());
+      double elevatorCompute = computeElevatorOutput();
+      extendMotor.set(elevatorCompute);
+      elevatorPercentOutputLog.log(elevatorCompute);
     } else {
       extendMotor.set(elevatorPercentOutput);
+      elevatorPercentOutputLog.log(elevatorPercentOutput);
     }
   }
 
