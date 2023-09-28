@@ -13,14 +13,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 
 public class DebugLog<T>{
-    private static DataLog datalog = DataLogManager.getLog();
-    private static HashMap<String,GenericEntry> entries = new HashMap<String,GenericEntry>();
+    private static final DataLog datalog = DataLogManager.getLog();
+    private static final HashMap<String,GenericEntry> entries = new HashMap<String,GenericEntry>();
 
     private ShuffleboardTab networkTab;
     private GenericEntry networkEntry;
     private Integer localEntry;
     private Consumer<T> localConsumer;
-    private String name;
+    private final String name;
 
     public DebugLog(T defaultValue, String name, SubsystemBase subsystem){
         this.name = name;
