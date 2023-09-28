@@ -215,10 +215,6 @@ public class ArmSubsystem extends SubsystemBase {
 
     DeltaBoard.putNumber("Elevator Temp C", extendMotor.getMotorTemperature());
 
-    armRotationLog.append(armPosition.armRotation);
-    armExtensionLog.append(armPosition.armExtension);
-    wristRotationLog.append(armPosition.wristRotation);
-    elevatorPercentOutputLog.append(computeElevatorOutput());
     armPosLog.append(armPosition.toString());
   }
 
@@ -241,6 +237,10 @@ public class ArmSubsystem extends SubsystemBase {
     shoulderPPC.setGoal(this.armPosition.armRotation);
     elevatorPPC.setGoal(this.armPosition.armExtension);
     wristMotor.set(ControlMode.MotionMagic, this.armPosition.wristRotation);
+    
+    armRotationLog.append(armPosition.armRotation);
+    armExtensionLog.append(armPosition.armExtension);
+    wristRotationLog.append(armPosition.wristRotation);
     // DeltaBoard.putNumber("Shoulder Target", armPosition.armRotation);
   }
 
@@ -403,9 +403,12 @@ public class ArmSubsystem extends SubsystemBase {
 
   public void setElevator() {
     if (!elevatorInPercentControl) {
-      extendMotor.set(computeElevatorOutput());
+      double elevatorCompute = computeElevatorOutput();
+      extendMotor.set(elevatorCompute);
+      elevatorPercentOutputLog.append(elevatorCompute);
     } else {
       extendMotor.set(elevatorPercentOutput);
+      elevatorPercentOutputLog.append(elevatorPercentOutput);
     }
   }
 
