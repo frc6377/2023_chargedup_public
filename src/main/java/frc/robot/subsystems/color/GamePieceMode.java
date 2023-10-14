@@ -1,18 +1,27 @@
 package frc.robot.subsystems.color;
 
-public enum GamePieceMode {
-  CUBE,
-  CONE,
-  SINGLE_SUBSTATION;
+import java.util.Arrays;
 
-  public RGB color() {
-    if (this == CUBE) return RGB.PURPLE;
-    if (this == CONE || this == SINGLE_SUBSTATION) return RGB.YELLOW;
-    return RGB.WHITE;
+public enum GamePieceMode {
+  CUBE(10),
+  CONE(20),
+  SINGLE_SUBSTATION(30);
+
+  private final int integerValue;
+
+  GamePieceMode(final int integerValue) {
+    this.integerValue = integerValue;
   }
 
-  public boolean shouldFlash() {
-    return this == SINGLE_SUBSTATION;
+  public int getAsInt() {
+    return integerValue;
+  }
+
+  public static GamePieceMode getFromInt(final int integerValue) {
+    return Arrays.stream(GamePieceMode.values())
+        .filter(v -> v.getAsInt() == integerValue)
+        .findFirst()
+        .orElse(CUBE);
   }
 
   public boolean isCube() {

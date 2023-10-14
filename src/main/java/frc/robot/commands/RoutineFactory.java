@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.RobotStateManager;
 import frc.robot.commands.autos.BumpSideThreeElementLeft;
 import frc.robot.commands.autos.BumpSideThreeElementRight;
 import frc.robot.commands.autos.LeftThreeElement;
@@ -34,19 +35,23 @@ public class RoutineFactory {
       ArmSubsystem arm,
       EndAffectorSubsystem endAffector,
       DrivetrainSubsystem drive,
-      SwerveAutoFactory factory) {
-    preloadOnly = new OnlyPreload(arm);
-    leftTwoElement = new LeftTwoElement(drive, factory, arm, endAffector);
-    leftTwoElementNoClimb = new LeftTwoElementNoClimb(drive, factory, arm, endAffector);
-    middleClimb = new MiddleClimb(drive, factory, arm, endAffector);
-    rightTwoElement = new RightTwoElement(drive, factory, arm, endAffector);
-    rightTwoElementNoClimb = new RightTwoElementNoClimb(drive, factory, arm, endAffector);
-    leftVolume = new LeftVolumeAuto(drive, factory, endAffector, arm);
-    rightThreeElement = new RightThreeElement(drive, factory, arm, endAffector);
-    leftThreeElement = new LeftThreeElement(drive, factory, arm, endAffector);
-    leftBumpsideThreeElement = new BumpSideThreeElementLeft(drive, factory, arm, endAffector);
-    midOnePlusGrab = new MidOneAndAHalf(drive, factory, arm, endAffector);
-    rightBumpsideThreeElement = new BumpSideThreeElementRight(drive, factory, arm, endAffector);
+      SwerveAutoFactory factory,
+      RobotStateManager robotState) {
+    preloadOnly = new OnlyPreload(arm, robotState);
+    leftTwoElement = new LeftTwoElement(drive, factory, arm, endAffector, robotState);
+    leftTwoElementNoClimb = new LeftTwoElementNoClimb(drive, factory, arm, endAffector, robotState);
+    middleClimb = new MiddleClimb(drive, factory, arm, endAffector, robotState);
+    rightTwoElement = new RightTwoElement(drive, factory, arm, endAffector, robotState);
+    rightTwoElementNoClimb =
+        new RightTwoElementNoClimb(drive, factory, arm, endAffector, robotState);
+    leftVolume = new LeftVolumeAuto(drive, factory, endAffector, arm, robotState);
+    rightThreeElement = new RightThreeElement(drive, factory, arm, endAffector, robotState);
+    leftThreeElement = new LeftThreeElement(drive, factory, arm, endAffector, robotState);
+    leftBumpsideThreeElement =
+        new BumpSideThreeElementLeft(drive, factory, arm, endAffector, robotState);
+    midOnePlusGrab = new MidOneAndAHalf(drive, factory, arm, endAffector, robotState);
+    rightBumpsideThreeElement =
+        new BumpSideThreeElementRight(drive, factory, arm, endAffector, robotState);
   }
 
   public Command getAuto(Routines routine) {

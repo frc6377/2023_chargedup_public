@@ -6,6 +6,8 @@ import com.ctre.phoenix.led.CANdle.LEDStripType;
 import com.ctre.phoenix.led.CANdle.VBatOutputMode;
 import com.ctre.phoenix.led.CANdleConfiguration;
 import com.ctre.phoenix.led.RainbowAnimation;
+import edu.wpi.first.networktables.IntegerSubscriber;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -29,7 +31,9 @@ public class SignalingSubsystem extends SubsystemBase {
   private int patternTick = 0;
   private DisablePattern disablePattern = DisablePattern.getRandom();
 
-  private GamePieceMode mode;
+  private final IntegerSubscriber gamePieceModeSubscriber =
+      NetworkTableInstance.getDefault().getIntegerTopic("GAME_PIECE_MODE").subscribe(10);
+  private GamePieceMode gamePieceMode = GamePieceMode.CUBE;
   private boolean hasGamePiece;
   private final Timer flashTimer = new Timer();
   private final Timer gamePieceSignalingTimer = new Timer();
@@ -38,9 +42,7 @@ public class SignalingSubsystem extends SubsystemBase {
 
   private final RainbowAnimation rainbowAnimation;
 
-  public SignalingSubsystem(
-      int gamePieceID, final GamePieceMode gamePieceMode, Consumer<Double> driverRumbleConsumer) {
-    this.mode = gamePieceMode;
+  public SignalingSubsystem(int gamePieceID, Consumer<Double> driverRumbleConsumer) {
     this.driverRumbleConsumer = driverRumbleConsumer;
 
     gamePieceCandle = new CANdle(gamePieceID);
@@ -65,15 +67,14 @@ public class SignalingSubsystem extends SubsystemBase {
     rainbowAnimation = new RainbowAnimation(1, Constants.RAINBOW_ANIMATION_SPEED, 64);
   }
 
-  public void setGamePiece(GamePieceMode mode) {
-    this.mode = mode;
+  public void setGamePiece() {
     updateLEDs();
   }
 
   public void updateLEDs() {
     if (hasGamePiece) writeLEDsGamePiece(RGB.HOWDY_BLUE);
     else {
-      writeLEDsGamePiece(mode.color());
+      writeLEDsGamePiece(getColorFromGamePieceMode(gamePieceMode));
     }
     flashTimer.start();
   }
@@ -92,11 +93,14 @@ public class SignalingSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     if (DriverStation.isDisabled()) updatePattern();
-    else if (mode.shouldFlash()) {
+    else if (GamePieceMode.getFromInt((int) gamePieceModeSubscriber.get()) != gamePieceMode) {
+      gamePieceMode = GamePieceMode.getFromInt((int) gamePieceModeSubscriber.get());
+      updateLEDs();
+    } else if (shouldFlash(gamePieceMode)) {
       if (flashTimer.hasElapsed(Constants.FLASHING_TIME)) {
         flashTimer.reset();
         flashOn = !flashOn;
-        if (flashOn) writeLEDsGamePiece(mode.color());
+        if (flashOn) writeLEDsGamePiece(getColorFromGamePieceMode(gamePieceMode));
         else writeLEDsGamePiece(RGB.BLACK);
       }
     }
@@ -106,6 +110,16 @@ public class SignalingSubsystem extends SubsystemBase {
       gamePieceSignalingTimer.reset();
       gamePieceSignalingTimer.stop();
     }
+  }
+
+  private static RGB getColorFromGamePieceMode(GamePieceMode mode) {
+    if (mode == GamePieceMode.CUBE) return RGB.PURPLE;
+    if (mode == GamePieceMode.CONE || mode == GamePieceMode.SINGLE_SUBSTATION) return RGB.YELLOW;
+    return RGB.WHITE;
+  }
+
+  private static boolean shouldFlash(GamePieceMode mode) {
+    return mode == GamePieceMode.SINGLE_SUBSTATION;
   }
 
   public void hasGamePieceSignalStart() {

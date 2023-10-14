@@ -15,6 +15,8 @@ import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.networktables.IntegerSubscriber;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -27,7 +29,6 @@ import frc.robot.OverheatedException;
 import frc.robot.networktables.DeltaBoard;
 import frc.robot.subsystems.color.GamePieceMode;
 import frc.robot.utilities.DebugLog;
-import java.util.function.Supplier;
 
 public class ArmSubsystem extends SubsystemBase {
 
@@ -56,13 +57,10 @@ public class ArmSubsystem extends SubsystemBase {
 
   private final WPI_TalonFX wristMotor;
 
-  private Supplier<GamePieceMode> gamePieceModeSupplier;
-
   // State Tracking
-  private ArmPosition armPosition = Constants.LOW_CUBE_ARM_POSITION;
+  private ArmPosition armPosition = ArmPosition.LOW_CUBE_ARM_POSITION;
   private boolean elevatorInPercentControl = false;
   private double elevatorPercentOutput = 0;
-
   // High Speed Data logging
   private DataLog armLog = DataLogManager.getLog();
   private DebugLog<Double> armRotationLog;
@@ -71,10 +69,8 @@ public class ArmSubsystem extends SubsystemBase {
   private DebugLog<String> armPosLog;
   private DebugLog<Double> elevatorPercentOutputLog;
 
-  public ArmSubsystem(Supplier<GamePieceMode> supplier) {
-    this();
-    this.gamePieceModeSupplier = supplier;
-  }
+  private final IntegerSubscriber gamePieceModeSubscriber =
+      NetworkTableInstance.getDefault().getIntegerTopic("GAME_PIECE_MODE").subscribe(10);
 
   public ArmSubsystem() {
     System.out.println("Starting Construct ArmSubsystem");
@@ -182,10 +178,6 @@ public class ArmSubsystem extends SubsystemBase {
     System.out.println("Complete Construct ArmSubsystem");
   }
 
-  public void setModeSupplier(Supplier<GamePieceMode> supplier) {
-    gamePieceModeSupplier = supplier;
-  }
-
   @Override
   public void periodic() {
     motorProtection();
@@ -232,7 +224,8 @@ public class ArmSubsystem extends SubsystemBase {
 
   public void setTarget(ArmPosition armPosition) {
     elevatorInPercentControl = false;
-    this.armPosition = armPosition.clamp(Constants.ARM_MIN_POSITION, Constants.ARM_MAX_POSITION);
+    this.armPosition =
+        armPosition.clamp(ArmPosition.ARM_MIN_POSITION, ArmPosition.ARM_MAX_POSITION);
     shoulderPPC.setGoal(this.armPosition.armRotation);
     elevatorPPC.setGoal(this.armPosition.armExtension);
     wristMotor.set(ControlMode.MotionMagic, this.armPosition.wristRotation);
@@ -252,10 +245,9 @@ public class ArmSubsystem extends SubsystemBase {
   private double computeShoulderArbitraryFeedForward() {
     double mass = 4.2;
 
-    if (gamePieceModeSupplier != null) {
-      if ((gamePieceModeSupplier.get().isCone()) && armPosition.getHeight() == ArmHeight.HIGH) {
-        mass += 0.45;
-      }
+    if ((GamePieceMode.getFromInt((int) gamePieceModeSubscriber.get()).isCone())
+        && armPosition.getHeight() == ArmHeight.HIGH) {
+      mass += 0.45;
     }
 
     double theta = shoulderThetaFromCANCoder();

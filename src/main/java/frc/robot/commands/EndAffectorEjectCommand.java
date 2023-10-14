@@ -1,31 +1,28 @@
 package frc.robot.commands;
 
+import edu.wpi.first.networktables.IntegerSubscriber;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.EndAffectorSubsystem;
 import frc.robot.subsystems.arm.ArmHeight;
 import frc.robot.subsystems.color.GamePieceMode;
 import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
 
 public class EndAffectorEjectCommand extends CommandBase {
   private final DoubleSupplier shootSupplier;
   private final EndAffectorSubsystem endAffector;
   private double target;
-  private final Supplier<ArmHeight> armHeightSupplier;
+  private final IntegerSubscriber gamePieceModeSubscriber =
+      NetworkTableInstance.getDefault().getIntegerTopic("GAME_PIECE_MODE").subscribe(10);
   private boolean enablePartial = false;
   ;
-  private final Supplier<GamePieceMode> gamePieceMode;
+  private final IntegerSubscriber armHeightSubscriber =
+      NetworkTableInstance.getDefault().getIntegerTopic("GAME_PIECE_MODE").subscribe(10);
 
-  public EndAffectorEjectCommand(
-      DoubleSupplier shootSupplier,
-      EndAffectorSubsystem endAffector,
-      Supplier<ArmHeight> armHeightSupplier,
-      Supplier<GamePieceMode> isCube) {
+  public EndAffectorEjectCommand(DoubleSupplier shootSupplier, EndAffectorSubsystem endAffector) {
     this.shootSupplier = shootSupplier;
     this.endAffector = endAffector;
-    this.armHeightSupplier = armHeightSupplier;
-    this.gamePieceMode = isCube;
     addRequirements(endAffector);
   }
 
@@ -33,9 +30,14 @@ public class EndAffectorEjectCommand extends CommandBase {
   public void initialize() {
     target = endAffector.getIntakePosition() + Constants.END_AFFECTOR_OFFSET;
     enablePartial =
-        (armHeightSupplier.get() == ArmHeight.HIGH || armHeightSupplier.get() == ArmHeight.MID)
-            && (gamePieceMode.get().isCone());
-    System.out.println("Partial:" + enablePartial + " armHeight" + armHeightSupplier.get());
+        (ArmHeight.getFromInt((int) armHeightSubscriber.get()) == ArmHeight.HIGH
+                || ArmHeight.getFromInt((int) armHeightSubscriber.get()) == ArmHeight.MID)
+            && (GamePieceMode.getFromInt((int) gamePieceModeSubscriber.get()).isCone());
+    System.out.println(
+        "Partial:"
+            + enablePartial
+            + " armHeight"
+            + ArmHeight.getFromInt((int) armHeightSubscriber.get()));
   }
 
   @Override
