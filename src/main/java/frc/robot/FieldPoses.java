@@ -44,7 +44,6 @@ public class FieldPoses {
 
   private final Rotation2d deliveryRotation;
   private final Rotation2d singleSubRotation = Constants.SINGLE_SUB_ROTATION;
-  private final Rotation2d doubleSubRotation;
 
   class NullAllianceException extends RuntimeException {}
 
@@ -125,10 +124,6 @@ public class FieldPoses {
         (isRed)
             ? Constants.DELIVERY_ROTATION.rotateBy(new Rotation2d(Math.PI))
             : Constants.DELIVERY_ROTATION;
-    doubleSubRotation =
-        (isRed)
-            ? Constants.DOUBLE_SUB_ROTATION.rotateBy(new Rotation2d(Math.PI))
-            : Constants.DOUBLE_SUB_ROTATION;
     // initialize all attributes such that they are absolute
     createBays(relativeBays);
 

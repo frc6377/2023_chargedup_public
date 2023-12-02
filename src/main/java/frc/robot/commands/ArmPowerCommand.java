@@ -76,9 +76,7 @@ public class ArmPowerCommand extends CommandBase {
   @Override
   public boolean isFinished() {
     return armSubsystem.thetaFromPPC()
-        == targetPose.theta; // once this is true the command has delivered its final
-    // setpoint and its job is
-    // done
+        == targetPose.theta; // once this is true the command has delivered its final setpoint and its job is done
   }
 
   @Override
@@ -88,11 +86,9 @@ public class ArmPowerCommand extends CommandBase {
 
   private double computeExtension() {
 
-    // math from https://www.desmos.com/calculator/r6gnd4hvdc
     double theta = armSubsystem.thetaFromPPC();
     double thetaRatio = (theta - initalPose.theta) / (targetPose.theta - initalPose.theta);
     double extensionDelta = targetPose.r - initalPose.r;
-    // DeltaBoard.putNumber("Pow", computePow(extensionDelta));
     return Math.pow(thetaRatio, computePow(extensionDelta)) * extensionDelta + initalPose.r;
   }
 

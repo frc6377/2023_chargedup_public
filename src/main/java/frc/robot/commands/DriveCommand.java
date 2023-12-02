@@ -62,13 +62,6 @@ public class DriveCommand extends CommandBase {
 
     double offset = Math.PI;
 
-    // When we stop lying to the robot undo this code
-    // if(DriverStation.getAlliance() == Alliance.Red){
-    //   offset = Math.PI;
-    // } else {
-    //   offset = 0;
-    // }
-
     System.out.println(offset + "offset");
 
     return ChassisSpeeds.fromFieldRelativeSpeeds(

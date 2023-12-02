@@ -54,7 +54,7 @@ public class RightThreeElement extends SequentialCommandGroup {
                 new WaitCommand(0.0)
                     .andThen(
                         factory.generateCommandFromFile(
-                            "PickSecondElementRight", true, 3, 2.5))) // yes this should be true
+                            "PickSecondElementRight", true /*Set to true intentionally*/, 3, 2.5)))
             .alongWith(
                 new WaitCommand(0.25).andThen(new InstantCommand(() -> endAffector.intake()))),
         new ArmPowerCommand(Constants.HIGH_STOWED_ARM_POSITION, arm, 3)

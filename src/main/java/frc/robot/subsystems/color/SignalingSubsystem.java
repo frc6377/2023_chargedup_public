@@ -21,7 +21,6 @@ public class SignalingSubsystem extends SubsystemBase {
   private static final int patternUpdateFrequency = 10;
 
   private final CANdle gamePieceCandle;
-  // private final CANdle gridPositionCandle;
 
   private static final int numberOfLEDS = 70;
 
@@ -44,7 +43,6 @@ public class SignalingSubsystem extends SubsystemBase {
     this.driverRumbleConsumer = driverRumbleConsumer;
 
     gamePieceCandle = new CANdle(gamePieceID);
-    // gridPositionCandle = new CANdle(gridSelectID);
     CANdleConfiguration configAll = new CANdleConfiguration();
     configAll.statusLedOffWhenActive = false;
     configAll.disableWhenLOS = false;
@@ -81,12 +79,10 @@ public class SignalingSubsystem extends SubsystemBase {
   public void startRainbowAnimation() {
     if (disablePattern != DisablePattern.RAINBOW) return;
     gamePieceCandle.animate(rainbowAnimation);
-    // gridPositionCandle.animate(rainbowAnimation);
   }
 
   public void stopRainbowAnimation() {
     gamePieceCandle.clearAnimation(0);
-    // gridPositionCandle.clearAnimation(0);
   }
 
   @Override
@@ -140,12 +136,7 @@ public class SignalingSubsystem extends SubsystemBase {
       return;
     }
 
-    // DeltaBoard.putString("Disable Pattern", disablePattern.name());
-
     switch (disablePattern) {
-        // case BI_FLAG:
-        //   pattern = BIFlag.getColors(patternTick);
-        //   break;
       case FIRE_FLY:
         pattern = FireFlyPattern.getPattern();
         patternLength = FireFlyPattern.getPatternLength();
@@ -187,7 +178,6 @@ public class SignalingSubsystem extends SubsystemBase {
     FIRE_FLY;
 
     public static DisablePattern getRandom() {
-      // Do not use due to special request
       DisablePattern[] DNU = {DisablePattern.TRANS_FLAG};
       DisablePattern[] allPatterns = DisablePattern.values();
       ArrayList<DisablePattern> useable = new ArrayList<>();

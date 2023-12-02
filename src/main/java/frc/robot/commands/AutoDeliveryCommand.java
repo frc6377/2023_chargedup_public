@@ -6,14 +6,10 @@ import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
 
 public class AutoDeliveryCommand extends SequentialCommandGroup {
-  private final ArmSubsystem arm;
-  private final DrivetrainSubsystem drive;
   private final SendableChooser<Integer> deliveryChooser = new SendableChooser<>();
   private final SwerveAutoFactory autoGenerator;
 
   public AutoDeliveryCommand(ArmSubsystem arm, DrivetrainSubsystem drive) {
-    this.drive = drive;
-    this.arm = arm;
     this.autoGenerator = new SwerveAutoFactory(null, drive);
     addOptions();
     addCommands(this.autoGenerator.generateGridCommand(deliveryChooser.getSelected()));

@@ -15,8 +15,6 @@ import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -33,15 +31,10 @@ public class ArmSubsystem extends SubsystemBase {
 
   // Hardware
   private final CANSparkMax leftShoulder;
-  private final RelativeEncoder leftShoulderEncoder;
-  private final SparkMaxPIDController leftShoulderController;
   private final ProfiledPIDController shoulderPPC;
   private final ProfiledPIDController elevatorPPC;
   private final CANSparkMax rightShoulder;
 
-  // todo make these WPI_CANCoders. using CANCoder for now because it works and we
-  // dont have time
-  // for any more testing
   private final CANCoder shoulderCANCoder;
   private final CANCoder wristCANCoder;
   private final CANCoder elevatorCANCoder;
@@ -64,7 +57,6 @@ public class ArmSubsystem extends SubsystemBase {
   private double elevatorPercentOutput = 0;
 
   // High Speed Data logging
-  private DataLog armLog = DataLogManager.getLog();
   private DebugLog<Double> armRotationLog;
   private DebugLog<Double> armExtensionLog;
   private DebugLog<Double> wristRotationLog;
@@ -105,14 +97,7 @@ public class ArmSubsystem extends SubsystemBase {
     rightShoulder.restoreFactoryDefaults();
 
     leftShoulder.setSmartCurrentLimit(Constants.ARM_ROTATION_CURRENT_LIMIT);
-
-    // We haven't been able to get following to work...
-    // rotationMotor2.follow(rotationMotor1);
-    // so instead we will just feed the same values to both motors.
     rightShoulder.setSmartCurrentLimit(Constants.ARM_ROTATION_CURRENT_LIMIT);
-
-    leftShoulderEncoder = leftShoulder.getEncoder();
-    leftShoulderController = leftShoulder.getPIDController();
 
     shoulderPPC = new ProfiledPIDController(2, 0, 0, new TrapezoidProfile.Constraints(4, 4));
     elevatorPPC =
@@ -139,7 +124,6 @@ public class ArmSubsystem extends SubsystemBase {
     extendController.setIZone(0, 0);
     extendController.setOutputRange(-1, 1);
     extendController.setSmartMotionAllowedClosedLoopError(0.1, 0);
-    // extendController.setFeedbackDevice(extendEncoder);
     extendController.setSmartMotionMaxAccel(16000, 0);
     extendController.setSmartMotionMaxVelocity(16000, 0);
 
@@ -172,13 +156,6 @@ public class ArmSubsystem extends SubsystemBase {
     wristCANCoder.configSensorDirection(true);
     wristMotor.setSelectedSensorPosition(
         wristCANCoderToIntegratedSensor(wristCANCoder.getAbsolutePosition()));
-
-    armRotationLog = new DebugLog(0.0, "/arm/armRotation", this);
-    armExtensionLog = new DebugLog(0.0, "/arm/armExtension", this);
-    wristRotationLog = new DebugLog(0.0, "/arm/wristRotation", this);
-    elevatorPercentOutputLog = new DebugLog(0.0, "/arm/elevatorPercentOutput", this);
-    armPosLog = new DebugLog("", "/arm/armPositionOutput", this);
-
     System.out.println("Complete Construct ArmSubsystem");
   }
 
@@ -199,18 +176,13 @@ public class ArmSubsystem extends SubsystemBase {
     double shoulderOutput;
     shoulderOutput = computeShoulderOutput();
 
-    // DeltaBoard.putNumber("Shoulder Output", shoulderOutput);
     leftShoulder.set(shoulderOutput);
-    // DeltaBoard.putNumber("Reported Shoulder Output", rightShoulder.get());
 
-    // DeltaBoard.putNumber("arb ffw", computeShoulderArbitraryFeedForward());
     DeltaBoard.putNumber("Arm Extension (encoder pos)", elevatorCANCoder.getPosition());
     DeltaBoard.putNumber("elevator setpoint raw", armPosition.armExtension);
-    // DeltaBoard.putNumber("Elevator ffw", computeElevatorFeedForward());
 
     DeltaBoard.putNumber("Wrist Position (Ticks)", wristMotor.getSelectedSensorPosition());
     DeltaBoard.putNumber("shoulder angle (degrees)", Math.toDegrees(shoulderThetaFromCANCoder()));
-    // DeltaBoard.putNumber("Elevator Target (meters)", currentArmExtenstionMeters());
 
     DeltaBoard.putNumber("Elevator Temp C", extendMotor.getMotorTemperature());
 
@@ -240,7 +212,6 @@ public class ArmSubsystem extends SubsystemBase {
     armRotationLog.log(armPosition.armRotation);
     armExtensionLog.log(armPosition.armExtension);
     wristRotationLog.log(armPosition.wristRotation);
-    // DeltaBoard.putNumber("Shoulder Target", armPosition.armRotation);
   }
 
   /**
@@ -248,7 +219,7 @@ public class ArmSubsystem extends SubsystemBase {
    *
    * @return The power needed to keep the arme stable, in percent output
    */
-  // TODO: move to I alpha instead of torque
+  // 
   private double computeShoulderArbitraryFeedForward() {
     double mass = 4.2;
 
@@ -264,7 +235,6 @@ public class ArmSubsystem extends SubsystemBase {
     double numMotors = 2;
     double torque = Math.cos(theta) * 9.81 * mass * centerOfMass;
     double out = torque / (Constants.STALLED_TORQUE * 0.85 * gearRatio * numMotors);
-    // DeltaBoard.putNumber("shoulder arb ffw", out);
     return out;
   }
 
@@ -291,21 +261,11 @@ public class ArmSubsystem extends SubsystemBase {
     double rawPos = shoulderCANCoder.getPosition();
     DeltaBoard.putNumber("raw CANcoder", rawPos);
     double theta = Math.toRadians(rawPos * (6.0 / 16.0));
-    // DeltaBoard.putNumber("shoulder theta", theta);
     return theta;
   }
 
   public double thetaFromPPC() {
     return shoulderPPC.getSetpoint().position;
-  }
-
-  private double computeWristArbitraryFeetForward() {
-    double theta =
-        wristMotor.getSelectedSensorPosition() * Constants.WRIST_TICKS_TO_RADIANS
-            + leftShoulder.getEncoder().getPosition() * Constants.ARM_ROTATION_TICKS_TO_RADIANS;
-
-    return (Math.cos(theta) * Constants.WRIST_MOMENT_OF_INERTIA * 9.8)
-        / (Constants.STALLED_TORQUE * Constants.WRIST_GEAR_RATIO);
   }
 
   private double computeShoulderOutput() {
@@ -317,7 +277,6 @@ public class ArmSubsystem extends SubsystemBase {
   private double computeElevatorOutput() {
     double output =
         elevatorPPC.calculate(elevatorCANCoder.getPosition()) + computeElevatorFeedForward();
-    // DeltaBoard.putNumber("elevator output", output);
     return output;
   }
 
@@ -412,7 +371,7 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public boolean stalledAtZero() {
-    boolean atZero = elevatorPPC.getGoal().position == 0; // is our final goal zero?
+    boolean atZero = elevatorPPC.getGoal().position == 0;
     boolean stalled =
         Math.abs(elevatorCANCoder.getVelocity())
             < 2; // moving at less than 2 degrees/sec either direction

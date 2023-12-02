@@ -21,10 +21,6 @@ import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 
-// TODO
-// reseting pose breaks field north. May not be an issue with this class
-// general tuning
-
 public class SwerveAutoFactory {
   private final Pose2DSubscriber sub = Topics.PoseTopic().subscribe(new Pose2d());
   private FieldPoses fieldPoses =
@@ -75,9 +71,6 @@ public class SwerveAutoFactory {
 
     Zone currentZone = getZone(currentPose.getY());
     Proximity currentProximity = getProx(currentPose.getX());
-
-    // DeltaBoard.putString("proximity", currentProximity.name());
-    // DeltaBoard.putString("zone", currentZone.name());
 
     // build our midpoints first
     switch (currentProximity) {
@@ -215,7 +208,6 @@ public class SwerveAutoFactory {
     Pose2d endPoint = new Pose2d(fieldPoses.getBay(0).getX(), 0, fieldPoses.getDeliveryRotation());
 
     ArrayList<PathPoint> points = new ArrayList<PathPoint>();
-    // Pose2d currentPose = sub.get();
     Pose2d currentPose =
         new Pose2d(fieldPoses.getDoubleSubstation().getX(), 0, fieldPoses.getSingleSubRotation());
 
@@ -259,9 +251,8 @@ public class SwerveAutoFactory {
             drivetrainSubsystem);
 
     if (poseReseter != null
-        && isFirstPath) { // checks if we have a pose reseter and if we want to reset our pose. If
-      // we
-      // do we want to overwrite whatever the kalman filter has. Mostly for auton
+        && isFirstPath) { // checks if we have a pose reseter and if we want to reset our pose.
+          // If so, we want to overwrite whatever the kalman filter has. Mostly for auton
       command =
           new InstantCommand(
                   () -> {
@@ -278,7 +269,7 @@ public class SwerveAutoFactory {
                 () -> System.out.println("starting path----------------------------------"))
             .andThen(command);
 
-    // run the command and than stop the drivetrain. Just to make sure we arent moving at the end
+    // run the command and then stop the drivetrain. Just to make sure we arent moving at the end
     return command.andThen(
         new InstantCommand(() -> drivetrainSubsystem.drive(new ChassisSpeeds())));
   }

@@ -65,8 +65,6 @@ public class AutoBalanceCommand extends CommandBase {
     double pitch = (sub.get()[1]);
     double roll = (sub.get()[2]);
 
-    // DONT TOUCH UNLESS U HAVE A FIX. I AM A BROKEN MAN
-
     double sign = 0;
     if (yaw >= -45 && yaw < 45) {
       sign = pitch;

@@ -58,7 +58,6 @@ public class OmegaBalance extends CommandBase {
     System.out.println("pitch " + pitch + " roll " + roll);
     return Math.hypot(roll, pitch);
   }
-  // DONT TOUCH UNLESS U HAVE A FIX. I AM A BROKEN MAN
   private double computeSign() {
     double yaw = (thetaSub.get()[0]);
     double pitch = (thetaSub.get()[1]);

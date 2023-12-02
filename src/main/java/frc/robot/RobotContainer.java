@@ -50,7 +50,6 @@ public class RobotContainer {
       new HowdyXboxController(Constants.DRIVER_CONTROLLER_ID);
   private final HowdyXboxController gunner =
       new HowdyXboxController(Constants.GUNNER_CONTROLLER_ID);
-  private final StreamDeck streamDeck = new StreamDeck(2, 36);
   // Subsystems
   private final DeploySubsystem deploySubsystem = new DeploySubsystem();
   private final ArmSubsystem arm = new ArmSubsystem();
@@ -79,7 +78,7 @@ public class RobotContainer {
         new DriveInput(
             driver::getRightY,
             driver::getRightX,
-            driverConfig); // TODO Make sure this isnt problamatic
+            driverConfig);
 
     gamePieceMode = GamePieceMode.CONE;
     gamePieceModeSupplier = () -> gamePieceMode;
@@ -130,7 +129,6 @@ public class RobotContainer {
     DoubleSupplier gunnerLeftYSupplier = gunner::getLeftY;
     DoubleSupplier gunnerRightYSupplier = gunner::getRightY;
     Trigger gunnerHybridButton = gunner.rightBumper();
-    Trigger driverFunnyButton = driver.povUp();
 
     DriveCommand driveCommand =
         new DriveCommand(
@@ -147,13 +145,6 @@ public class RobotContainer {
     driverPickup
         .and(() -> gamePieceMode.isCone())
         .onTrue(new ArmPowerCommandWithZero(Constants.LOW_CONE_ARM_POSITION, arm, 3));
-    // strafe.onTrue(SequentialCommandGroup(Commands.startEnd(()->
-    // driveCommand.setDriveType(DriveType.STRAFE),
-    // ()->driveCommand.setDriveType(DriveType.CLASSIC), new
-    // Subsystem[]{}),autoCommand.generateGridCommand(getBay()).until(this::isDriving)))
-
-    // strafe.whileTrue(Commands.startEnd(()-> driveCommand.setDriveType(DriveType.STRAFE),
-    // ()->driveCommand.setDriveType(DriveType.CLASSIC), new Subsystem[]{}));
 
     drivetrainSubsystem.setDefaultCommand(driveCommand);
 
@@ -184,8 +175,6 @@ public class RobotContainer {
     highGearButton.whileTrue(
         Commands.startEnd(
             () -> DriveInput.setToHighGear(true), () -> DriveInput.setToHighGear(false)));
-
-    // driverGoButton.onTrue(autoCommand.generateGridCommand(getBay()).until(this::isDriving));
 
     Trigger driverToggleGamePieceButton = driver.leftBumper();
     driverToggleGamePieceButton.onTrue(
@@ -288,12 +277,6 @@ public class RobotContainer {
     return routineFactory.getAuto(autoChooser.getSelected());
   }
 
-  public int getBay() {
-    int selected = streamDeck.getSelected() - 1;
-    int grid = (selected / 9) * 3; // if we are in the left right or middle grid
-    return 8 - (grid + (selected % 9 % 3)); // if we are in the "1, 2, or 3" bays per grid
-  }
-
   public void onDisabled() {
     colorStrip.randomizePattern();
   }
@@ -304,10 +287,6 @@ public class RobotContainer {
 
   public void updateLEDs() {
     colorStrip.updateLEDs();
-  }
-
-  private boolean isDriving() {
-    return 0.5 < Math.hypot(driver.getLeftX(), driver.getLeftY());
   }
 
   public void unbindShoulder() {
