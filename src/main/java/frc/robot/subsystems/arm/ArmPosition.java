@@ -156,12 +156,12 @@ public class ArmPosition {
     }
   }
 
-  @Override
-  public boolean equals(Object o) {
-    if (o.getClass() != this.getClass()) return false;
-    ArmPosition other = (ArmPosition) o;
-    return other.armExtension == this.armExtension
-        && this.armRotation == other.armRotation
-        && this.wristRotation == other.wristRotation;
-  }
+  // @Override
+  // public boolean equals(Object o) {
+  //   if (o.getClass() != this.getClass()) return false;
+  //   ArmPosition other = (ArmPosition) o;
+  //   return other.armExtension == this.armExtension
+  //       && this.armRotation == other.armRotation
+  //       && this.wristRotation == other.wristRotation;
+  // }
 }
