@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.EndAffectorSubsystem;
 import frc.robot.subsystems.arm.ArmHeight;
+import frc.robot.subsystems.arm.ArmPosition;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.color.SignalingSubsystem;
 
@@ -50,7 +51,7 @@ public class IntakeCommand extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     if (!interrupted) {
-      armSubsystem.setTarget(Constants.HYBRID_CUBE_ARM_POSITION);
+      armSubsystem.setTarget(ArmPosition.HYBRID_CUBE_ARM_POSITION);
     }
     signalingSubsystem.hasGamePieceSignalStop();
     subsystem.idle();

@@ -177,6 +177,8 @@ tasks.register("writeBranchName") {
             ).text = outstream // Set the contents of the file to the variable branch
 }
 
+deploy.targets.roborio.artifacts.frcStaticFileDeploy.dependsOn(writeBranchName)
+
 tasks.register("writeCommitHash") {
     def stdout = new ByteArrayOutputStream()
 
@@ -193,6 +195,8 @@ tasks.register("writeCommitHash") {
             ).text = outstream
 }
 
+deploy.targets.roborio.artifacts.frcStaticFileDeploy.dependsOn(writeCommitHash)
+
 tasks.register("writeComputerName") {
     def stdout = new ByteArrayOutputStream()
 
@@ -208,6 +212,8 @@ tasks.register("writeComputerName") {
             "hostname.txt"
             ).text = outstream
 }
+
+deploy.targets.roborio.artifacts.frcStaticFileDeploy.dependsOn(writeComputerName)
 
 // tasks.register("writeBuildDate") {
 //     def stdout = new ByteArrayOutputStream()

@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.config.IdentifyRoborio;
 import frc.config.RobotVersion;
@@ -24,8 +23,6 @@ import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.RoutineFactory;
 import frc.robot.commands.RoutineFactory.Routines;
 import frc.robot.commands.SwerveAutoFactory;
-import frc.robot.commands.SwitchGamePiece;
-import frc.robot.commands.SwitchSingleSubstationMode;
 import frc.robot.commands.ZeroElevator;
 import frc.robot.subsystems.DeploySubsystem;
 import frc.robot.subsystems.EndAffectorSubsystem;
@@ -38,9 +35,7 @@ import frc.robot.subsystems.drivetrain.DriveInput;
 import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
 import frc.robot.subsystems.drivetrain.config.DriverConfig;
 import frc.robot.subsystems.fieldPositioningSystem.FieldPositioningSystem;
-import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
 
 public class RobotContainer {
   // Find the configuration class to load for this robot
@@ -53,8 +48,7 @@ public class RobotContainer {
   // Subsystems
   private final DeploySubsystem deploySubsystem = new DeploySubsystem();
   private final ArmSubsystem arm = new ArmSubsystem();
-  private final Supplier<GamePieceMode> gamePieceModeSupplier;
-  private final Consumer<GamePieceMode> gamePieceModeConsumer;
+  private final RobotStateManager robotState;
   private final EndAffectorSubsystem endAffector;
   private final SignalingSubsystem colorStrip;
   private final FieldPositioningSystem fieldPositioningSystem = new FieldPositioningSystem();
@@ -63,7 +57,7 @@ public class RobotContainer {
       new SwerveAutoFactory(fieldPositioningSystem::resetRobotPosition, drivetrainSubsystem);
   private final SendableChooser<Routines> autoChooser;
   private final RoutineFactory routineFactory;
-  private GamePieceMode gamePieceMode;
+  // private GamePieceMode gamePieceMode;
 
   public RobotContainer() {
     deploySubsystem.Log();
@@ -80,17 +74,11 @@ public class RobotContainer {
             driver::getRightX,
             driverConfig);
 
-    gamePieceMode = GamePieceMode.CONE;
-    gamePieceModeSupplier = () -> gamePieceMode;
-    gamePieceModeConsumer = (in) -> gamePieceMode = in;
+    robotState = new RobotStateManager(GamePieceMode.CUBE, ArmHeight.LOW);
 
-    endAffector =
-        new EndAffectorSubsystem(
-            Constants.END_AFFECTOR_ID, Constants.END_AFFECTOR_KP, gamePieceMode);
+    endAffector = new EndAffectorSubsystem(Constants.END_AFFECTOR_ID, Constants.END_AFFECTOR_KP);
 
-    colorStrip =
-        new SignalingSubsystem(
-            Constants.GAME_PIECE_CANDLE, gamePieceModeSupplier.get(), driver::setRumble);
+    colorStrip = new SignalingSubsystem(Constants.GAME_PIECE_CANDLE, driver::setRumble);
 
     fieldPositioningSystem.setDriveTrainSupplier(
         () -> drivetrainSubsystem.getOdometry(), drivetrainSubsystem.getKinematics());
@@ -104,11 +92,10 @@ public class RobotContainer {
             rotationSupplier,
             pointingDriveInput));
 
-    arm.setModeSupplier(gamePieceModeSupplier);
-
     autoChooser = new SendableChooser<>();
     addChooserOptions();
-    routineFactory = new RoutineFactory(arm, endAffector, drivetrainSubsystem, autoCommand);
+    routineFactory =
+        new RoutineFactory(arm, endAffector, drivetrainSubsystem, autoCommand, robotState);
 
     configureBindings();
   }
@@ -139,12 +126,7 @@ public class RobotContainer {
             turnSupplier,
             pointingDriveInput);
 
-    driverPickup
-        .and(() -> gamePieceMode.isCube())
-        .onTrue(new ArmPowerCommandWithZero(Constants.LOW_CUBE_ARM_POSITION, arm, 3));
-    driverPickup
-        .and(() -> gamePieceMode.isCone())
-        .onTrue(new ArmPowerCommandWithZero(Constants.LOW_CONE_ARM_POSITION, arm, 3));
+    driverPickup.onTrue(new ArmPowerCommandWithZero(ArmHeight.LOW, arm, 3.0, robotState));
 
     drivetrainSubsystem.setDefaultCommand(driveCommand);
 
@@ -155,12 +137,7 @@ public class RobotContainer {
 
     DoubleSupplier shootSupplier = driver::getRightTriggerAxis;
 
-    shootButton.whileTrue(
-        new EndAffectorEjectCommand(
-            shootSupplier,
-            endAffector,
-            () -> arm.getArmGoalPosition().getHeight(),
-            gamePieceModeSupplier));
+    shootButton.whileTrue(new EndAffectorEjectCommand(shootSupplier, endAffector));
 
     Trigger driverResetFieldNorth = driver.start();
 
@@ -177,29 +154,29 @@ public class RobotContainer {
             () -> DriveInput.setToHighGear(true), () -> DriveInput.setToHighGear(false)));
 
     Trigger driverToggleGamePieceButton = driver.leftBumper();
+
     driverToggleGamePieceButton.onTrue(
-        new SwitchGamePiece(
-            endAffector, arm, colorStrip, gamePieceModeConsumer, gamePieceModeSupplier));
+        new InstantCommand(() -> robotState.SwitchCubeCone())
+            .andThen(new ArmPowerCommand(ArmHeight.LOW, arm, 3, robotState)));
 
     Trigger driverToggleSingleSubstation = driver.y();
+
     driverToggleSingleSubstation.onTrue(
-        new SwitchSingleSubstationMode(
-            endAffector, colorStrip, gamePieceModeConsumer, gamePieceModeSupplier, arm));
+        new InstantCommand(() -> robotState.ToggleSingleSubstationMode())
+            .andThen(
+                new ArmPowerCommand(ArmPosition.HYBRID_CUBE_ARM_POSITION, arm, 3, robotState)));
 
     Trigger driverStowed = driver.x();
     Trigger gunnerStowed = gunner.x();
 
-    gunnerStowed.onTrue(new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3));
-    driverStowed.onTrue(
-        Commands.runOnce(() -> driverStowBehavior().schedule(), new Subsystem[] {}));
+    gunnerStowed.onTrue(
+        new ArmPowerCommand(ArmPosition.HYBRID_CUBE_ARM_POSITION, arm, 3, robotState));
 
     Trigger driverDefenseStowed = driver.b();
-    driverDefenseStowed.onTrue(
-        new ArmPowerCommandWithZero(Constants.HIGH_STOWED_ARM_POSITION, arm, 3));
 
     Trigger gunnerDefenseStowed = gunner.rightBumper();
     gunnerDefenseStowed.onTrue(
-        new ArmPowerCommandWithZero(Constants.HIGH_STOWED_ARM_POSITION, arm, 3));
+        new ArmPowerCommandWithZero(ArmHeight.HIGH_STOWED, arm, 3, robotState));
 
     Trigger zeroElevator = gunner.start();
     zeroElevator.onTrue(new ZeroElevator(arm));
@@ -214,62 +191,19 @@ public class RobotContainer {
     Trigger gunnerRightY =
         new Trigger(() -> Math.abs(gunner.getRightY()) > Constants.ARM_MANUAL_OVERRIDE_DEADZONE);
 
-    driverStowed
-        .and(() -> gamePieceMode != GamePieceMode.SINGLE_SUBSTATION)
-        .onTrue(Commands.runOnce(() -> driverStowBehavior().schedule(), new Subsystem[] {}));
-    driverStowed
-        .and(() -> gamePieceMode == GamePieceMode.SINGLE_SUBSTATION)
-        .onTrue(new ArmPowerCommand(Constants.DOUBLE_SUBSTATION_CONE_POSITION, arm, 3));
-    driverDefenseStowed
-        .and(() -> gamePieceMode != GamePieceMode.SINGLE_SUBSTATION)
-        .onTrue(new ArmPowerCommandWithZero(Constants.HIGH_STOWED_ARM_POSITION, arm, 3));
-    driverDefenseStowed
-        .and(() -> gamePieceMode == GamePieceMode.SINGLE_SUBSTATION)
-        .onTrue(new ArmPowerCommand(Constants.SINGLE_SUBSTATION_CONE_POSITION, arm, 3));
+    driverStowed.onTrue(new ArmPowerCommand(ArmHeight.STOWED, arm, 3, robotState));
+    driverDefenseStowed.onTrue(new ArmPowerCommand(ArmHeight.HIGH_STOWED, arm, 3, robotState));
     gunnerLeftY
         .or(gunnerRightY)
         .onTrue(new ArmManualCommand(gunnerLeftYSupplier, gunnerRightYSupplier, arm));
 
     gunnerSelfRight1
         .and(gunnerSelfRight2)
-        .onTrue(new ArmPowerCommand(Constants.SELF_RIGHT, arm, 3));
-    gunnerLowButton
-        .and(() -> gamePieceMode.isCube())
-        .onTrue(new ArmPowerCommandWithZero(Constants.LOW_CUBE_ARM_POSITION, arm, 3));
-    gunnerLowButton
-        .and(() -> gamePieceMode.isCone())
-        .onTrue(new ArmPowerCommandWithZero(Constants.LOW_CONE_ARM_POSITION, arm, 3));
-    gunnerMidButton
-        .and(() -> gamePieceMode.isCube())
-        .onTrue(new ArmPowerCommand(Constants.MID_CUBE_ARM_POSITION, arm, 3));
-    gunnerMidButton
-        .and(() -> gamePieceMode.isCone())
-        .onTrue(new ArmPowerCommand(Constants.MID_CONE_ARM_POSITION, arm, 3));
-    gunnerHighButton
-        .and(() -> gamePieceMode.isCube())
-        .onTrue(new ArmPowerCommand(Constants.HIGH_CUBE_ARM_POSITION, arm, 3));
-    gunnerHighButton
-        .and(() -> gamePieceMode.isCone())
-        .onTrue(
-            new ArmPowerCommand(Constants.HIGH_CONE_ARM_POSITION, arm, 3)
-                .andThen(
-                    new InstantCommand(() -> arm.setTarget(Constants.HIGHER_CONE_ARM_POSITION))));
-    gunnerHybridButton
-        .and(() -> gamePieceMode.isCube())
-        .onTrue(new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3));
-    gunnerHybridButton
-        .and(() -> gamePieceMode.isCone())
-        .onTrue(new ArmPowerCommand(Constants.HYBRID_CONE_ARM_POSITION, arm, 3));
-  }
-
-  private Command driverStowBehavior() {
-    if (arm.getArmPosition().getHeight().isStowed()) {
-      ArmPosition targetPosition =
-          ArmPosition.getArmPositionFromHeightAndType(ArmHeight.LOW, gamePieceMode);
-      return new ArmPowerCommand(targetPosition, arm, 3);
-    } else {
-      return new ArmPowerCommand(Constants.HYBRID_CUBE_ARM_POSITION, arm, 3);
-    }
+        .onTrue(new ArmPowerCommand(ArmPosition.SELF_RIGHT_POSITION, arm, 3, robotState));
+    gunnerLowButton.onTrue(new ArmPowerCommandWithZero(ArmHeight.LOW, arm, 3, robotState));
+    gunnerMidButton.onTrue(new ArmPowerCommand(ArmHeight.MID, arm, 3, robotState));
+    gunnerHighButton.onTrue(new ArmPowerCommand(ArmHeight.HIGH, arm, 3, robotState));
+    gunnerHybridButton.onTrue(new ArmPowerCommand(ArmHeight.HYBRID, arm, 3, robotState));
   }
 
   public Command getAutonomousCommand() {

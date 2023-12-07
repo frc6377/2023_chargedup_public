@@ -6,8 +6,6 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import frc.robot.subsystems.arm.ArmHeight;
-import frc.robot.subsystems.arm.ArmPosition;
 import frc.robot.subsystems.drivetrain.config.PodConfig;
 import java.util.Arrays;
 import java.util.List;
@@ -269,55 +267,6 @@ public final class Constants {
   public static final double WRIST_CANCODER_OFFSET = -111.094;
   public static final double ZEROING_OFFSET =
       -6208; // Ticks from zero when the wrist is on the ground
-  public static final ArmPosition ARM_MAX_POSITION =
-      new ArmPosition(110, 360 * 13.8, 22002, ArmHeight.NOT_SPECIFIED);
-  public static final ArmPosition ARM_MIN_POSITION =
-      new ArmPosition(-6, 0, -21788, ArmHeight.NOT_SPECIFIED);
-
-  public static final ArmPosition STOWED_ARM_POSITION =
-      new ArmPosition(Math.toRadians(-7.5), 0, 8000, ArmHeight.STOWED);
-  public static final ArmPosition HIGH_STOWED_ARM_POSITION =
-      new ArmPosition(Math.toRadians(70), 0, -16000, ArmHeight.HIGH_STOWED);
-
-  public static final ArmPosition LOW_CUBE_ARM_POSITION =
-      new ArmPosition(Math.toRadians(-7.5), 0, 3300, ArmHeight.LOW);
-  public static final ArmPosition LOW_CONE_ARM_POSITION =
-      new ArmPosition(Math.toRadians(-7.5), 0, -5700, ArmHeight.LOW);
-
-  public static final ArmPosition MID_CUBE_ARM_POSITION =
-      new ArmPosition(Math.toRadians(35), 360.0 * 5.95, -2358, ArmHeight.MID);
-  public static final ArmPosition MID_CONE_ARM_POSITION =
-      new ArmPosition(Math.toRadians(44.75), 360.0 * 7.5, -21787, ArmHeight.MID);
-
-  public static final ArmPosition HIGH_CUBE_ARM_POSITION =
-      new ArmPosition(Math.toRadians(34.94), 360 * 10.35, 3498, ArmHeight.HIGH);
-  public static final ArmPosition HIGH_CONE_ARM_POSITION =
-      new ArmPosition(Math.toRadians(45.5), 4600, -21000, ArmHeight.HIGH);
-  public static final ArmPosition HIGHER_CONE_ARM_POSITION =
-      new ArmPosition(Math.toRadians(45.5), 4800, -21000, ArmHeight.HIGH);
-  public static final ArmPosition SINGLE_SUBSTATION_CONE_POSITION =
-      new ArmPosition(
-          Math.toRadians(48.416748), 6.591797, -12481.000000, ArmHeight.SINGLE_SUBSTATION);
-  public static final ArmPosition DOUBLE_SUBSTATION_CONE_POSITION =
-      new ArmPosition(Math.toRadians(60), 880 + 360 * 1.5, -21000, ArmHeight.DOUBLE_SUBSTATION);
-
-  public static final ArmPosition HYBRID_CUBE_ARM_POSITION =
-      new ArmPosition(Math.toRadians(-7.5), 360, 23001, ArmHeight.LOW);
-
-  public static final ArmPosition HYBRID_CONE_ARM_POSITION =
-      new ArmPosition(Math.toRadians(35), 360, -27000, ArmHeight.LOW);
-
-  public static final ArmPosition BACKWARDS_HIGH_CONE =
-      new ArmPosition(Math.toRadians(125), 8.2 * 360, 16000, ArmHeight.NOT_SPECIFIED);
-
-  public static final ArmPosition BACKWARDS_MID_CONE =
-      new ArmPosition(Math.toRadians(114.56), 1066, 19660, ArmHeight.NOT_SPECIFIED);
-
-  public static final ArmPosition AUTON_SAFECHUCK =
-      new ArmPosition(Math.toRadians(20), 0, 17000, ArmHeight.NOT_SPECIFIED);
-
-  public static final ArmPosition SELF_RIGHT =
-      new ArmPosition(Math.toRadians(125), 0, 0, ArmHeight.HIGH);
 
   // A value between 0 and 1.
   public static final double RAINBOW_ANIMATION_SPEED = 0.5;
