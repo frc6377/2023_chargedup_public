@@ -20,6 +20,11 @@ public class EndAffectorEjectCommand extends CommandBase {
   private final IntegerSubscriber armHeightSubscriber =
       NetworkTableInstance.getDefault().getIntegerTopic("GAME_PIECE_MODE").subscribe(10);
 
+  /**
+   * Has the intake eject
+   * @param shootSupplier The strength that the intake should eject
+   * @param endAffector End affector subsystem
+   */
   public EndAffectorEjectCommand(DoubleSupplier shootSupplier, EndAffectorSubsystem endAffector) {
     this.shootSupplier = shootSupplier;
     this.endAffector = endAffector;
@@ -29,6 +34,8 @@ public class EndAffectorEjectCommand extends CommandBase {
   @Override
   public void initialize() {
     target = endAffector.getIntakePosition() + Constants.END_AFFECTOR_OFFSET;
+    
+    //We don't partially eject unless we're placing high and mid cones
     enablePartial =
         (ArmHeight.getFromInt((int) armHeightSubscriber.get()) == ArmHeight.HIGH
                 || ArmHeight.getFromInt((int) armHeightSubscriber.get()) == ArmHeight.MID)

@@ -19,6 +19,10 @@ public class AutoBalanceCommand extends CommandBase {
   private final ProfiledPIDController pitchController;
   private int count = 0;
 
+  /**
+   * Balances the robot on the charge station
+   * @param drive Drive train subsystem
+   */
   public AutoBalanceCommand(DrivetrainSubsystem drive) {
     this.drive = drive;
     pitchController =

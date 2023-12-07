@@ -9,13 +9,11 @@ import frc.robot.subsystems.arm.ArmHeight;
 import frc.robot.subsystems.arm.ArmPosition;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.color.GamePieceMode;
-import java.util.function.Supplier;
 
 public class ArmPowerCommand extends CommandBase {
 
   private PolarPoint initalPose;
   private double targetWristAngle;
-  private Supplier<ArmPosition> targetPositionSupplier;
 
   private PolarPoint targetPose;
 
@@ -28,6 +26,14 @@ public class ArmPowerCommand extends CommandBase {
   private final RobotStateManager robotState;
   private final boolean calculateArmPosition;
 
+  /**
+   * Moves the arm to a specified position with minimal momentum.
+   * Accepts an armHeight and decides position based on game piece mode when executed.
+   * @param armHeight The armHeight to go to
+   * @param armSubsystem Arm subsystem
+   * @param pow Power with which to run
+   * @param robotState Robot state manager
+   */
   public ArmPowerCommand(
       final ArmHeight armHeight,
       final ArmSubsystem armSubsystem,
@@ -40,7 +46,13 @@ public class ArmPowerCommand extends CommandBase {
     calculateArmPosition = true;
     addRequirements(armSubsystem, robotState);
   }
-
+  /**
+   * Moves the arm to a specified position with minimal momentum
+   * @param targetPosition The armPosition to go to
+   * @param armSubsystem Arm subsystem
+   * @param pow Power with which to run
+   * @param robotState Robot state
+   */
   public ArmPowerCommand(
       ArmPosition targetPosition,
       ArmSubsystem armSubsystem,
@@ -48,7 +60,7 @@ public class ArmPowerCommand extends CommandBase {
       RobotStateManager robotState) {
     this.targetPose =
         new PolarPoint(
-            targetPosition.getArmRotation(),
+            targetPosition.getArmRotationRadians(),
             MathUtil.clamp(targetPosition.getArmExtension(), 0, 13.8 * 360.0));
     this.targetWristAngle = targetPosition.getWristRotation();
     this.armSubsystem = armSubsystem;
@@ -59,39 +71,23 @@ public class ArmPowerCommand extends CommandBase {
     addRequirements(armSubsystem, robotState);
   }
 
-  public ArmPowerCommand(
-      Supplier<ArmPosition> targetPositionSupplier,
-      ArmSubsystem armSubsystem,
-      double pow,
-      RobotStateManager robotState) {
-    this.targetPositionSupplier = targetPositionSupplier;
-    this.armSubsystem = armSubsystem;
-    this.pow = pow;
-    this.robotState = robotState;
-    calculateArmPosition = false;
-    addRequirements(armSubsystem, robotState);
-  }
-
   @Override
   public void initialize() {
+    //If the command was initialized with an armHeight, we need to recalculate the target position each time
+    //the command is run based on the robot state
     if (calculateArmPosition) {
       targetPosition =
           ArmPosition.getArmPositionFromHeightAndType(
               targetHeight, GamePieceMode.getFromInt((int) gamePieceModeSubscriber.get()));
       this.targetPose =
           new PolarPoint(
-              targetPosition.getArmRotation(),
+              targetPosition.getArmRotationRadians(),
               MathUtil.clamp(targetPosition.getArmExtension(), 0, 13.8 * 360.0));
       this.targetWristAngle = targetPosition.getWristRotation();
-    } else {
-      if (targetPose == null) {
-        targetPosition = targetPositionSupplier.get();
-        this.targetPose =
-            new PolarPoint(
-                targetPosition.getArmRotation(),
-                MathUtil.clamp(targetPosition.getArmExtension(), 0, 13.8 * 360.0));
-        this.targetWristAngle = targetPosition.getWristRotation();
-      }
+    } 
+    
+    //Converts the targetPosition into an armHeight
+    else {
       targetHeight = targetPosition.getHeight();
     }
 
@@ -107,7 +103,7 @@ public class ArmPowerCommand extends CommandBase {
     double armExtension =
         (targetPose.theta != initalPose.theta)
             ? computeExtension()
-            : targetPose.r; // math breaks if theta doesnt change
+            : targetPose.r; // We get a divide by zero error if theta doesnt change
     armSubsystem.setTarget(
         new ArmPosition(
             targetPose.theta,
@@ -142,7 +138,7 @@ public class ArmPowerCommand extends CommandBase {
   }
 
   private double computePow(double extensionDelta) {
-    // if we extend more we want to it last, if we retract we want to do it first.
+    // if we extend more, we want to it last. If we retract more, we want to do it first.
     return (extensionDelta < 0) ? pow : pow;
   }
 

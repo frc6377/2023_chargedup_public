@@ -11,29 +11,36 @@ import frc.robot.subsystems.color.SignalingSubsystem;
 
 public class IntakeCommand extends CommandBase {
 
-  private final EndAffectorSubsystem subsystem;
+  private final EndAffectorSubsystem endAffectorSubsystem;
   private final SignalingSubsystem signalingSubsystem;
   private final Timer startIntakeTimer = new Timer();
   private final ArmSubsystem armSubsystem;
-
+  /**
+   * Runs the intake and automatically stows the arm and signals if it detects a game piece
+   * @param endAffectorSubsystem End affector subsystem
+   * @param signalingSubsystem Signaling subsystem
+   * @param armSubsystem Arm subsystem
+   */
   public IntakeCommand(
       EndAffectorSubsystem endAffectorSubsystem,
       SignalingSubsystem signalingSubsystem,
       ArmSubsystem armSubsystem) {
-    this.subsystem = endAffectorSubsystem;
+    this.endAffectorSubsystem = endAffectorSubsystem;
     this.signalingSubsystem = signalingSubsystem;
     this.armSubsystem = armSubsystem;
   }
 
   @Override
   public void initialize() {
-    subsystem.intake();
+    endAffectorSubsystem.intake();
     startIntakeTimer.start();
     startIntakeTimer.reset();
   }
 
   @Override
   public void execute() {
+    //Checks if the motor isn't moving and enough time has passed. If it has stopped, there is most likely a game piece. 
+    //We need to wait because the motor takes time to start up.
     if (startIntakeTimer.hasElapsed(Constants.GAME_PIECE_DETECTION_WAIT)) {
       if (belowThreshhold()) {
         signalingSubsystem.hasGamePieceSignalStart();
@@ -43,6 +50,7 @@ public class IntakeCommand extends CommandBase {
 
   @Override
   public boolean isFinished() {
+    //Ends when it detects a game piece and the arm is in pickup position
     return (startIntakeTimer.hasElapsed(Constants.GAME_PIECE_DETECTION_WAIT)
         && belowThreshhold()
         && armSubsystem.getArmGoalPosition().getHeight() == ArmHeight.LOW);
@@ -54,10 +62,10 @@ public class IntakeCommand extends CommandBase {
       armSubsystem.setTarget(ArmPosition.HYBRID_CUBE_ARM_POSITION);
     }
     signalingSubsystem.hasGamePieceSignalStop();
-    subsystem.idle();
+    endAffectorSubsystem.idle();
   }
 
   private boolean belowThreshhold() {
-    return Math.abs(subsystem.getVelocity()) < Constants.GAME_PIECE_DETECTION_VELOCITY;
+    return Math.abs(endAffectorSubsystem.getVelocity()) < Constants.GAME_PIECE_DETECTION_VELOCITY;
   }
 }

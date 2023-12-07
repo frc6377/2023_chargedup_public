@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 public class SignalingSubsystem extends SubsystemBase {
   private static final int patternUpdateFrequency = 10;
 
-  private final CANdle gamePieceCandle;
+  private final CANdle candle;
 
   private static final int numberOfLEDS = 70;
 
@@ -41,10 +41,15 @@ public class SignalingSubsystem extends SubsystemBase {
 
   private final RainbowAnimation rainbowAnimation;
 
-  public SignalingSubsystem(int gamePieceID, Consumer<Double> driverRumbleConsumer) {
+  /**
+   * Handles the lights and controller rumble
+   * @param CANdleID The CANdle CAN id
+   * @param driverRumbleConsumer A doubleConsumer that takes in the rumble intensity
+   */
+  public SignalingSubsystem(int CANdleID, Consumer<Double> driverRumbleConsumer) {
     this.driverRumbleConsumer = driverRumbleConsumer;
 
-    gamePieceCandle = new CANdle(gamePieceID);
+    candle = new CANdle(CANdleID);
     CANdleConfiguration configAll = new CANdleConfiguration();
     configAll.statusLedOffWhenActive = false;
     configAll.disableWhenLOS = false;
@@ -52,12 +57,12 @@ public class SignalingSubsystem extends SubsystemBase {
     configAll.brightnessScalar = 0.1;
     configAll.vBatOutputMode = VBatOutputMode.Modulated;
 
-    var errorcode = gamePieceCandle.configAllSettings(configAll, 100);
+    var errorcode = candle.configAllSettings(configAll, 100);
     if (errorcode != ErrorCode.OK) {
       System.out.println("Error initializing CANdle");
     }
 
-    clearLEDsGamePiece();
+    clearLEDs();
 
     TransFlag.numberOfLEDS = numberOfLEDS;
     FireFlyPattern.numberOfLEDS = numberOfLEDS;
@@ -65,41 +70,44 @@ public class SignalingSubsystem extends SubsystemBase {
     rainbowAnimation = new RainbowAnimation(1, Constants.RAINBOW_ANIMATION_SPEED, 64);
   }
 
-  public void setGamePiece() {
-    updateLEDs();
-  }
-
+  /**
+   * Has the LEDs update their color/flashing pattern
+   */
   public void updateLEDs() {
-    if (hasGamePiece) writeLEDsGamePiece(RGB.HOWDY_BLUE);
+    if (hasGamePiece) writeLEDs(RGB.HOWDY_BLUE);
     else {
-      writeLEDsGamePiece(getColorFromGamePieceMode(gamePieceMode));
+      writeLEDs(getColorFromGamePieceMode(gamePieceMode));
     }
     flashTimer.start();
   }
 
   public void startRainbowAnimation() {
     if (disablePattern != DisablePattern.RAINBOW) return;
-    gamePieceCandle.animate(rainbowAnimation);
+    candle.animate(rainbowAnimation);
   }
 
   public void stopRainbowAnimation() {
-    gamePieceCandle.clearAnimation(0);
+    candle.clearAnimation(0);
   }
 
   @Override
   public void periodic() {
     if (DriverStation.isDisabled()) updatePattern();
+
+    //Checks the game piece mode and updates LEDs if it has changed
     else if (GamePieceMode.getFromInt((int) gamePieceModeSubscriber.get()) != gamePieceMode) {
       gamePieceMode = GamePieceMode.getFromInt((int) gamePieceModeSubscriber.get());
       updateLEDs();
-    } else if (shouldFlash(gamePieceMode)) {
+    } 
+    else if (shouldFlash(gamePieceMode)) {
       if (flashTimer.hasElapsed(Constants.FLASHING_TIME)) {
         flashTimer.reset();
         flashOn = !flashOn;
-        if (flashOn) writeLEDsGamePiece(getColorFromGamePieceMode(gamePieceMode));
-        else writeLEDsGamePiece(RGB.BLACK);
+        if (flashOn) writeLEDs(getColorFromGamePieceMode(gamePieceMode));
+        else writeLEDs(RGB.BLACK);
       }
     }
+    //Stops the game piece signaling when the timer ends
     if (!hasGamePiece && gamePieceSignalingTimer.hasElapsed(Constants.GAME_PIECE_SIGNALING_TIME)) {
       driverRumbleConsumer.accept(0.0);
       updateLEDs();
@@ -130,12 +138,12 @@ public class SignalingSubsystem extends SubsystemBase {
     gamePieceSignalingTimer.start();
   }
 
-  private void clearLEDsGamePiece() {
-    writeLEDsGamePiece(RGB.BLACK);
+  private void clearLEDs() {
+    writeLEDs(RGB.BLACK);
   }
 
-  private void writeLEDsGamePiece(RGB rgb) {
-    gamePieceCandle.setLEDs(rgb.red, rgb.green, rgb.blue);
+  private void writeLEDs(RGB rgb) {
+    candle.setLEDs(rgb.red, rgb.green, rgb.blue);
   }
 
   private void updatePattern() {
@@ -176,7 +184,7 @@ public class SignalingSubsystem extends SubsystemBase {
       PatternNode node = pattern[patternIndex];
       RGB c = pattern[patternIndex].color;
 
-      gamePieceCandle.setLEDs(c.red, c.green, c.blue, 0, LEDIndex, node.repeat);
+      candle.setLEDs(c.red, c.green, c.blue, 0, LEDIndex, node.repeat);
       LEDIndex += node.repeat;
       patternIndex += 1;
     }
@@ -209,6 +217,6 @@ public class SignalingSubsystem extends SubsystemBase {
   }
 
   public void displayCriticalError() {
-    gamePieceCandle.setLEDs(255, 0, 0);
+    candle.setLEDs(255, 0, 0);
   }
 }

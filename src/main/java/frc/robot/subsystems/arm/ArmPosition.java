@@ -50,6 +50,13 @@ public class ArmPosition {
   protected final ArmHeight height;
   protected final String description;
 
+  /**
+   * An exact position of each part of the arm.
+   * @param armRotation The rotation of the shoulder in degrees
+   * @param armExtension The extension of the elevator in motor ticks
+   * @param wristRotation The rotation of the wrist in motor ticks
+   * @param armHeight The armHeight that corresponds to the armPosition
+   */
   public ArmPosition(
       double armRotation, double armExtension, double wristRotation, ArmHeight armHeight) {
     this.armRotation = armRotation;
@@ -64,7 +71,7 @@ public class ArmPosition {
 
   public ArmPosition add(ArmPosition armPos2) {
     return new ArmPosition(
-        armRotation + armPos2.getArmRotation(),
+        armRotation + armPos2.getArmRotationRadians(),
         armExtension + armPos2.getArmExtension(),
         wristRotation + armPos2.getWristRotation(),
         ArmHeight.NOT_SPECIFIED);
@@ -74,7 +81,7 @@ public class ArmPosition {
     return description;
   }
 
-  public double getArmRotation() {
+  public double getArmRotationRadians() {
     return armRotation;
   }
 
@@ -94,6 +101,11 @@ public class ArmPosition {
     return description;
   }
 
+  /**
+   * @param height An arm height
+   * @param gamePieceMode A game piece mode
+   * @return The arm position that corresponds to that height and game piece mode
+   */
   public static ArmPosition getArmPositionFromHeightAndType(
       ArmHeight height, GamePieceMode gamePieceMode) {
     boolean isCube = gamePieceMode.isCube();
@@ -139,7 +151,7 @@ public class ArmPosition {
     ArmPosition clamped =
         new ArmPosition(
             MathUtil.clamp(
-                this.armRotation, armMinPosition.getArmRotation(), armMaxPosition.getArmRotation()),
+                this.armRotation, armMinPosition.getArmRotationRadians(), armMaxPosition.getArmRotationRadians()),
             MathUtil.clamp(
                 this.armExtension,
                 armMinPosition.getArmExtension(),
@@ -155,13 +167,4 @@ public class ArmPosition {
       return clamped;
     }
   }
-
-  // @Override
-  // public boolean equals(Object o) {
-  //   if (o.getClass() != this.getClass()) return false;
-  //   ArmPosition other = (ArmPosition) o;
-  //   return other.armExtension == this.armExtension
-  //       && this.armRotation == other.armRotation
-  //       && this.wristRotation == other.wristRotation;
-  // }
 }

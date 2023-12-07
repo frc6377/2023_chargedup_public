@@ -20,10 +20,6 @@ public class MidOneAndAHalf extends SequentialCommandGroup {
         new InstantCommand(() -> endAffector.halt()),
         new ArmPowerCommand(ArmPosition.BACKWARDS_MID_CONE_POSITION, arm, 3, robotState),
         new WaitCommand(1),
-        /*new InstantCommand(
-        () -> {
-          endAffector.setCone();
-        }),*/
         new InstantCommand(
             () -> {
               endAffector.fastOutake();

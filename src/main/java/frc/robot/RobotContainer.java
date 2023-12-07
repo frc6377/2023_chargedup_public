@@ -74,9 +74,10 @@ public class RobotContainer {
             driver::getRightX,
             driverConfig);
 
+    //Create subsystems
     robotState = new RobotStateManager(GamePieceMode.CUBE, ArmHeight.LOW);
 
-    endAffector = new EndAffectorSubsystem(Constants.END_AFFECTOR_ID, Constants.END_AFFECTOR_KP);
+    endAffector = new EndAffectorSubsystem(Constants.END_AFFECTOR_ID);
 
     colorStrip = new SignalingSubsystem(Constants.GAME_PIECE_CANDLE, driver::setRumble);
 
@@ -227,7 +228,7 @@ public class RobotContainer {
     ArmPosition currentPos = arm.getArmPosition();
     ArmPosition unboundPos =
         new ArmPosition(
-            currentPos.getArmRotation() + Math.toRadians(5),
+            currentPos.getArmRotationRadians() + Math.toRadians(5),
             currentPos.getArmExtension(),
             currentPos.getWristRotation(),
             ArmHeight.NOT_SPECIFIED);

@@ -44,7 +44,6 @@ public final class Constants {
   public static final double ARM_MANUAL_OVERRIDE_DEADZONE = 0.1;
   public static final double ARM_LENGTH_MANUAL_OVERRIDE_SPEED = -0.2;
   public static final double WRIST_MANUAL_OVERRIDE_SPEED = -100;
-  // TODO: add real value for the motor ID
   public static final int END_AFFECTOR_ID = 9;
 
   public static final int GAME_PIECE_CANDLE = 2;
@@ -109,9 +108,6 @@ public final class Constants {
   public static final double ARM_KF = 0.000156 * 10;
   public static final int ARM_MAX_VELO = 2;
   public static final int ARM_MAX_ACCEL = 1;
-  // TODO: rename to be in all caps+full names(also the extender and wrist)
-  // added new functions from line 83-98 for rotational motor and extension motor.
-  // TODO: convert arm rotation values to radians
   public static final int ARM_ROTATION_CURRENT_LIMIT = 40;
 
   public static final int LEFT_SHOULDER_ID = 13;
@@ -138,7 +134,6 @@ public final class Constants {
 
   public static final int WRIST_ID = 14;
 
-  // TODO: Get actual value(is the weight of the arm multiplied by the number needed to convert
   public static final double ROTATION_ARM_GEAR_RATIO = 100;
   public static final double STALLED_TORQUE = 2.6;
   public static final double ARM_WEIGHT_KG = 5.4;

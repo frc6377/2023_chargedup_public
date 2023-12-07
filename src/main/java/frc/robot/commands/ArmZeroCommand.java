@@ -7,6 +7,10 @@ public class ArmZeroCommand extends CommandBase {
   private final ArmSubsystem arm;
   private int counter = 0;
 
+  /**
+   * Rezeros the elevator
+   * @param arm Arm subsystem
+   */
   public ArmZeroCommand(ArmSubsystem arm) {
     this.arm = arm;
   }

@@ -20,7 +20,6 @@ public class LeftTwoElement extends SequentialCommandGroup {
       ArmSubsystem arm,
       EndAffectorSubsystem endAffector,
       RobotStateManager robotState) {
-    Command unbind = new ArmPowerCommand(arm::getUnbindPosition, arm, 3, robotState);
     addCommands(
         new InstantCommand(() -> endAffector.halt()),
         new ArmPowerCommand(ArmPosition.BACKWARDS_HIGH_CONE_POSITION, arm, 3, robotState),

@@ -17,8 +17,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.IntegerSubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -68,7 +66,8 @@ public class ArmSubsystem extends SubsystemBase {
 
   public ArmSubsystem() {
     System.out.println("Starting Construct ArmSubsystem");
-
+    
+    //Create and configure shoulder
     leftShoulder = new CANSparkMax(Constants.LEFT_SHOULDER_ID, MotorType.kBrushless);
     rightShoulder = new CANSparkMax(Constants.RIGHT_SHOULDER_ID, MotorType.kBrushless);
 
@@ -78,6 +77,7 @@ public class ArmSubsystem extends SubsystemBase {
     shoulderCANCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
     shoulderCANCoder.setPositionToAbsolute();
 
+    //Create and configure elevator
     elevatorCANCoder = new CANCoder(10);
     elevatorCANCoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
     elevatorCANCoder.configSensorDirection(true);
@@ -85,6 +85,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     final double shoudlerPositionOnStartUp = shoulderCANCoder.getPosition();
 
+    //If the shoulder says that it is at a negative angle, we can increase its angle by 360 to make the math easier.
     if (shoudlerPositionOnStartUp < -30) {
       shoulderCANCoder.setPosition(shoudlerPositionOnStartUp + 360);
     }
@@ -125,6 +126,7 @@ public class ArmSubsystem extends SubsystemBase {
     extendController.setSmartMotionMaxAccel(16000, 0);
     extendController.setSmartMotionMaxVelocity(16000, 0);
 
+    //Create and configure wrist motor
     wristMotor = new WPI_TalonFX(Constants.WRIST_ID);
     wristMotor.configStatorCurrentLimit(
         new StatorCurrentLimitConfiguration(
@@ -196,8 +198,14 @@ public class ArmSubsystem extends SubsystemBase {
     }
   }
 
+  /**
+   * Sets the position that the arm should aim for.
+   * 
+   * @param armPosition The arm position that it should aim for.
+   */
   public void setTarget(ArmPosition armPosition) {
     elevatorInPercentControl = false;
+    //Clamping shouldn't be necessary, but just in case, we do it anyway.
     this.armPosition =
         armPosition.clamp(ArmPosition.ARM_MIN_POSITION, ArmPosition.ARM_MAX_POSITION);
     shoulderPPC.setGoal(this.armPosition.armRotation);
@@ -210,9 +218,9 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   /**
-   * Calculates the amount of power needed to counteract the force of gravity to keep the arm at a
+   * Calculates the amount of power needed to counteract the force of gravity on the arm
    *
-   * @return The power needed to keep the arme stable, in percent output
+   * @return The power needed to keep the arm stable, in percent output
    */
   // 
   private double computeShoulderArbitraryFeedForward() {
@@ -297,11 +305,12 @@ public class ArmSubsystem extends SubsystemBase {
     return theta * 2048; // revs to ticks
   }
 
+  /**
+   * Reconfigures the wrist position assuming the elevator is entirely back,
+   * shoulder is entirely down, and the wrist is touching the ground.
+   * The new offset is displayed so the constant can be updated.
+   */
   private void configureWristOffset() {
-    /* Reconfigures the wrist position assuming the elevator is entirely back,
-     * shoulder is entirely down, and the wrist is touching the ground.
-     * The new offset is displayed so the constant can be updated.
-     */
     if (DriverStation.isDisabled()) {
       wristOffsetEntry.setDouble(
           -(wristCANCoder.getAbsolutePosition() - Constants.WRIST_CANCODER_OFFSET)
@@ -310,6 +319,10 @@ public class ArmSubsystem extends SubsystemBase {
     }
   }
 
+  /**
+   * Returns the current position of the arm according to the encoders
+   * @return
+   */
   public ArmPosition getArmPosition() {
     return new ArmPosition(
         shoulderThetaFromCANCoder(),
@@ -318,6 +331,10 @@ public class ArmSubsystem extends SubsystemBase {
         ArmHeight.NOT_SPECIFIED);
   }
 
+  /**
+   * Returns the position that the arm is trying to maintain
+   * @return The arm's goal position
+   */
   public ArmPosition getArmGoalPosition() {
     return armPosition;
   }
@@ -341,6 +358,9 @@ public class ArmSubsystem extends SubsystemBase {
             ArmHeight.NOT_SPECIFIED));
   }
 
+  /**
+   * Checks and outputs the elevator motor's temperature to DeltaBoard, throws an exception if it is too high.
+   */
   private void motorProtection() {
     double motorTemp = extendMotor.getMotorTemperature();
     DeltaBoard.putNumber("Elevator Temp C", motorTemp);
@@ -364,6 +384,9 @@ public class ArmSubsystem extends SubsystemBase {
     }
   }
 
+  /**
+   * @return True if the elevator is fully retracted.
+   */
   public boolean stalledAtZero() {
     boolean atZero = elevatorPPC.getGoal().position == 0;
     boolean stalled =
