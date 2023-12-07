@@ -252,7 +252,7 @@ public class SwerveAutoFactory {
 
     if (poseReseter != null
         && isFirstPath) { // checks if we have a pose reseter and if we want to reset our pose.
-          // If so, we want to overwrite whatever the kalman filter has. Mostly for auton
+      // If so, we want to overwrite whatever the kalman filter has. Mostly for auton
       command =
           new InstantCommand(
                   () -> {

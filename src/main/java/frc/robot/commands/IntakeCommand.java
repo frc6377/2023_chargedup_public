@@ -17,6 +17,7 @@ public class IntakeCommand extends CommandBase {
   private final ArmSubsystem armSubsystem;
   /**
    * Runs the intake and automatically stows the arm and signals if it detects a game piece
+   *
    * @param endAffectorSubsystem End affector subsystem
    * @param signalingSubsystem Signaling subsystem
    * @param armSubsystem Arm subsystem
@@ -39,8 +40,9 @@ public class IntakeCommand extends CommandBase {
 
   @Override
   public void execute() {
-    //Checks if the motor isn't moving and enough time has passed. If it has stopped, there is most likely a game piece. 
-    //We need to wait because the motor takes time to start up.
+    // Checks if the motor isn't moving and enough time has passed. If it has stopped, there is most
+    // likely a game piece.
+    // We need to wait because the motor takes time to start up.
     if (startIntakeTimer.hasElapsed(Constants.GAME_PIECE_DETECTION_WAIT)) {
       if (belowThreshhold()) {
         signalingSubsystem.hasGamePieceSignalStart();
@@ -50,7 +52,7 @@ public class IntakeCommand extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    //Ends when it detects a game piece and the arm is in pickup position
+    // Ends when it detects a game piece and the arm is in pickup position
     return (startIntakeTimer.hasElapsed(Constants.GAME_PIECE_DETECTION_WAIT)
         && belowThreshhold()
         && armSubsystem.getArmGoalPosition().getHeight() == ArmHeight.LOW);

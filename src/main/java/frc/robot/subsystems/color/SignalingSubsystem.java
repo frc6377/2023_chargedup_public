@@ -43,6 +43,7 @@ public class SignalingSubsystem extends SubsystemBase {
 
   /**
    * Handles the lights and controller rumble
+   *
    * @param CANdleID The CANdle CAN id
    * @param driverRumbleConsumer A doubleConsumer that takes in the rumble intensity
    */
@@ -70,9 +71,7 @@ public class SignalingSubsystem extends SubsystemBase {
     rainbowAnimation = new RainbowAnimation(1, Constants.RAINBOW_ANIMATION_SPEED, 64);
   }
 
-  /**
-   * Has the LEDs update their color/flashing pattern
-   */
+  /** Has the LEDs update their color/flashing pattern */
   public void updateLEDs() {
     if (hasGamePiece) writeLEDs(RGB.HOWDY_BLUE);
     else {
@@ -94,12 +93,11 @@ public class SignalingSubsystem extends SubsystemBase {
   public void periodic() {
     if (DriverStation.isDisabled()) updatePattern();
 
-    //Checks the game piece mode and updates LEDs if it has changed
+    // Checks the game piece mode and updates LEDs if it has changed
     else if (GamePieceMode.getFromInt((int) gamePieceModeSubscriber.get()) != gamePieceMode) {
       gamePieceMode = GamePieceMode.getFromInt((int) gamePieceModeSubscriber.get());
       updateLEDs();
-    } 
-    else if (shouldFlash(gamePieceMode)) {
+    } else if (shouldFlash(gamePieceMode)) {
       if (flashTimer.hasElapsed(Constants.FLASHING_TIME)) {
         flashTimer.reset();
         flashOn = !flashOn;
@@ -107,7 +105,7 @@ public class SignalingSubsystem extends SubsystemBase {
         else writeLEDs(RGB.BLACK);
       }
     }
-    //Stops the game piece signaling when the timer ends
+    // Stops the game piece signaling when the timer ends
     if (!hasGamePiece && gamePieceSignalingTimer.hasElapsed(Constants.GAME_PIECE_SIGNALING_TIME)) {
       driverRumbleConsumer.accept(0.0);
       updateLEDs();

@@ -21,6 +21,7 @@ public class AutoBalanceCommand extends CommandBase {
 
   /**
    * Balances the robot on the charge station
+   *
    * @param drive Drive train subsystem
    */
   public AutoBalanceCommand(DrivetrainSubsystem drive) {

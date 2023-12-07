@@ -27,8 +27,9 @@ public class ArmPowerCommand extends CommandBase {
   private final boolean calculateArmPosition;
 
   /**
-   * Moves the arm to a specified position with minimal momentum.
-   * Accepts an armHeight and decides position based on game piece mode when executed.
+   * Moves the arm to a specified position with minimal momentum. Accepts an armHeight and decides
+   * position based on game piece mode when executed.
+   *
    * @param armHeight The armHeight to go to
    * @param armSubsystem Arm subsystem
    * @param pow Power with which to run
@@ -48,6 +49,7 @@ public class ArmPowerCommand extends CommandBase {
   }
   /**
    * Moves the arm to a specified position with minimal momentum
+   *
    * @param targetPosition The armPosition to go to
    * @param armSubsystem Arm subsystem
    * @param pow Power with which to run
@@ -73,8 +75,9 @@ public class ArmPowerCommand extends CommandBase {
 
   @Override
   public void initialize() {
-    //If the command was initialized with an armHeight, we need to recalculate the target position each time
-    //the command is run based on the robot state
+    // If the command was initialized with an armHeight, we need to recalculate the target position
+    // each time
+    // the command is run based on the robot state
     if (calculateArmPosition) {
       targetPosition =
           ArmPosition.getArmPositionFromHeightAndType(
@@ -84,9 +87,9 @@ public class ArmPowerCommand extends CommandBase {
               targetPosition.getArmRotationRadians(),
               MathUtil.clamp(targetPosition.getArmExtension(), 0, 13.8 * 360.0));
       this.targetWristAngle = targetPosition.getWristRotation();
-    } 
-    
-    //Converts the targetPosition into an armHeight
+    }
+
+    // Converts the targetPosition into an armHeight
     else {
       targetHeight = targetPosition.getHeight();
     }
@@ -118,7 +121,9 @@ public class ArmPowerCommand extends CommandBase {
   @Override
   public boolean isFinished() {
     return armSubsystem.thetaFromPPC()
-        == targetPose.theta; // once this is true the command has delivered its final setpoint and its job is done
+        == targetPose
+            .theta; // once this is true the command has delivered its final setpoint and its job is
+    // done
   }
 
   @Override

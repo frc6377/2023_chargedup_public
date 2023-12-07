@@ -69,12 +69,9 @@ public class RobotContainer {
     DoubleSupplier rotationSupplier =
         new DriveInput(driver::getLeftX, DriveInput.InputType.TRANSLATION, driverConfig, false);
     DoubleSupplier pointingDriveInput =
-        new DriveInput(
-            driver::getRightY,
-            driver::getRightX,
-            driverConfig);
+        new DriveInput(driver::getRightY, driver::getRightX, driverConfig);
 
-    //Create subsystems
+    // Create subsystems
     robotState = new RobotStateManager(GamePieceMode.CUBE, ArmHeight.LOW);
 
     endAffector = new EndAffectorSubsystem(Constants.END_AFFECTOR_ID);

@@ -52,6 +52,7 @@ public class ArmPosition {
 
   /**
    * An exact position of each part of the arm.
+   *
    * @param armRotation The rotation of the shoulder in degrees
    * @param armExtension The extension of the elevator in motor ticks
    * @param wristRotation The rotation of the wrist in motor ticks
@@ -151,7 +152,9 @@ public class ArmPosition {
     ArmPosition clamped =
         new ArmPosition(
             MathUtil.clamp(
-                this.armRotation, armMinPosition.getArmRotationRadians(), armMaxPosition.getArmRotationRadians()),
+                this.armRotation,
+                armMinPosition.getArmRotationRadians(),
+                armMaxPosition.getArmRotationRadians()),
             MathUtil.clamp(
                 this.armExtension,
                 armMinPosition.getArmExtension(),

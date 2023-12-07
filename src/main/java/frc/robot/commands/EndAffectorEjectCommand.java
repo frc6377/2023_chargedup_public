@@ -22,6 +22,7 @@ public class EndAffectorEjectCommand extends CommandBase {
 
   /**
    * Has the intake eject
+   *
    * @param shootSupplier The strength that the intake should eject
    * @param endAffector End affector subsystem
    */
@@ -34,8 +35,8 @@ public class EndAffectorEjectCommand extends CommandBase {
   @Override
   public void initialize() {
     target = endAffector.getIntakePosition() + Constants.END_AFFECTOR_OFFSET;
-    
-    //We don't partially eject unless we're placing high and mid cones
+
+    // We don't partially eject unless we're placing high and mid cones
     enablePartial =
         (ArmHeight.getFromInt((int) armHeightSubscriber.get()) == ArmHeight.HIGH
                 || ArmHeight.getFromInt((int) armHeightSubscriber.get()) == ArmHeight.MID)

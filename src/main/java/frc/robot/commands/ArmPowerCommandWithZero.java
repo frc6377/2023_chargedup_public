@@ -9,6 +9,7 @@ import frc.robot.subsystems.arm.ArmSubsystem;
 public class ArmPowerCommandWithZero extends SequentialCommandGroup {
   /**
    * Runs an ArmPowerCommand, but will re-zero the elevator in the process.
+   *
    * @param armPos The armPosition to go to
    * @param arm Arm subsystem
    * @param pow Power with which to run
@@ -28,6 +29,7 @@ public class ArmPowerCommandWithZero extends SequentialCommandGroup {
   }
   /**
    * Runs an ArmPowerCommand, but will re-zero the elevator in the process.
+   *
    * @param armHeight The armHeight to go to
    * @param arm Arm subsystem
    * @param pow Power with which to run

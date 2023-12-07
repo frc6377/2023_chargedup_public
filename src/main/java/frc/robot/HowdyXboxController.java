@@ -9,6 +9,7 @@ public class HowdyXboxController extends CommandXboxController {
 
   /**
    * Creates a Command Xbox Controller with rumble support added
+   *
    * @param port The controller port
    */
   public HowdyXboxController(int port) {

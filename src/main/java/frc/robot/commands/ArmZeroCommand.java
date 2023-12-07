@@ -9,6 +9,7 @@ public class ArmZeroCommand extends CommandBase {
 
   /**
    * Rezeros the elevator
+   *
    * @param arm Arm subsystem
    */
   public ArmZeroCommand(ArmSubsystem arm) {
