@@ -62,9 +62,7 @@ public class Pose2DTopic {
     }
 
     /*
-     * WARNING: This topic will not work as expected. It will
-     * return a DoubleArrayTopic instead of a Pose2DTopic.
-     *
+     * WARNING: This topic will not work as expected. It will return a DoubleArrayTopic instead of a Pose2DTopic.
      * Currently, there is no way around this issue.
      */
     @Override

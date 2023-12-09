@@ -22,10 +22,10 @@ public class ArmPowerCommandWithZero extends SequentialCommandGroup {
             armPos.getArmRotationRadians(),
             0,
             armPos.getWristRotation(),
-            armPos.getHeight()); // ensures extension is 0
+            armPos.getHeight());
     addCommands(
         new ArmPowerCommand(armPos, arm, pow, robotState),
-        new ArmZeroCommand(arm).withTimeout(1.5)); // 1.5 secs to find 0
+        new ArmZeroCommand(arm).withTimeout(1.5));
   }
   /**
    * Runs an ArmPowerCommand, but will re-zero the elevator in the process.
@@ -39,6 +39,6 @@ public class ArmPowerCommandWithZero extends SequentialCommandGroup {
       ArmHeight armHeight, ArmSubsystem arm, double pow, RobotStateManager robotState) {
     addCommands(
         new ArmPowerCommand(armHeight, arm, pow, robotState),
-        new ArmZeroCommand(arm).withTimeout(1.5)); // 1.5 secs to find 0
+        new ArmZeroCommand(arm).withTimeout(1.5));
   }
 }

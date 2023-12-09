@@ -127,7 +127,6 @@ public class ArmSubsystem extends SubsystemBase {
     extendController.setSmartMotionMaxAccel(16000, 0);
     extendController.setSmartMotionMaxVelocity(16000, 0);
 
-    // Create and configure wrist motor
     wristMotor = new WPI_TalonFX(Constants.WRIST_ID);
     wristMotor.configStatorCurrentLimit(
         new StatorCurrentLimitConfiguration(
@@ -209,11 +208,10 @@ public class ArmSubsystem extends SubsystemBase {
   /**
    * Sets the position that the arm should aim for.
    *
-   * @param armPosition The arm position that it should aim for.
+   * @param armPosition The target arm position.
    */
   public void setTarget(ArmPosition armPosition) {
     elevatorInPercentControl = false;
-    // Clamping shouldn't be necessary, but just in case, we do it anyway.
     this.armPosition =
         armPosition.clamp(ArmPosition.ARM_MIN_POSITION, ArmPosition.ARM_MAX_POSITION);
     shoulderPPC.setGoal(this.armPosition.armRotation);
@@ -226,9 +224,9 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   /**
-   * Calculates the amount of power needed to counteract the force of gravity on the arm
+   * Calculates the amount of power needed to counteract the force of gravity on the arm.
    *
-   * @return The power needed to keep the arm stable, in percent output
+   * @return The power needed to keep the arm stable, in percent output.
    */
   //
   private double computeShoulderArbitraryFeedForward() {
@@ -263,9 +261,9 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   /**
-   * Returns the angle of the shoulder in radians
+   * Returns the angle of the shoulder in radians.
    *
-   * @return the angle of the shoulder in radians
+   * @return The angle of the shoulder in radians.
    */
   public double shoulderThetaFromCANCoder() {
     double rawPos = shoulderCANCoder.getPosition();

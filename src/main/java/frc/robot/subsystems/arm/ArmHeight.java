@@ -20,7 +20,7 @@ public enum ArmHeight {
    * Represents a specific height of the arm. Each height has several positions that correspond with
    * different game piece modes.
    *
-   * @param integerValue ID corresponding to the ArmHeight
+   * @param integerValue ArmHeight ID.
    */
   ArmHeight(final int integerValue) {
     this.integerValue = integerValue;
@@ -31,9 +31,9 @@ public enum ArmHeight {
   }
 
   /**
-   * Creates an ArmHeight corresponding to a numerical value
+   * Creates an ArmHeight corresponding to a numerical value.
    *
-   * @param integerValue ID of the ArmHeight
+   * @param integerValue ArmHeight ID.
    */
   public static ArmHeight getFromInt(final int integerValue) {
     return Arrays.stream(ArmHeight.values())

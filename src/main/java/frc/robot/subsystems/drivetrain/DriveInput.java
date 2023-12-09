@@ -78,7 +78,6 @@ public class DriveInput implements DoubleSupplier {
 
     public double getMult(boolean highGear, DriverConfig cfg) {
       switch (id) {
-          // The `default` behavior is intentionally falling through to the `case 0` behavior here.
         default:
         case 0:
           if (highGear) return -cfg.highGearMaxSped;

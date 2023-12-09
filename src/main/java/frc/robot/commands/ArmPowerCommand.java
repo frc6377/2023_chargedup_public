@@ -76,8 +76,7 @@ public class ArmPowerCommand extends CommandBase {
   @Override
   public void initialize() {
     // If the command was initialized with an armHeight, we need to recalculate the target position
-    // each time
-    // the command is run based on the robot state
+    // each time the command is run based on the robot state
     if (calculateArmPosition) {
       targetPosition =
           ArmPosition.getArmPositionFromHeightAndType(
@@ -89,7 +88,6 @@ public class ArmPowerCommand extends CommandBase {
       this.targetWristAngle = targetPosition.getWristRotation();
     }
 
-    // Converts the targetPosition into an armHeight
     else {
       targetHeight = targetPosition.getHeight();
     }
@@ -106,7 +104,7 @@ public class ArmPowerCommand extends CommandBase {
     double armExtension =
         (targetPose.theta != initalPose.theta)
             ? computeExtension()
-            : targetPose.r; // We get a divide by zero error if theta doesnt change
+            : targetPose.r;
     armSubsystem.setTarget(
         new ArmPosition(
             targetPose.theta,
@@ -121,9 +119,7 @@ public class ArmPowerCommand extends CommandBase {
   @Override
   public boolean isFinished() {
     return armSubsystem.thetaFromPPC()
-        == targetPose
-            .theta; // once this is true the command has delivered its final setpoint and its job is
-    // done
+        == targetPose.theta;
   }
 
   @Override
@@ -143,7 +139,6 @@ public class ArmPowerCommand extends CommandBase {
   }
 
   private double computePow(double extensionDelta) {
-    // if we extend more, we want to it last. If we retract more, we want to do it first.
     return (extensionDelta < 0) ? pow : pow;
   }
 
