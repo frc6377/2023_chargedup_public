@@ -27,7 +27,6 @@ public class Robot extends TimedRobot {
     m_robotContainer = new RobotContainer();
 
     DataLogManager.start();
-    // Automatically log joystick and Driver Station control data
     DriverStation.startDataLog(DataLogManager.getLog());
   }
 

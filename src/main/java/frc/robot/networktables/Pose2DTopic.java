@@ -21,100 +21,27 @@ public class Pose2DTopic {
     return new Pose2DTopic(topic);
   }
 
-  /**
-   * Create a new subscriber to the topic.
-   *
-   * <p>The subscriber is only active as long as the returned object is not closed.
-   *
-   * <p>Subscribers that do not match the published data type do not return any values. To determine
-   * if the data type matches, use the appropriate Topic functions.
-   *
-   * @param defaultValue default value used when a default is not provided to a getter function
-   * @param options subscribe options
-   * @return subscriber
-   */
   public Pose2DSubscriber subscribe(Pose2d defaultValue, PubSubOption... options) {
     var entry = internalTopic.getEntry(toDoubleArray(defaultValue), options);
     return new Pose2DEntryImpl(internalTopic, entry);
   }
 
-  /**
-   * Create a new subscriber to the topic, with specified type string.
-   *
-   * <p>The subscriber is only active as long as the returned object is not closed.
-   *
-   * <p>Subscribers that do not match the published data type do not return any values. To determine
-   * if the data type matches, use the appropriate Topic functions.
-   *
-   * @param typeString type string
-   * @param defaultValue default value used when a default is not provided to a getter function
-   * @param options subscribe options
-   * @return subscriber
-   */
   public Pose2DSubscriber subscribeEx(
       String typeString, Pose2d defaultValue, PubSubOption... options) {
     var entry = internalTopic.getEntryEx(typeString, toDoubleArray(defaultValue), options);
     return new Pose2DEntryImpl(internalTopic, entry);
   }
 
-  /**
-   * Create a new publisher to the topic.
-   *
-   * <p>The publisher is only active as long as the returned object is not closed.
-   *
-   * <p>It is not possible to publish two different data types to the same topic. Conflicts between
-   * publishers are typically resolved by the server on a first-come, first-served basis. Any
-   * published values that do not match the topic's data type are dropped (ignored). To determine if
-   * the data type matches, use the appropriate Topic functions.
-   *
-   * @param options publish options
-   * @return publisher
-   */
   public Pose2DPublisher publish(PubSubOption... options) {
     var entry = internalTopic.getEntry(new double[] {}, options);
     return new Pose2DEntryImpl(internalTopic, entry);
   }
 
-  /**
-   * Create a new entry for the topic.
-   *
-   * <p>Entries act as a combination of a subscriber and a weak publisher. The subscriber is active
-   * as long as the entry is not closed. The publisher is created when the entry is first written
-   * to, and remains active until either unpublish() is called or the entry is closed.
-   *
-   * <p>It is not possible to use two different data types with the same topic. Conflicts between
-   * publishers are typically resolved by the server on a first-come, first-served basis. Any
-   * published values that do not match the topic's data type are dropped (ignored), and the entry
-   * will show no new values if the data type does not match. To determine if the data type matches,
-   * use the appropriate Topic functions.
-   *
-   * @param defaultValue default value used when a default is not provided to a getter function
-   * @param options publish and/or subscribe options
-   * @return entry
-   */
   public Pose2DEntry getEntry(Pose2d defaultValue, PubSubOption... options) {
     var entry = internalTopic.getEntry(toDoubleArray(defaultValue), options);
     return new Pose2DEntryImpl(internalTopic, entry);
   }
 
-  /**
-   * Create a new entry for the topic, with specified type string.
-   *
-   * <p>Entries act as a combination of a subscriber and a weak publisher. The subscriber is active
-   * as long as the entry is not closed. The publisher is created when the entry is first written
-   * to, and remains active until either unpublish() is called or the entry is closed.
-   *
-   * <p>It is not possible to use two different data types with the same topic. Conflicts between
-   * publishers are typically resolved by the server on a first-come, first-served basis. Any
-   * published values that do not match the topic's data type are dropped (ignored), and the entry
-   * will show no new values if the data type does not match. To determine if the data type matches,
-   * use the appropriate Topic functions.
-   *
-   * @param typeString type string
-   * @param defaultValue default value used when a default is not provided to a getter function
-   * @param options publish and/or subscribe options
-   * @return entry
-   */
   public Pose2DEntry getEntryEx(String typeString, Pose2d defaultValue, PubSubOption... options) {
     var entry = internalTopic.getEntryEx(typeString, toDoubleArray(defaultValue), options);
     return new Pose2DEntryImpl(internalTopic, entry);

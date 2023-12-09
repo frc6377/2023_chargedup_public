@@ -31,7 +31,6 @@ public class IdentifyRoborio {
       }
       return RobotVersion.getVersionForMacAddress(sj.toString());
     } catch (SocketException e) {
-      // print non-fatal error
       e.printStackTrace();
       return null;
     }

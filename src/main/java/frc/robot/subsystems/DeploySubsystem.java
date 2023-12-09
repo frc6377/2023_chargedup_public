@@ -73,19 +73,11 @@ public class DeploySubsystem extends SubsystemBase {
     }
 
     private String readFile(File name) {
-      // Declaring an empty string
       String str = "";
 
-      // Try block to check for exceptions
       try {
-
-        // Reading all bytes form file and
-        // storing that in the string
         str = new String(Files.readAllBytes(Paths.get(name.getCanonicalPath())));
-      }
-
-      // Catch block to handle the exceptions
-      catch (IOException e) {
+      } catch (IOException e) {
         return "MISSING FILE";
       }
 

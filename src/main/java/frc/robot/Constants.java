@@ -122,7 +122,6 @@ public final class Constants {
 
   public static final int ARM_EXTENDER_ID = 12;
 
-  // This is the Circumference of the pully
   public static final double ARM_EXTENSIONS_TICKS_TO_METERS = 0.0254 * Math.PI;
   public static final double ARM_LENGTH_AT_ZERO_TICKS_METERS = 0.7;
 

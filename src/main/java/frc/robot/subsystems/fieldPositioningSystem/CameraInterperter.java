@@ -37,7 +37,7 @@ class CameraInterperter {
         });
     return lines;
   }
-  // robotHeading is in Radians
+  // robotHeading is in radians
   public MXPlusBLine getPotentialPositionsLine(double robotHeading, PhotonTrackedTarget target) {
     if (target.getFiducialId() > 8 || target.getFiducialId() < 1) return null;
     double aprilTagAngle = Math.toRadians(target.getYaw());

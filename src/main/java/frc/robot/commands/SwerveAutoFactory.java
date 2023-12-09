@@ -23,8 +23,7 @@ import java.util.function.Consumer;
 
 public class SwerveAutoFactory {
   private final Pose2DSubscriber sub = Topics.PoseTopic().subscribe(new Pose2d());
-  private FieldPoses fieldPoses =
-      null; // bad values if built on startup, so instead the generate command method populates this
+  private FieldPoses fieldPoses = null;
   public final double maxVelocity = Constants.AUTO_MAX_VELOCITY;
   public final double maxAcceleration = Constants.AUTO_MAX_ACCELERATION;
   private Consumer<Pose2d> poseReseter = null;
@@ -35,54 +34,44 @@ public class SwerveAutoFactory {
     this.drivetrainSubsystem = drivetrainSubsystem;
   }
 
-  // loads a trajectory from file and hands it to the command generator
+  // Loads a trajectory from file and hands it to the command generator.
   public SequentialCommandGroup generateCommandFromFile(String pathTofollow, boolean isFirstPath) {
-
     return generateCommandFromFile(pathTofollow, isFirstPath, maxVelocity, maxAcceleration);
   }
 
   public SequentialCommandGroup generateCommandFromFile(
       String pathTofollow, boolean isFirstPath, double Velo, double accel) {
-    createFieldPoses(); // create a field poses object if we dont have one already
+    createFieldPoses();
     PathPlannerTrajectory trajectory = PathPlanner.loadPath(pathTofollow, Velo, accel);
     return generateControllerCommand(isFirstPath, trajectory);
   }
 
-  // this constructor just calls the target pose constructor, except it lets you directly reference
-  // a delivery bay
-
-  // generates a trajectory on the fly from a given target pose
+  // Generates a trajectory on the fly from a given target pose.
   public Command generateGridCommand(int targetBay) {
 
-    createFieldPoses(); // create a field poses object if we dont have one already
+    createFieldPoses();
     Translation2d targetPose = fieldPoses.getBay(targetBay);
 
     Rotation2d deliveryRotation = fieldPoses.getDeliveryRotation();
     Pose2d currentPose = sub.get();
 
-    Translation2d firstTarget =
-        targetPose; // this variable tracks the pose of the second control point in the trajectory
-    // so that our first control point's heading will face it
+    Translation2d firstTarget = targetPose;
     ArrayList<PathPoint> points = new ArrayList<PathPoint>();
 
-    // checks if we are not past the charge station because this means we are pretty free to move
-    // along the Y axis and also it means we need to align ourself with one of the stations
-    // "channels"
+    // Checks if the robot ois not past the charge station.
 
     Zone currentZone = getZone(currentPose.getY());
     Proximity currentProximity = getProx(currentPose.getX());
 
-    // build our midpoints first
+    // Build midpoints.
     switch (currentProximity) {
-      case CLOSE: // if close we have no midpoints
+      case CLOSE:
         break;
       case MID:
         Translation2d inflection =
             new Translation2d(
                 fieldPoses.closeProximityBoundary,
-                currentPose
-                    .getY()); // if we are in mid we cannot move in the y axis. So just go straight
-        // until we enter close
+                currentPose.getY()); // Cannot move in the y-axis at mid.
         points.add(
             poseToPathPoint(
                 new Pose2d(
@@ -146,7 +135,7 @@ public class SwerveAutoFactory {
         break;
     }
 
-    // constructs the first point last using the current drivetrain velocity
+    // Constructs the first point last using the current drivetrain velocity.
     points.add(
         0,
         poseToPathPoint(
@@ -251,8 +240,8 @@ public class SwerveAutoFactory {
             drivetrainSubsystem);
 
     if (poseReseter != null
-        && isFirstPath) { // checks if we have a pose reseter and if we want to reset our pose.
-      // If so, we want to overwrite whatever the kalman filter has. Mostly for auton
+        && isFirstPath) { // Checks if we have a pose reseter and if we want to reset our pose.
+      // If so, we want to overwrite whatever the Kalman filter has.
       command =
           new InstantCommand(
                   () -> {
@@ -263,26 +252,22 @@ public class SwerveAutoFactory {
     }
     command =
         new InstantCommand(() -> drivetrainSubsystem.sendTrajectoryToNT(trajectory))
-            .andThen(command); // posts trajectory to dashboard
+            .andThen(command);
     command =
         new InstantCommand(
                 () -> System.out.println("starting path----------------------------------"))
             .andThen(command);
 
-    // run the command and then stop the drivetrain. Just to make sure we arent moving at the end
+    // Run the command and then stop the drivetrain.
     return command.andThen(
         new InstantCommand(() -> drivetrainSubsystem.drive(new ChassisSpeeds())));
   }
 
-  // converts a Pose2d to a PathPoint
   private PathPoint poseToPathPoint(Pose2d pose, double velocityOverride, Rotation2d heading) {
-
-    // translation, rotation (direction of the path), holonomic rotation (where the robot is
-    // facing), velocity override (initial velo)
     return new PathPoint(pose.getTranslation(), heading, pose.getRotation(), velocityOverride);
   }
 
-  // computes the angle between two poses. Used so points have headings that point to the next point
+  // Computes the angle between two poses.
   private Rotation2d headingBetweenPoints(Translation2d translation1, Translation2d translation2) {
     double theta =
         Math.atan2(
@@ -290,8 +275,6 @@ public class SwerveAutoFactory {
     return new Rotation2d(theta + Math.PI);
   }
 
-  // constructs a field poses object if we dont have already. This is done because if this object is
-  // created on startup it is garbage
   private void createFieldPoses() {
     if (fieldPoses == null) {
       fieldPoses = new FieldPoses();
@@ -300,8 +283,6 @@ public class SwerveAutoFactory {
 
   private Proximity getProx(double x) {
 
-    // built on the principle x > y = -x < -y. Because we must check if greater on red and if lesser
-    // on blue we negate both sides of the equation to effectively flip the comparison
     int mult = (fieldPoses.isRed()) ? -1 : 1;
     x *= mult;
 
@@ -318,8 +299,6 @@ public class SwerveAutoFactory {
 
   private Zone getZone(double y) {
 
-    // built on the principle x > y = -x < -y. Because we must check if greater on red and if lesser
-    // on blue we negate both sides of the equation to effectively flip the comparison
     int mult = (fieldPoses.isRed()) ? -1 : 1;
     y *= mult;
 
