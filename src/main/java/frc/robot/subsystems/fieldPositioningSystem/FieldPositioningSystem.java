@@ -123,7 +123,7 @@ public class FieldPositioningSystem extends SubsystemBase {
     yprOmegaPub.accept(yprVelocity);
     List<MXPlusBLine> allPotentialPositionLines = leftCamera.getPotentialPositionsLines(ypr[0]);
     allPotentialPositionLines.addAll(rightCamera.getPotentialPositionsLines(ypr[0]));
-    
+
     if (allPotentialPositionLines.size() >= 2
         && allPotentialPositionLines.get(0) != null
         && allPotentialPositionLines.get(1) != null) {

@@ -129,8 +129,7 @@ public final class Constants {
   public static final int WRIST_CURRENT_LIMIT = 30;
   public static final int WRIST_STATOR_LIMIT = 40;
 
-  public static final double WRIST_TICKS_TO_RADIANS =
-      Math.PI / 50;
+  public static final double WRIST_TICKS_TO_RADIANS = Math.PI / 50;
 
   public static final int WRIST_ID = 14;
 
