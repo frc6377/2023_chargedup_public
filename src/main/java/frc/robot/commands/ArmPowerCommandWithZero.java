@@ -19,10 +19,7 @@ public class ArmPowerCommandWithZero extends SequentialCommandGroup {
       ArmPosition armPos, ArmSubsystem arm, double pow, RobotStateManager robotState) {
     armPos =
         new ArmPosition(
-            armPos.getArmRotationRadians(),
-            0,
-            armPos.getWristRotation(),
-            armPos.getHeight());
+            armPos.getArmRotationRadians(), 0, armPos.getWristRotation(), armPos.getHeight());
     addCommands(
         new ArmPowerCommand(armPos, arm, pow, robotState),
         new ArmZeroCommand(arm).withTimeout(1.5));

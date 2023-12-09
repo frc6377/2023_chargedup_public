@@ -86,9 +86,7 @@ public class ArmPowerCommand extends CommandBase {
               targetPosition.getArmRotationRadians(),
               MathUtil.clamp(targetPosition.getArmExtension(), 0, 13.8 * 360.0));
       this.targetWristAngle = targetPosition.getWristRotation();
-    }
-
-    else {
+    } else {
       targetHeight = targetPosition.getHeight();
     }
 
@@ -102,9 +100,7 @@ public class ArmPowerCommand extends CommandBase {
   @Override
   public void execute() {
     double armExtension =
-        (targetPose.theta != initalPose.theta)
-            ? computeExtension()
-            : targetPose.r;
+        (targetPose.theta != initalPose.theta) ? computeExtension() : targetPose.r;
     armSubsystem.setTarget(
         new ArmPosition(
             targetPose.theta,
@@ -118,8 +114,7 @@ public class ArmPowerCommand extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return armSubsystem.thetaFromPPC()
-        == targetPose.theta;
+    return armSubsystem.thetaFromPPC() == targetPose.theta;
   }
 
   @Override
