@@ -31,11 +31,11 @@ public class FieldPositioningSystem extends SubsystemBase {
 
   private Pose2d currentRobotPose;
   private Pigeon2 inertialMeasurementUnit;
-  private boolean camerasEnabled = false;
   private Supplier<SwerveModuleState[]> swerveOdomSupplier;
   private SwerveDrivePoseEstimator swerveDriveOdometry;
   private CameraInterperter leftCamera;
   private CameraInterperter rightCamera;
+
   private final Pose2DPublisher pub = Topics.PoseTopic().publish();
   private final DoubleArrayPublisher yprPub =
       NetworkTableInstance.getDefault().getDoubleArrayTopic("pitch").publish();
@@ -49,17 +49,21 @@ public class FieldPositioningSystem extends SubsystemBase {
   }
 
   public FieldPositioningSystem() {
+
     SmartDashboard.putBoolean("Use Rejection", true);
     final String aprilTagFileLocation =
         Filesystem.getDeployDirectory().getAbsolutePath() + "/2023-Apriltaglocation.json";
+
     try {
       aprilTagFieldLayout = new AprilTagFieldLayout(aprilTagFileLocation);
     } catch (IOException e) {
       throw new FieldPositioningSystemError(
           "ERROR: Apriltag location file (" + aprilTagFileLocation + ") not found", e);
     }
+
     leftCamera = new CameraInterperter(aprilTagFieldLayout, FPSConfiguration.leftCamera);
     rightCamera = new CameraInterperter(aprilTagFieldLayout, FPSConfiguration.rightCamera);
+
     currentSwervePodPosition =
         new SwerveModulePosition[] {
           new SwerveModulePosition(),
@@ -75,20 +79,10 @@ public class FieldPositioningSystem extends SubsystemBase {
     inertialMeasurementUnit.setYaw(0);
   }
 
-  /**
-   * returns the current robot rotation on the X-Y plane computed from the gyro and vision data
-   *
-   * @return the current robot rotation on the X-Y plane as a Rotation2d
-   */
   public Rotation2d getCurrentRobotRotationXY() {
     return currentRobotPose.getRotation();
   }
 
-  /**
-   * Get the current robot pos in the XY plane
-   *
-   * @return the current robot position
-   */
   public Pose2d getRobotXYPose() {
     return currentRobotPose;
   }
@@ -97,12 +91,6 @@ public class FieldPositioningSystem extends SubsystemBase {
     return Rotation2d.fromDegrees(inertialMeasurementUnit.getYaw());
   }
 
-  /**
-   * Configure what drive train to update odometry with.
-   *
-   * @param swerveOdomSupplier - supplier of serve module state
-   * @param swerveKinematics - the robots swerve drive kinematic module
-   */
   public void setDriveTrainSupplier(
       Supplier<SwerveModuleState[]> swerveOdomSupplier, SwerveDriveKinematics swerveKinematics) {
     if (swerveOdomSupplier == null) {
@@ -117,7 +105,6 @@ public class FieldPositioningSystem extends SubsystemBase {
     swerveDriveOdometry.setVisionMeasurementStdDevs(VecBuilder.fill(1, 1, 1));
   }
 
-  /** Called every 20ms to provide update the robots position */
   @Override
   public void periodic() {
     updateSwerveDriveOdometry();
@@ -136,6 +123,7 @@ public class FieldPositioningSystem extends SubsystemBase {
     yprOmegaPub.accept(yprVelocity);
     List<MXPlusBLine> allPotentialPositionLines = leftCamera.getPotentialPositionsLines(ypr[0]);
     allPotentialPositionLines.addAll(rightCamera.getPotentialPositionsLines(ypr[0]));
+    
     if (allPotentialPositionLines.size() >= 2
         && allPotentialPositionLines.get(0) != null
         && allPotentialPositionLines.get(1) != null) {
@@ -149,18 +137,12 @@ public class FieldPositioningSystem extends SubsystemBase {
     }
   }
 
-  /**
-   * Set the pigeon object to be used for a IMU
-   *
-   * @param pigeon - the pigeon to use
-   */
   public void setPigeon2(Pigeon2 pigeon) {
     inertialMeasurementUnit = pigeon;
   }
 
   public void setCameras(CameraInterperter[] cameras) {}
 
-  /** Reset the IMU in accordance to driver perspictive. */
   public void resetIMU() {
     switch (DriverStation.getAlliance()) {
       case Blue:
@@ -176,11 +158,6 @@ public class FieldPositioningSystem extends SubsystemBase {
     }
   }
 
-  /**
-   * Sets the robot position to a given input.
-   *
-   * @param robotPosition the target location in meters
-   */
   public void resetRobotPosition(Pose2d robotPosition) {
     swerveDriveOdometry.resetPosition(getRotionFromIMU(), currentSwervePodPosition, robotPosition);
   }
@@ -188,7 +165,6 @@ public class FieldPositioningSystem extends SubsystemBase {
   private SwerveModulePosition[] currentSwervePodPosition;
   private double lastSwerveModuleUpdate;
 
-  /** update the odometry model with current information. */
   private void updateSwerveDriveOdometry() {
     if (swerveOdomSupplier == null) {
       return;
@@ -218,6 +194,4 @@ public class FieldPositioningSystem extends SubsystemBase {
     swerveDriveOdometry.update(
         Rotation2d.fromDegrees(inertialMeasurementUnit.getYaw()), currentSwervePodPosition);
   }
-
-  /* -------------------- Cameras -------------------- */
 }

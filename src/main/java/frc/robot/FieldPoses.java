@@ -24,7 +24,8 @@ public class FieldPoses {
   public final double rightStationZoneBoundary;
   public final double leftZoneBoundary;
   public final double leftStationZoneBoundary;
-  // defined such that the blue driver station is to the left
+
+  // Defined such that the blue driver station is to the left.
   public final Translation2d rightFarInflectionPoint;
   public final Translation2d rightCloseInflectionPoint;
 
@@ -46,8 +47,6 @@ public class FieldPoses {
   private final Rotation2d singleSubRotation = Constants.SINGLE_SUB_ROTATION;
 
   class NullAllianceException extends RuntimeException {}
-
-  // getters
 
   public final Translation2d getRightFarInflectionPoint() {
     return rightFarInflectionPoint;
@@ -124,7 +123,6 @@ public class FieldPoses {
         (isRed)
             ? Constants.DELIVERY_ROTATION.rotateBy(new Rotation2d(Math.PI))
             : Constants.DELIVERY_ROTATION;
-    // initialize all attributes such that they are absolute
     createBays(relativeBays);
 
     rightZoneBoundary = (isRed) ? Constants.TOP_ZONE_BOUNDARY : Constants.BOTTOM_ZONE_BOUNDARY;
@@ -156,13 +154,7 @@ public class FieldPoses {
     midProximityBoundary = relativeToAbsolute(Constants.MID_PROXIMITY_BOUNDARY);
   }
 
-  /*
-   * Because networks tables are required to determine which side you are on. It is
-   * important that we use lazy initialization.
-   */
   public final boolean isRed() {
-    // TODO: consider whether to also watch for DriverStation.isDSAttached() to be true
-    // TODO: cache this?
     final Alliance alliance = DriverStation.getAlliance();
     if (alliance == Alliance.Invalid) {
       throw new NullAllianceException();
@@ -175,7 +167,7 @@ public class FieldPoses {
   }
 
   private void createBays(List<Translation2d> relativeBays) {
-    // because bays are ordered left to right they must be flipped based on alliance color
+    // Because bays are ordered left to right, they must be flipped based on alliance color.
     if (isRed) {
       Collections.reverse(relativeBays);
     }
@@ -184,7 +176,6 @@ public class FieldPoses {
     }
   }
 
-  // mirrors a translation 2d object
   private Translation2d relativeToAbsolute(Translation2d translation) {
 
     if (isRed) {
@@ -194,7 +185,6 @@ public class FieldPoses {
     return translation;
   }
 
-  // mirrors a distance from the alliance wall
   private double relativeToAbsolute(double x) {
     if (isRed) {
       x = Constants.FIELD_X - x;

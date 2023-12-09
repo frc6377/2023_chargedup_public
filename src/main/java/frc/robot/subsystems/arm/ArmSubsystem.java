@@ -157,6 +157,13 @@ public class ArmSubsystem extends SubsystemBase {
     wristCANCoder.configSensorDirection(true);
     wristMotor.setSelectedSensorPosition(
         wristCANCoderToIntegratedSensor(wristCANCoder.getAbsolutePosition()));
+
+    armRotationLog = new DebugLog(0.0, "/arm/armRotation", this);
+    armExtensionLog = new DebugLog(0.0, "/arm/armExtension", this);
+    wristRotationLog = new DebugLog(0.0, "/arm/wristRotation", this);
+    elevatorPercentOutputLog = new DebugLog(0.0, "/arm/elevatorPercentOutput", this);
+    armPosLog = new DebugLog("", "/arm/armPositionOutput", this);
+
     System.out.println("Complete Construct ArmSubsystem");
   }
 
